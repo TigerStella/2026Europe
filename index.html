@@ -595,7 +595,12 @@
     <div class="diary-toolbar">
       <button class="add-btn" onclick="openDiaryModal()">✏️ 오늘의 일기 쓰기</button>
       <button class="btn btn-ghost" onclick="openBrunch()">✍️ 브런치 발행</button>
-      <button class="btn btn-ghost" onclick="openEbook()">📖 전자책 초안</button>
+      <button class="btn btn-ghost" onclick="openEbook()">📖 전자책 만들기</button>
+      <span style="flex:1"></span>
+      <button class="btn btn-ghost" onclick="exportData()" title="일기·사진·추가일정 백업">💾 백업</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()" title="백업 파일 불러오기">📥 복원</button>
+      <button class="btn btn-ghost" onclick="openSettings()" title="브런치 문체·서명 설정">⚙️ 설정</button>
+      <input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(event)">
     </div>
 
     <div class="diary-cols">
@@ -624,16 +629,38 @@
         <select class="field" id="brunchScope" style="max-width:200px" onchange="renderBrunch()">
           <option value="all">전체 일기 모아서</option>
         </select>
-        <select class="field" id="brunchVoice" style="max-width:160px" onchange="renderBrunch()">
+        <select class="field" id="brunchVoice" style="max-width:150px" onchange="renderBrunch()">
           <option value="both">엄마+아들 함께</option>
           <option value="mom">엄마 시점</option>
           <option value="son">아들 시점</option>
+        </select>
+        <select class="field" id="brunchTone" style="max-width:150px" onchange="renderBrunch()">
+          <option value="warm">따뜻한 에세이</option>
+          <option value="plain">담백한 기록</option>
+          <option value="lyric">감성 서정</option>
         </select>
         <button class="btn btn-primary" onclick="copyBrunch()">📋 복사하기</button>
         <button class="btn btn-ghost" onclick="closeBrunch()">닫기</button>
       </div>
       <div class="brunch-paper" id="brunchPaper"></div>
-      <div class="brunch-note">※ '글선생' 프로젝트의 브런치 문체 설정에 맞춰 문단·톤을 조정할 수 있어요. (제목/부제/도입·본문·맺음 구조)</div>
+      <div class="brunch-note">※ '글선생' 문체 설정에 맞춰 톤·서명을 조정할 수 있어요 → ⚙️ 설정. (제목·부제·도입·본문·인용·맺음 구조)</div>
+    </div>
+
+    <!-- E-BOOK OUTPUT -->
+    <div class="brunch-out" id="ebookOut">
+      <div class="section-header"><span class="section-icon">📖</span><span class="section-title">전자책 원고 미리보기</span></div>
+      <div class="brunch-tools">
+        <select class="field" id="ebookVoice" style="max-width:150px" onchange="renderEbook()">
+          <option value="both">엄마+아들 함께</option>
+          <option value="mom">엄마 시점</option>
+          <option value="son">아들 시점</option>
+        </select>
+        <button class="btn btn-primary" onclick="ebookPrint()">🖨 PDF로 저장</button>
+        <button class="btn btn-primary" onclick="ebookEpub()">📚 EPUB 다운로드</button>
+        <button class="btn btn-ghost" onclick="closeEbook()">닫기</button>
+      </div>
+      <div class="brunch-paper" id="ebookPaper"></div>
+      <div class="brunch-note">🖨 PDF: 인쇄창에서 '대상 → PDF로 저장' 선택 · 📚 EPUB: e북 리더(Apple 북, 리디 등)에서 바로 열 수 있는 표준 전자책 파일</div>
     </div>
   </div>
 </div>
@@ -663,6 +690,26 @@
     <div class="form-actions">
       <button class="btn btn-primary" onclick="saveDiary()">저장</button>
       <button class="btn btn-ghost" onclick="closeDiaryModal()">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-back" id="settingsModal">
+  <div class="modal">
+    <h3>⚙️ 브런치 · 전자책 설정</h3>
+    <div class="field" style="margin-bottom:10px"><label>전자책 / 글 제목</label>
+      <input id="setTitle" placeholder="유럽, 우리 둘이 걸은 열여덟 밤"></div>
+    <div class="field" style="margin-bottom:10px"><label>부제</label>
+      <input id="setSubtitle" placeholder="엄마와 아들의 여행 일기"></div>
+    <div class="field" style="margin-bottom:10px"><label>지은이 / 서명</label>
+      <input id="setAuthor" placeholder="글 · 노을과 타이거"></div>
+    <div class="field" style="margin-bottom:14px"><label>기본 문체 톤</label>
+      <select id="setTone"><option value="warm">따뜻한 에세이</option><option value="plain">담백한 기록</option><option value="lyric">감성 서정</option></select></div>
+    <div class="brunch-note" style="text-align:left;margin:0 0 14px">💡 '글선생' 프로젝트의 문체 규칙(어투·문단 길이·맺음말)을 알려주시면 이 설정에 맞춰 더 정밀하게 반영해 드려요.</div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveSettings()">저장</button>
+      <button class="btn btn-ghost" onclick="closeSettings()">취소</button>
     </div>
   </div>
 </div>
@@ -832,11 +879,19 @@ const COMMUNITY = {
 const LS = {
   acts: 'noleu_added_acts_v1',
   diary: 'noleu_diary_v1',
+  settings: 'noleu_settings_v1',
 };
-function load(key, def){ try { return JSON.parse(localStorage.getItem(key)) || def; } catch(e){ return def; } }
+function load(key, def){ try { const v=JSON.parse(localStorage.getItem(key)); return (v===null||v===undefined)?def:v; } catch(e){ return def; } }
 function save(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){ toast('저장 공간이 부족해요 (사진 용량 확인)'); } }
 let addedActs = load(LS.acts, {});   // { dayNum: [ {ic,t,type,time} ] }
-let diary = load(LS.diary, []);       // [ {id, who, day, date, title, body, photos:[dataURL] } ]
+let diary = load(LS.diary, []);       // [ {id, who, day, date, title, body, photos:[{src,cap}] } ]
+let settings = load(LS.settings, {}); // {title, subtitle, author, tone}
+const DEFAULT_SETTINGS = { title:'유럽, 우리 둘이 걸은 열여덟 밤', subtitle:'엄마와 아들의 여행 일기', author:'글 · 노을과 타이거', tone:'warm' };
+settings = Object.assign({}, DEFAULT_SETTINGS, settings);
+
+// normalize legacy photo format (string -> {src,cap})
+function normPhotos(arr){ return (arr||[]).map(p => typeof p==='string' ? {src:p, cap:''} : {src:p.src, cap:p.cap||''}); }
+diary.forEach(e => { e.photos = normPhotos(e.photos); });
 
 /* ══════════════════ HELPERS ══════════════════ */
 function esc(s){ return (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -1076,7 +1131,7 @@ function openDiaryModal(who){
 }
 function editDiary(id){
   const e=diary.find(x=>x.id===id); if(!e) return;
-  editingId=id; pendingPhotos=(e.photos||[]).slice();
+  editingId=id; pendingPhotos=(e.photos||[]).map(p=>({src:p.src, cap:p.cap||''}));
   document.getElementById('diaryModalTitle').textContent='✏️ 일기 수정';
   fillDaySelect(document.getElementById('dDay'), null);
   document.getElementById('dWho').value=e.who;
@@ -1090,11 +1145,10 @@ function closeDiaryModal(){ document.getElementById('diaryModal').classList.remo
 
 function handlePhotoPick(ev){
   const files=[...ev.target.files];
-  let remaining=files.length;
-  if(!remaining) return;
+  if(!files.length) return;
   files.forEach(file=>{
     const reader=new FileReader();
-    reader.onload=e=>{ resizeImage(e.target.result, 900, dataUrl=>{ pendingPhotos.push(dataUrl); renderPhotoPreview(); }); };
+    reader.onload=e=>{ resizeImage(e.target.result, 1000, dataUrl=>{ pendingPhotos.push({src:dataUrl, cap:''}); renderPhotoPreview(); }); };
     reader.readAsDataURL(file);
   });
 }
@@ -1112,8 +1166,12 @@ function resizeImage(src, maxW, cb){
 }
 function renderPhotoPreview(){
   document.getElementById('photoPreview').innerHTML = pendingPhotos.map((p,i)=>
-    `<div class="pp"><img src="${p}"><button class="rm" onclick="removePendingPhoto(${i})">✕</button></div>`).join('');
+    `<div class="pp" style="display:flex;flex-direction:column;gap:3px;width:80px">
+       <div style="position:relative"><img src="${p.src}"><button class="rm" onclick="removePendingPhoto(${i})">✕</button></div>
+       <input value="${esc(p.cap)}" oninput="setPhotoCap(${i}, this.value)" placeholder="캡션" style="width:80px;font-size:10px;border:1px solid var(--border);border-radius:6px;padding:3px 5px;font-family:inherit">
+     </div>`).join('');
 }
+function setPhotoCap(i, v){ if(pendingPhotos[i]) pendingPhotos[i].cap=v; }
 function removePendingPhoto(i){ pendingPhotos.splice(i,1); renderPhotoPreview(); }
 
 function saveDiary(){
@@ -1149,7 +1207,7 @@ function renderDiary(){
         <div class="postit-date">${dayLabel(e.day)}</div>
         ${e.title?`<div class="postit-title">${esc(e.title)}</div>`:''}
         <div class="postit-body">${esc(e.body)}</div>
-        ${e.photos&&e.photos.length?`<div class="postit-photos">${e.photos.map(p=>`<img src="${p}" onclick="viewImage('${p}')">`).join('')}</div>`:''}
+        ${e.photos&&e.photos.length?`<div class="postit-photos">${e.photos.map(p=>`<img src="${p.src}" title="${esc(p.cap)}" onclick="viewImage(this.src)">`).join('')}</div>`:''}
       </div>`).join('');
   });
 }
@@ -1182,10 +1240,11 @@ function buildBrunch(){
   const whoName = v=> v==='mom'?'엄마':'아들';
 
   // Title & subtitle (Brunch 스타일: 감성적 제목 + 부제)
+  const tone=document.getElementById('brunchTone')?.value || settings.tone || 'warm';
   let h1, sub;
   if(scope==='all'){
-    h1 = `유럽, 우리 둘이 걸은 열여덟 밤`;
-    sub = `${cities.join(' · ')} — 엄마와 아들의 여행 일기`;
+    h1 = settings.title || '유럽, 우리 둘이 걸은 열여덟 밤';
+    sub = settings.subtitle || `${cities.join(' · ')} — 엄마와 아들의 여행 일기`;
   } else {
     const cityName = CITIES[DAYS.find(d=>d.d===+scope).city].name;
     h1 = firstTitle || `${cityName}에서의 하루`;
@@ -1200,7 +1259,7 @@ function buildBrunch(){
 
   let blocks=[];
   // intro
-  blocks.push({type:'p', html: intro(cities, dates)});
+  blocks.push({type:'p', html: intro(cities, dates, tone)});
   dayNums.forEach(dn=>{
     const dl=DAYS.find(d=>d.d===dn);
     const cityName=CITIES[dl.city].name;
@@ -1212,20 +1271,26 @@ function buildBrunch(){
         if(i===0 && para.length<60) blocks.push({type:'quote', html:esc(para)});
         else blocks.push({type:'p', html:esc(para)});
       });
-      (e.photos||[]).forEach(p=> blocks.push({type:'img', html:p}));
+      (e.photos||[]).forEach(p=> blocks.push({type:'img', html:p.src, cap:p.cap}));
     });
   });
   // closing
-  blocks.push({type:'close', html: closing(cities)});
+  blocks.push({type:'close', html: closing(cities, tone)});
 
-  return { h1, sub, metaLine, blocks };
+  return { h1, sub, metaLine, blocks, author: settings.author };
 }
-function intro(cities, dates){
-  return `${dates[0]}, 우리는 ${cities[0]}의 아침 공기 속에서 여행을 시작했다. 계획표 위의 글자들이 하나씩 진짜 골목과 냄새와 표정으로 바뀌어 가는 동안, 나는 이 순간을 오래 기억하고 싶어 이렇게 몇 줄을 남긴다.`;
-}
-function closing(cities){
-  return `${cities[cities.length-1]}의 밤이 저물고, 우리가 함께 걸은 길들이 마음에 남는다. 다음 페이지에서 또 이어질 이야기.`;
-}
+const TONE_INTRO = {
+  warm: (c,d)=>`${d[0]}, 우리는 ${c[0]}의 아침 공기 속에서 여행을 시작했다. 계획표 위의 글자들이 하나씩 진짜 골목과 냄새와 표정으로 바뀌어 가는 동안, 나는 이 순간을 오래 기억하고 싶어 이렇게 몇 줄을 남긴다.`,
+  plain: (c,d)=>`${d[0]} ${c[0]}에서 여행이 시작됐다. 그날그날의 일들을 순서대로 적어 둔다. 지나고 나면 흐려질 것들을, 지금의 문장으로 붙잡아 둔다.`,
+  lyric: (c,d)=>`${c[0]}의 하늘은 낯설고도 다정했다. ${d[0]}, 우리는 서로의 손을 잡고 처음 보는 도시의 아침으로 걸어 들어갔다. 이 여행이 우리에게 남길 것들을, 아직은 다 알지 못한 채로.`,
+};
+const TONE_CLOSE = {
+  warm: c=>`${c[c.length-1]}의 밤이 저물고, 우리가 함께 걸은 길들이 마음에 남는다. 다음 페이지에서 또 이어질 이야기.`,
+  plain: c=>`${c[c.length-1]}에서의 마지막 밤. 여기까지의 기록을 남긴다.`,
+  lyric: c=>`${c[c.length-1]}의 노을이 하루를 닫는다. 우리가 나눈 말과 침묵, 함께 본 빛들이 오래 남기를. 그리고 다시, 또 다른 아침으로.`,
+};
+function intro(cities, dates, tone){ return (TONE_INTRO[tone]||TONE_INTRO.warm)(cities, dates); }
+function closing(cities, tone){ return (TONE_CLOSE[tone]||TONE_CLOSE.warm)(cities); }
 function splitParas(txt){ return (txt||'').split(/\n\s*\n|\n/).map(s=>s.trim()).filter(Boolean); }
 
 function renderBrunch(){
@@ -1236,7 +1301,7 @@ function renderBrunch(){
     if(b.type==='h2') return `<h2>${b.html}</h2>`;
     if(b.type==='quote') return `<blockquote>${b.html}</blockquote>`;
     if(b.type==='label') return `<p style="font-size:12px;color:var(--text-light);font-weight:700;margin-bottom:6px">${b.html}</p>`;
-    if(b.type==='img') return `<div class="brunch-fig"><img src="${b.html}"></div>`;
+    if(b.type==='img') return `<div class="brunch-fig"><img src="${b.html}">${b.cap?`<div style="font-size:12px;color:var(--text-light);margin-top:6px;font-style:italic">${esc(b.cap)}</div>`:''}</div>`;
     if(b.type==='close') return `<div class="brunch-close">${b.html}</div>`;
     return `<p>${b.html}</p>`;
   }).join('');
@@ -1246,20 +1311,22 @@ function renderBrunch(){
     <div class="brunch-sub">${esc(data.sub)}</div>
     <div class="brunch-meta">${esc(data.metaLine)}</div>
     <div class="brunch-rule"></div>
-    <div class="brunch-body">${body}</div>`;
+    <div class="brunch-body">${body}</div>
+    ${data.author?`<div class="brunch-close" style="margin-top:24px;font-style:normal">${esc(data.author)}</div>`:''}`;
 }
 function copyBrunch(){
   const data=buildBrunch();
   if(!data){ toast('복사할 내용이 없어요'); return; }
   let lines=[data.h1, data.sub, '', data.metaLine, '─────────────', ''];
   data.blocks.forEach(b=>{
-    if(b.type==='img') { lines.push('[사진]'); return; }
+    if(b.type==='img') { lines.push(b.cap?`[사진: ${b.cap}]`:'[사진]'); return; }
     if(b.type==='h2') { lines.push('', '■ '+strip(b.html), ''); return; }
     if(b.type==='quote') { lines.push('“'+strip(b.html)+'”'); return; }
     if(b.type==='label') { lines.push(strip(b.html)+' —'); return; }
     if(b.type==='close') { lines.push('', strip(b.html)); return; }
     lines.push(strip(b.html), '');
   });
+  if(data.author) lines.push('', data.author);
   const text=lines.join('\n');
   navigator.clipboard.writeText(text).then(()=>toast('브런치 글이 복사됐어요 📋'),
     ()=>{ // fallback
@@ -1270,14 +1337,238 @@ function copyBrunch(){
 }
 function strip(html){ const d=document.createElement('div'); d.innerHTML=html; return d.textContent||''; }
 
-/* ══════════════════ E-BOOK DRAFT ══════════════════ */
+/* ══════════════════ SETTINGS ══════════════════ */
+function openSettings(){
+  document.getElementById('setTitle').value=settings.title||'';
+  document.getElementById('setSubtitle').value=settings.subtitle||'';
+  document.getElementById('setAuthor').value=settings.author||'';
+  document.getElementById('setTone').value=settings.tone||'warm';
+  document.getElementById('settingsModal').classList.add('open');
+}
+function closeSettings(){ document.getElementById('settingsModal').classList.remove('open'); }
+function saveSettings(){
+  settings.title=document.getElementById('setTitle').value.trim()||DEFAULT_SETTINGS.title;
+  settings.subtitle=document.getElementById('setSubtitle').value.trim();
+  settings.author=document.getElementById('setAuthor').value.trim();
+  settings.tone=document.getElementById('setTone').value;
+  save(LS.settings, settings);
+  const bt=document.getElementById('brunchTone'); if(bt) bt.value=settings.tone;
+  closeSettings();
+  if(document.getElementById('brunchOut').classList.contains('open')) renderBrunch();
+  if(document.getElementById('ebookOut').classList.contains('open')) renderEbook();
+  toast('설정을 저장했어요 ⚙️');
+}
+
+/* ══════════════════ BACKUP / RESTORE ══════════════════ */
+function downloadBlob(blob, name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 800); }
+function stamp(){ const d=new Date(); const p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`; }
+function exportData(){
+  const payload={ app:'noleu-europe', version:1, exportedAt:new Date().toISOString(), addedActs, diary, settings };
+  downloadBlob(new Blob([JSON.stringify(payload,null,2)], {type:'application/json'}), `noleu-europe-backup-${stamp()}.json`);
+  toast('백업 파일을 저장했어요 💾');
+}
+function importData(ev){
+  const file=ev.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const j=JSON.parse(e.target.result);
+      if(!j || (!j.diary && !j.addedActs)) throw 0;
+      if(!confirm('현재 데이터를 백업 파일 내용으로 교체할까요?\n(현재 일기·추가일정이 대체됩니다)')){ ev.target.value=''; return; }
+      addedActs = j.addedActs || {};
+      diary = (j.diary||[]); diary.forEach(x=>x.photos=normPhotos(x.photos));
+      settings = Object.assign({}, DEFAULT_SETTINGS, j.settings||{});
+      save(LS.acts, addedActs); save(LS.diary, diary); save(LS.settings, settings);
+      refreshTimelines(); renderDiary();
+      toast('복원 완료 ✅');
+    }catch(err){ toast('올바른 백업 파일이 아니에요'); }
+    ev.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+/* ══════════════════ E-BOOK ══════════════════ */
+function buildBook(voice){
+  let entries=diary.slice().sort((a,b)=>a.day-b.day || (a.who>b.who?1:-1));
+  if(voice && voice!=='both') entries=entries.filter(e=>e.who===voice);
+  if(!entries.length) return null;
+  const cityOf = e => DAYS.find(d=>d.d===e.day).city;
+  const usedCities = CITY_ORDER.filter(k=> entries.some(e=>cityOf(e)===k));
+  const chapters = usedCities.map((k,idx)=>{
+    const c=CITIES[k];
+    const ce=entries.filter(e=>cityOf(e)===k);
+    const dayNums=[...new Set(ce.map(e=>e.day))].sort((a,b)=>a-b);
+    const days=dayNums.map(dn=>{ const d0=DAYS.find(d=>d.d===dn); return { day:dn, date:d0.date, wd:d0.wd, entries:ce.filter(e=>e.day===dn) }; });
+    return { key:k, num:idx+1, title:`${idx+1}장 · ${c.name}`, city:c, days };
+  });
+  const dts=entries.map(e=>e.date);
+  return {
+    title: settings.title || '유럽 여행 일기',
+    subtitle: settings.subtitle || usedCities.map(k=>CITIES[k].name).join(' · '),
+    author: settings.author || '',
+    range: `${dts[0]}${dts.length>1?` – ${dts[dts.length-1]}`:''}`,
+    cities: usedCities.map(k=>CITIES[k].name), chapters, voice
+  };
+}
+function entryHTML(e, voice){
+  let out='';
+  if(voice==='both') out+=`<p style="font-size:12px;color:var(--text-light);font-weight:700;margin:2px 0 6px">${e.who==='mom'?'👩 엄마':'🧑 아들'}</p>`;
+  if(e.title) out+=`<h3 style="font-size:16px;margin:8px 0;color:var(--slate)">${esc(e.title)}</h3>`;
+  splitParas(e.body).forEach(p=> out+=`<p>${esc(p)}</p>`);
+  (e.photos||[]).forEach(p=> out+=`<div class="brunch-fig"><img src="${p.src}">${p.cap?`<div style="font-size:12px;color:var(--text-light);font-style:italic;margin-top:6px">${esc(p.cap)}</div>`:''}</div>`);
+  return out;
+}
+function ebookBody(book){
+  const toc = book.chapters.map(ch=>`<div style="display:flex;justify-content:space-between;font-size:14px;padding:6px 0;border-bottom:1px dotted var(--border)"><span>${esc(ch.title)}</span><span style="color:var(--text-light)">${ch.days[0].date}~</span></div>`).join('');
+  const chaps = book.chapters.map(ch=>{
+    const inner = ch.days.map(day=>`<h2>${day.date} (${day.wd})</h2>${day.entries.map(e=>entryHTML(e, book.voice)).join('')}`).join('');
+    return `<div style="margin-top:36px"><div class="brunch-kicker">CHAPTER ${ch.num}</div><div class="brunch-h1" style="font-size:24px">${esc(ch.city.name)}</div><div class="brunch-rule"></div>${inner}</div>`;
+  }).join('');
+  return {toc, chaps};
+}
 function openEbook(){
   if(!diary.length){ toast('일기를 먼저 작성해주세요'); return; }
-  // reuse brunch panel with all + both, and add a book cover note
-  document.getElementById('brunchScope').value='all';
-  document.getElementById('brunchVoice').value='both';
-  openBrunch();
-  toast('전체 일기를 전자책 원고 형태로 모았어요 📖');
+  closeBrunch();
+  document.getElementById('ebookOut').classList.add('open');
+  renderEbook();
+  document.getElementById('ebookOut').scrollIntoView({behavior:'smooth'});
+}
+function closeEbook(){ document.getElementById('ebookOut').classList.remove('open'); }
+function renderEbook(){
+  const voice=document.getElementById('ebookVoice').value;
+  const book=buildBook(voice);
+  const paper=document.getElementById('ebookPaper');
+  if(!book){ paper.innerHTML='<p class="hint">해당하는 일기가 없어요.</p>'; return; }
+  const {toc, chaps}=ebookBody(book);
+  paper.innerHTML=`
+    <div style="text-align:center;padding:24px 0 8px">
+      <div class="brunch-kicker">TRAVEL BOOK · 노을의 유럽</div>
+      <div class="brunch-h1" style="font-size:32px">${esc(book.title)}</div>
+      <div class="brunch-sub">${esc(book.subtitle)}</div>
+      <div class="brunch-meta">${esc(book.range)} · ${esc(book.cities.join(', '))}</div>
+      ${book.author?`<div style="margin-top:14px;color:var(--text-mid)">${esc(book.author)}</div>`:''}
+    </div>
+    <div class="brunch-rule"></div>
+    <h2 style="text-align:center;font-size:18px">목차</h2>
+    <div style="max-width:440px;margin:0 auto 4px">${toc}</div>
+    <div class="brunch-body">${chaps}</div>`;
+}
+function ebookPrint(){
+  const voice=document.getElementById('ebookVoice').value;
+  const book=buildBook(voice);
+  if(!book){ toast('내용이 없어요'); return; }
+  const w=window.open('','_blank');
+  if(!w){ toast('팝업을 허용해주세요'); return; }
+  const cover=`<div class="cover"><div class="kick">TRAVEL BOOK</div><h1>${esc(book.title)}</h1><div class="sub">${esc(book.subtitle)}</div><div class="meta">${esc(book.range)} · ${esc(book.cities.join(', '))}</div>${book.author?`<div class="author">${esc(book.author)}</div>`:''}</div>`;
+  const {toc}=ebookBody(book);
+  const chapters=book.chapters.map(ch=>`<div class="chapter"><div class="kick">CHAPTER ${ch.num}</div><div class="chapter-title">${esc(ch.city.name)}</div>${ch.days.map(day=>`<h2>${day.date} (${day.wd})</h2>${day.entries.map(e=>entryHTML(e, book.voice)).join('')}`).join('')}</div>`).join('');
+  w.document.write(`<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>${esc(book.title)}</title>
+  <style>
+    @page{ margin:18mm; }
+    *{ box-sizing:border-box; } body{ font-family:'Noto Sans KR',sans-serif; color:#1E2535; line-height:1.9; max-width:720px; margin:0 auto; padding:20px; }
+    .cover{ text-align:center; padding:130px 0 60px; page-break-after:always; }
+    .cover h1{ font-size:38px; margin:14px 0; } .cover .sub{ font-size:16px; color:#4A5568; } .cover .meta{ color:#8B96A8; margin-top:10px; } .cover .author{ margin-top:34px; color:#4A5568; }
+    .kick{ text-align:center; letter-spacing:3px; color:#E8A245; font-size:11px; text-transform:uppercase; }
+    h2{ font-size:19px; border-bottom:2px solid #E8A245; padding-bottom:4px; margin:26px 0 12px; }
+    h3{ font-size:16px; margin:10px 0; color:#2D3F5E; }
+    .chapter{ page-break-before:always; } .chapter-title{ font-size:26px; text-align:center; margin:6px 0 4px; }
+    img{ max-width:100%; border-radius:6px; display:block; margin:14px auto; } .brunch-fig{ margin:14px 0; text-align:center; }
+    blockquote{ border-left:3px solid #E8A245; padding-left:14px; color:#4A5568; font-style:italic; } p{ margin:0 0 14px; }
+    .toc div{ display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dotted #ddd; }
+  </style></head><body>${cover}<h2>목차</h2><div class="toc">${toc}</div>${chapters}</body></html>`);
+  w.document.close();
+  setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} }, 500);
+  toast('인쇄창에서 "PDF로 저장"을 선택하세요 🖨');
+}
+
+/* ── EPUB generator (자체 ZIP, 외부 라이브러리 없음) ── */
+const BOOK_UID='urn:noleu:2025-europe';
+const EPUB_CSS=`body{font-family:'Noto Sans KR',AppleGothic,sans-serif;line-height:1.85;margin:5%;color:#1a1a1a;}h1{font-size:1.7em;text-align:center;margin:1em 0;}h2{font-size:1.2em;border-bottom:1px solid #E8A245;padding-bottom:.2em;margin:1.4em 0 .6em;}h3{font-size:1.05em;margin:.8em 0;color:#2D3F5E;}p{margin:0 0 .9em;}.who{font-weight:bold;color:#666;font-size:.85em;margin-bottom:.2em;}.kick{text-align:center;letter-spacing:2px;color:#E8A245;font-size:.75em;}.cover{text-align:center;padding:22% 0;}.cover h1{font-size:2.2em;}.sub{color:#555;}.meta{color:#999;font-size:.85em;}.author{margin-top:2em;color:#555;}img{max-width:100%;display:block;margin:.6em auto;}.cap{text-align:center;font-size:.8em;color:#888;font-style:italic;}.fig{margin:1em 0;}`;
+function xesc(s){ return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function xhtmlDoc(title, inner){ return `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="ko"><head><meta charset="utf-8"/><title>${xesc(title)}</title><link rel="stylesheet" type="text/css" href="style.css"/></head><body>${inner}</body></html>`; }
+function entryXHTML(e, voice, imgName){
+  let out='';
+  if(voice==='both') out+=`<p class="who">${e.who==='mom'?'엄마':'아들'}</p>`;
+  if(e.title) out+=`<h3>${xesc(e.title)}</h3>`;
+  splitParas(e.body).forEach(p=> out+=`<p>${xesc(p)}</p>`);
+  (e.photos||[]).forEach(p=>{ const nm=imgName(p.src); out+=`<div class="fig"><img src="${nm}" alt=""/>${p.cap?`<p class="cap">${xesc(p.cap)}</p>`:''}</div>`; });
+  return out;
+}
+function ebookEpub(){
+  const voice=document.getElementById('ebookVoice').value;
+  const book=buildBook(voice);
+  if(!book){ toast('내용이 없어요'); return; }
+  try{
+    const files=[];
+    files.push({name:'mimetype', data:strToU8('application/epub+zip')});
+    files.push({name:'META-INF/container.xml', data:strToU8(`<?xml version="1.0" encoding="UTF-8"?>\n<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>`)});
+    files.push({name:'OEBPS/style.css', data:strToU8(EPUB_CSS)});
+
+    const imgMap=new Map(); const imgFiles=[]; let ic=0;
+    const imgName=src=>{ if(imgMap.has(src)) return imgMap.get(src); ic++; const nm=`img/p${ic}.jpg`; imgMap.set(src,nm); imgFiles.push({name:'OEBPS/'+nm, data:dataURLtoU8(src)}); return nm; };
+
+    files.push({name:'OEBPS/cover.xhtml', data:strToU8(xhtmlDoc('표지', `<div class="cover"><p class="kick">TRAVEL BOOK</p><h1>${xesc(book.title)}</h1><p class="sub">${xesc(book.subtitle)}</p><p class="meta">${xesc(book.range)}</p><p class="meta">${xesc(book.cities.join(' · '))}</p>${book.author?`<p class="author">${xesc(book.author)}</p>`:''}</div>`))});
+
+    const chapFiles=[];
+    book.chapters.forEach(ch=>{
+      let inner=`<p class="kick">CHAPTER ${ch.num}</p><h1>${xesc(ch.city.name)}</h1>`;
+      ch.days.forEach(day=>{ inner+=`<h2>${xesc(day.date)} (${xesc(day.wd)})</h2>`; day.entries.forEach(e=>{ inner+=entryXHTML(e, book.voice, imgName); }); });
+      const fn=`chap${ch.num}.xhtml`;
+      files.push({name:'OEBPS/'+fn, data:strToU8(xhtmlDoc(ch.city.name, inner))});
+      chapFiles.push({fn, title:ch.city.name, num:ch.num});
+    });
+    imgFiles.forEach(f=>files.push(f));
+
+    const navItems=[`<li><a href="cover.xhtml">표지</a></li>`].concat(chapFiles.map(c=>`<li><a href="${c.fn}">${xesc(c.num+'장 · '+c.title)}</a></li>`)).join('');
+    files.push({name:'OEBPS/nav.xhtml', data:strToU8(`<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="ko"><head><meta charset="utf-8"/><title>목차</title></head><body><nav epub:type="toc" id="toc"><h1>목차</h1><ol>${navItems}</ol></nav></body></html>`)});
+
+    const navPoints=[`<navPoint id="np-cover" playOrder="1"><navLabel><text>표지</text></navLabel><content src="cover.xhtml"/></navPoint>`].concat(chapFiles.map((c,i)=>`<navPoint id="np-${c.num}" playOrder="${i+2}"><navLabel><text>${xesc(c.num+'장 · '+c.title)}</text></navLabel><content src="${c.fn}"/></navPoint>`)).join('');
+    files.push({name:'OEBPS/toc.ncx', data:strToU8(`<?xml version="1.0" encoding="UTF-8"?>\n<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1"><head><meta name="dtb:uid" content="${BOOK_UID}"/></head><docTitle><text>${xesc(book.title)}</text></docTitle><navMap>${navPoints}</navMap></ncx>`)});
+
+    const manifest=[
+      `<item id="css" href="style.css" media-type="text/css"/>`,
+      `<item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>`,
+      `<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>`,
+      `<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>`
+    ].concat(chapFiles.map(c=>`<item id="c${c.num}" href="${c.fn}" media-type="application/xhtml+xml"/>`))
+     .concat([...imgMap.values()].map((nm,i)=>`<item id="img${i+1}" href="${nm}" media-type="image/jpeg"/>`)).join('');
+    const spine=[`<itemref idref="cover"/>`].concat(chapFiles.map(c=>`<itemref idref="c${c.num}"/>`)).join('');
+    files.push({name:'OEBPS/content.opf', data:strToU8(`<?xml version="1.0" encoding="UTF-8"?>\n<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="bookid"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:identifier id="bookid">${BOOK_UID}</dc:identifier><dc:title>${xesc(book.title)}</dc:title><dc:language>ko</dc:language>${book.author?`<dc:creator>${xesc(book.author)}</dc:creator>`:''}<meta property="dcterms:modified">2025-01-01T00:00:00Z</meta></metadata><manifest>${manifest}</manifest><spine toc="ncx">${spine}</spine></package>`)});
+
+    downloadBlob(zipStore(files), `${(book.title||'travel').replace(/[^\w가-힣]+/g,'_')}.epub`);
+    toast('EPUB 전자책을 저장했어요 📚');
+  }catch(err){ console.error(err); toast('EPUB 생성 중 오류가 났어요'); }
+}
+
+/* ── ZIP (store, no compression) + CRC32 ── */
+const CRC_TABLE=(()=>{ const t=new Uint32Array(256); for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c = (c&1) ? (0xEDB88320 ^ (c>>>1)) : (c>>>1); t[n]=c>>>0; } return t; })();
+function crc32(bytes){ let c=0xFFFFFFFF; for(let i=0;i<bytes.length;i++) c=CRC_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c>>>8); return (c ^ 0xFFFFFFFF)>>>0; }
+function strToU8(str){ return new TextEncoder().encode(str); }
+function dataURLtoU8(dataURL){ const b64=dataURL.split(',')[1]||''; const bin=atob(b64); const u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return u; }
+function zipStore(files){
+  const parts=[]; const central=[]; let offset=0;
+  files.forEach(f=>{
+    const nameU8=strToU8(f.name), crc=crc32(f.data), size=f.data.length;
+    const lh=new DataView(new ArrayBuffer(30));
+    lh.setUint32(0,0x04034b50,true); lh.setUint16(4,20,true); lh.setUint16(6,0,true); lh.setUint16(8,0,true);
+    lh.setUint16(10,0,true); lh.setUint16(12,0x21,true); lh.setUint32(14,crc,true); lh.setUint32(18,size,true);
+    lh.setUint32(22,size,true); lh.setUint16(26,nameU8.length,true); lh.setUint16(28,0,true);
+    parts.push(new Uint8Array(lh.buffer), nameU8, f.data);
+    const ch=new DataView(new ArrayBuffer(46));
+    ch.setUint32(0,0x02014b50,true); ch.setUint16(4,20,true); ch.setUint16(6,20,true); ch.setUint16(8,0,true);
+    ch.setUint16(10,0,true); ch.setUint16(12,0,true); ch.setUint16(14,0x21,true); ch.setUint32(16,crc,true);
+    ch.setUint32(20,size,true); ch.setUint32(24,size,true); ch.setUint16(28,nameU8.length,true);
+    ch.setUint16(30,0,true); ch.setUint16(32,0,true); ch.setUint16(34,0,true); ch.setUint16(36,0,true);
+    ch.setUint32(38,0,true); ch.setUint32(42,offset,true);
+    central.push(new Uint8Array(ch.buffer), nameU8);
+    offset += 30 + nameU8.length + size;
+  });
+  let centralSize=0; central.forEach(c=>centralSize+=c.length);
+  const eocd=new DataView(new ArrayBuffer(22));
+  eocd.setUint32(0,0x06054b50,true); eocd.setUint16(4,0,true); eocd.setUint16(6,0,true);
+  eocd.setUint16(8,files.length,true); eocd.setUint16(10,files.length,true);
+  eocd.setUint32(12,centralSize,true); eocd.setUint32(16,offset,true); eocd.setUint16(20,0,true);
+  return new Blob([...parts, ...central, new Uint8Array(eocd.buffer)], {type:'application/epub+zip'});
 }
 
 /* ══════════════════ FREE APIs ══════════════════ */
