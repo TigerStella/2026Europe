@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>노을의 유럽여행 🌅</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap');
+
+  :root {
+    --sunset-gold: #E8A245;
+    --dusk-coral: #D4735A;
+    --deep-navy: #1A2744;
+    --slate: #2D3F5E;
+    --mist: #F0EDE8;
+    --ivory: #FAF8F5;
+    --london-fog: #8B96A8;
+    --text-dark: #1E2535;
+    --text-mid: #4A5568;
+    --text-light: #8B96A8;
+    --border: #E2DDD8;
+    --london: #5B7FA6;
+    --paris: #C4788A;
+    --munich: #6B9E7A;
+    --florence: #D4735A;
+    --rome: #B5832A;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--ivory);
+    color: var(--text-dark);
+    line-height: 1.6;
+  }
+
+  /* ── FX (EXCHANGE) BAR ── */
+  .fx-bar {
+    background: var(--deep-navy);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    flex-wrap: wrap;
+    padding: 7px 16px;
+    font-size: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .fx-item { display: inline-flex; align-items: center; gap: 6px; }
+  .fx-flag { font-size: 13px; }
+  .fx-code { color: rgba(255,255,255,0.55); font-weight: 500; letter-spacing: 0.5px; }
+  .fx-val { color: var(--sunset-gold); font-weight: 700; }
+  .fx-val small { color: rgba(255,255,255,0.4); font-weight: 400; font-size: 10px; }
+  .fx-meta { color: rgba(255,255,255,0.35); font-size: 10px; }
+
+  /* ── HEADER ── */
+  .hero {
+    background: linear-gradient(135deg, var(--deep-navy) 0%, var(--slate) 60%, #3D5278 100%);
+    color: white;
+    padding: 40px 24px 34px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-eyebrow {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--sunset-gold);
+    margin-bottom: 12px;
+    opacity: 0.9;
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(28px, 6vw, 48px);
+    font-weight: 400;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+  .hero-subtitle {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 24px;
+  }
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .hero-stat { text-align: center; }
+  .hero-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--sunset-gold);
+    display: block;
+    line-height: 1;
+  }
+  .hero-stat-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* ── CITY ROUTE BAR ── */
+  .route-bar {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  .route-inner { display: inline-flex; align-items: center; gap: 0; min-width: max-content; }
+  .route-city { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 0 4px; }
+  .route-dot {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0; border: 2px solid transparent; transition: transform 0.2s;
+  }
+  .route-city:hover .route-dot { transform: scale(1.1); }
+  .route-city-name { font-size: 10px; font-weight: 500; color: var(--text-mid); }
+  .route-city-date { font-size: 9px; color: var(--text-light); }
+  .route-line { flex: 0 0 28px; height: 2px; position: relative; margin: 0 2px; align-self: flex-start; margin-top: 17px; }
+  .route-line.plane { background: repeating-linear-gradient(90deg, var(--london-fog) 0, var(--london-fog) 4px, transparent 4px, transparent 8px); }
+  .route-line.train { background: var(--sunset-gold); }
+  .route-line-icon { position: absolute; top: -7px; left: 50%; transform: translateX(-50%); font-size: 11px; background: white; padding: 0 2px; }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+  .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; margin-top: 32px; }
+  .section-header:first-child { margin-top: 0; }
+  .section-icon { font-size: 18px; }
+  .section-title { font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-mid); }
+  .section-sub { font-size: 11px; color: var(--text-light); font-weight: 400; letter-spacing: 0; text-transform: none; margin-left: auto; }
+
+  /* ── TIMELINE (vertical) ── */
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .day-block { display: grid; grid-template-columns: 56px 1fr; gap: 0 16px; position: relative; }
+  .day-block + .day-block { margin-top: 2px; }
+  .day-left { display: flex; flex-direction: column; align-items: center; padding-top: 16px; }
+  .day-circle {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    flex-shrink: 0; z-index: 1; border: 2px solid white;
+  }
+  .day-circle .day-num { font-size: 13px; font-weight: 700; color: white; line-height: 1; }
+  .day-circle .day-date { font-size: 9px; color: rgba(255,255,255,0.8); line-height: 1; }
+  .day-line { width: 2px; flex: 1; min-height: 12px; margin-top: 4px; }
+  .day-right {
+    background: white; border-radius: 12px; padding: 14px 16px; margin: 8px 0;
+    border-left: 3px solid transparent; box-shadow: 0 1px 4px rgba(0,0,0,0.06); transition: box-shadow 0.2s;
+  }
+  .day-right:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10); }
+  .day-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .day-weekday { font-size: 11px; font-weight: 700; color: var(--text-light); letter-spacing: 1px; text-transform: uppercase; }
+  .city-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; color: white; letter-spacing: 0.5px; }
+  .day-title { font-size: 14px; font-weight: 500; color: var(--text-dark); margin-bottom: 6px; }
+  .day-details { display: flex; flex-direction: column; gap: 5px; }
+  .detail-row { display: flex; gap: 8px; font-size: 12px; color: var(--text-mid); align-items: flex-start; }
+  .detail-icon { flex-shrink: 0; font-size: 13px; margin-top: 1px; }
+  .detail-text { flex: 1; line-height: 1.5; }
+  .detail-text strong { color: var(--text-dark); }
+  .detail-row.added { background: #FFFBF3; border: 1px dashed #F1D08B; border-radius: 8px; padding: 6px 8px; }
+  .detail-del { cursor: pointer; color: var(--text-light); font-size: 12px; flex-shrink: 0; padding: 0 2px; }
+  .detail-del:hover { color: var(--dusk-coral); }
+  .transport-pill {
+    display: inline-flex; align-items: center; gap: 4px; background: #FFF8ED; border: 1px solid #FDDCA0;
+    border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 500; color: #8A6200; margin-top: 6px;
+  }
+
+  /* city colors */
+  .london { background: var(--london); } .paris { background: var(--paris); } .munich { background: var(--munich); }
+  .florence { background: var(--florence); } .rome { background: var(--rome); } .transit { background: var(--london-fog); }
+  .london-border { border-left-color: var(--london); } .paris-border { border-left-color: var(--paris); }
+  .munich-border { border-left-color: var(--munich); } .florence-border { border-left-color: var(--florence); }
+  .rome-border { border-left-color: var(--rome); } .transit-border { border-left-color: var(--london-fog); }
+  .london-line { background: var(--london); } .paris-line { background: var(--paris); } .munich-line { background: var(--munich); }
+  .florence-line { background: var(--florence); } .rome-line { background: var(--rome); } .transit-line { background: var(--london-fog); }
+
+  /* ── WEATHER STRIP ── */
+  .weather-strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
+  .weather-chip {
+    background: white; border-radius: 12px; padding: 10px 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    display: flex; align-items: center; gap: 10px; flex-shrink: 0; border-top: 3px solid var(--border);
+  }
+  .weather-emoji { font-size: 22px; }
+  .weather-body { display: flex; flex-direction: column; }
+  .weather-city { font-size: 11px; font-weight: 700; color: var(--text-dark); }
+  .weather-temp { font-size: 13px; font-weight: 700; color: var(--slate); }
+  .weather-temp small { font-size: 10px; color: var(--text-light); font-weight: 400; }
+
+  /* ── CITY CHIPS (jump) ── */
+  .citychip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+  .citychip {
+    flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 22px;
+    background: white; border: 1.5px solid var(--border); cursor: pointer; font-size: 12px; font-weight: 700;
+    color: var(--text-mid); transition: all 0.15s; font-family: inherit;
+  }
+  .citychip:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
+  .citychip .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* ── HORIZONTAL DAY TIMELINE ── */
+  .hscroll { display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 14px; -webkit-overflow-scrolling: touch; }
+  .hday {
+    flex: 0 0 auto; width: 108px; background: white; border-radius: 14px; padding: 12px 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06); cursor: pointer; border-top: 3px solid transparent;
+    transition: width 0.28s ease, box-shadow 0.2s; position: relative; overflow: hidden;
+  }
+  .hday:hover { box-shadow: 0 5px 18px rgba(0,0,0,0.10); }
+  .hday.expanded { width: 300px; cursor: default; }
+  .hday-top { display: flex; align-items: center; gap: 8px; }
+  .hday-num {
+    width: 34px; height: 34px; border-radius: 50%; color: white; flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .hday-num b { font-size: 12px; line-height: 1; } .hday-num span { font-size: 8px; opacity: 0.85; }
+  .hday-cityline { display: flex; flex-direction: column; min-width: 0; }
+  .hday-city { font-size: 12px; font-weight: 700; }
+  .hday-wd { font-size: 10px; color: var(--text-light); }
+  .hday-name { font-size: 11px; color: var(--text-mid); margin-top: 8px; line-height: 1.4; white-space: normal; }
+  .hday.expanded .hday-name { font-weight: 500; color: var(--text-dark); }
+  .hday-detail { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .hday.expanded .hday-detail { display: block; animation: fade 0.3s; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  .hday-jump {
+    margin-top: 10px; width: 100%; padding: 7px; border-radius: 8px; border: none; cursor: pointer;
+    background: var(--deep-navy); color: white; font-size: 11px; font-weight: 700; font-family: inherit;
+  }
+  .hday-jump:hover { background: var(--slate); }
+  .hint { font-size: 11px; color: var(--text-light); margin: 2px 0 12px; }
+
+  /* ── CITY SUB-TABS ── */
+  .subtabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 4px; -webkit-overflow-scrolling: touch; }
+  .subtab {
+    flex-shrink: 0; padding: 9px 15px; border-radius: 10px 10px 0 0; background: #EFEBE5; border: none; cursor: pointer;
+    font-size: 12px; font-weight: 700; color: var(--text-mid); font-family: inherit; border-bottom: 3px solid transparent;
+  }
+  .subtab.active { background: white; color: var(--deep-navy); box-shadow: 0 -2px 8px rgba(0,0,0,0.05); }
+  .subpanel { display: none; }
+  .subpanel.active { display: block; }
+  .city-layout { display: grid; grid-template-columns: 1fr 300px; gap: 18px; align-items: start; }
+  .prep-panel { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); position: sticky; top: 60px; }
+  .prep-head { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-mid); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+  .prep-item { display: flex; gap: 8px; font-size: 12px; color: var(--text-mid); padding: 7px 0; border-bottom: 1px dashed var(--border); align-items: flex-start; }
+  .prep-item:last-child { border-bottom: none; }
+  .prep-item .ic { flex-shrink: 0; }
+  .prep-sub { font-size: 10px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin: 14px 0 4px; }
+
+  .add-btn {
+    display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, var(--sunset-gold), var(--dusk-coral));
+    color: white; border: none; border-radius: 22px; padding: 9px 16px; font-size: 12px; font-weight: 700;
+    cursor: pointer; font-family: inherit; box-shadow: 0 2px 8px rgba(212,115,90,0.3); margin-bottom: 14px;
+  }
+  .add-btn:hover { filter: brightness(1.05); }
+
+  /* forms */
+  .addform { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 16px; display: none; }
+  .addform.open { display: block; animation: fade 0.25s; }
+  .addform .row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
+  .field label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); }
+  .field input, .field select, .field textarea {
+    border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 13px; font-family: inherit; color: var(--text-dark); background: var(--ivory);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--sunset-gold); }
+  .form-actions { display: flex; gap: 8px; }
+  .btn { border: none; border-radius: 8px; padding: 9px 16px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .btn-primary { background: var(--deep-navy); color: white; }
+  .btn-primary:hover { background: var(--slate); }
+  .btn-ghost { background: #EFEBE5; color: var(--text-mid); }
+  .btn-ghost:hover { background: var(--border); }
+
+  /* ── HOTELS GRID ── */
+  .hotels-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .hotel-card { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-top: 3px solid transparent; }
+  .hotel-city-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+  .hotel-name { font-size: 14px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; line-height: 1.3; }
+  .hotel-dates { font-size: 11px; color: var(--text-light); margin-bottom: 10px; }
+  .hotel-info { display: flex; flex-direction: column; gap: 6px; }
+  .hotel-row { display: flex; gap: 6px; font-size: 11px; color: var(--text-mid); align-items: flex-start; }
+  .hotel-row span:first-child { flex-shrink: 0; }
+  .hotel-cost { margin-top: 8px; font-size: 12px; font-weight: 700; color: var(--sunset-gold); }
+
+  /* ── TRANSPORT ── */
+  .transport-list { display: flex; flex-direction: column; gap: 8px; }
+  .transport-item { background: white; border-radius: 10px; padding: 14px 16px; display: flex; align-items: flex-start; gap: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .transport-icon-big { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+  .transport-body { flex: 1; }
+  .transport-route { font-size: 14px; font-weight: 700; color: var(--text-dark); }
+  .transport-detail { font-size: 12px; color: var(--text-mid); margin-top: 2px; line-height: 1.5; }
+  .transport-app { font-size: 11px; color: var(--text-light); margin-top: 4px; }
+  .transport-cost-badge { font-size: 12px; font-weight: 700; color: var(--dusk-coral); flex-shrink: 0; align-self: center; }
+
+  /* ── COST ── */
+  .cost-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-bottom: 12px; }
+  .cost-card { background: white; border-radius: 10px; padding: 14px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .cost-card-label { font-size: 10px; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .cost-card-amount { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--deep-navy); }
+  .cost-card-unit { font-size: 10px; color: var(--text-light); }
+  .cost-total { background: var(--deep-navy); color: white; border-radius: 10px; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+  .cost-total-label { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.7; }
+  .cost-total-amount { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--sunset-gold); }
+
+  /* ── TIPS / COMMUNITY CARDS ── */
+  .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+  .tip-card { background: white; border-radius: 10px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-left: 3px solid var(--sunset-gold); }
+  .tip-title { font-size: 12px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
+  .tip-text { font-size: 11px; color: var(--text-mid); line-height: 1.6; }
+
+  /* ── COMMUNITY ── */
+  .comm-city { background: white; border-radius: 14px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 14px; border-top: 3px solid transparent; }
+  .comm-city-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .comm-city-name { font-size: 16px; font-weight: 700; color: var(--text-dark); }
+  .comm-city-src { font-size: 10px; color: var(--text-light); margin-bottom: 14px; }
+  .comm-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .comm-col-head { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-mid); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .comm-entry { padding: 8px 0; border-bottom: 1px dashed var(--border); }
+  .comm-entry:last-child { border-bottom: none; }
+  .comm-entry-name { font-size: 13px; font-weight: 700; color: var(--text-dark); }
+  .comm-entry-desc { font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+  .comm-tag { display: inline-block; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 10px; background: #F3EEE7; color: var(--text-light); margin-left: 4px; }
+
+  /* ── NAV TABS ── */
+  .nav-tabs {
+    position: sticky; top: 0; z-index: 100; background: white; border-bottom: 1px solid var(--border);
+    display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .nav-tab {
+    padding: 14px 18px; font-size: 12px; font-weight: 500; color: var(--text-light); cursor: pointer;
+    border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; background: none;
+    border-top: none; border-left: none; border-right: none; font-family: inherit;
+  }
+  .nav-tab.active { color: var(--deep-navy); border-bottom-color: var(--sunset-gold); font-weight: 700; }
+  .tab-section { display: none; padding-bottom: 60px; }
+  .tab-section.active { display: block; }
+
+  /* ── DIARY ── */
+  .diary-toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
+  .diary-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .diary-col-head {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border);
+  }
+  .diary-col-head .avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .diary-col-head .who { font-size: 15px; font-weight: 700; color: var(--text-dark); }
+  .diary-col-head .cnt { font-size: 11px; color: var(--text-light); margin-left: auto; }
+  .postit-wrap { display: flex; flex-direction: column; gap: 12px; }
+  .postit {
+    border-radius: 4px; padding: 14px 16px 16px; position: relative; box-shadow: 2px 4px 12px rgba(0,0,0,0.12);
+    transform: rotate(-0.6deg); transition: transform 0.15s; cursor: default;
+  }
+  .postit:nth-child(even) { transform: rotate(0.7deg); }
+  .postit:hover { transform: rotate(0) scale(1.01); box-shadow: 3px 6px 18px rgba(0,0,0,0.16); }
+  .postit.mom { background: #FDECEF; }
+  .postit.son { background: #E8F1FB; }
+  .postit-date { font-size: 11px; font-weight: 700; color: var(--text-mid); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+  .postit-date .pin { position: absolute; top: -6px; left: 50%; transform: translateX(-50%); font-size: 15px; }
+  .postit-title { font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
+  .postit-body { font-size: 12px; color: var(--text-mid); line-height: 1.65; white-space: pre-wrap; }
+  .postit-photos { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .postit-photos img { width: 62px; height: 62px; object-fit: cover; border-radius: 6px; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.15); cursor: pointer; }
+  .postit-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; }
+  .postit-actions button { border: none; background: rgba(255,255,255,0.6); border-radius: 6px; width: 22px; height: 22px; cursor: pointer; font-size: 11px; }
+  .postit-actions button:hover { background: white; }
+  .diary-empty { font-size: 12px; color: var(--text-light); text-align: center; padding: 24px; border: 2px dashed var(--border); border-radius: 12px; }
+
+  .modal-back { position: fixed; inset: 0; background: rgba(20,25,40,0.55); z-index: 500; display: none; align-items: center; justify-content: center; padding: 16px; }
+  .modal-back.open { display: flex; }
+  .modal { background: white; border-radius: 16px; padding: 22px; width: 100%; max-width: 480px; max-height: 88vh; overflow-y: auto; }
+  .modal h3 { font-size: 16px; margin-bottom: 14px; color: var(--deep-navy); }
+  .photo-preview { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .photo-preview .pp { position: relative; }
+  .photo-preview img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
+  .photo-preview .rm { position: absolute; top: -6px; right: -6px; background: var(--dusk-coral); color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; cursor: pointer; line-height: 1; }
+  .imgmodal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 600; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .imgmodal.open { display: flex; }
+  .imgmodal img { max-width: 100%; max-height: 92vh; border-radius: 8px; }
+
+  /* ── BRUNCH OUTPUT ── */
+  .brunch-out { display: none; margin-top: 26px; }
+  .brunch-out.open { display: block; animation: fade 0.3s; }
+  .brunch-paper {
+    background: white; border-radius: 4px; padding: 40px clamp(20px,5vw,56px); box-shadow: 0 6px 30px rgba(0,0,0,0.10);
+    border: 1px solid var(--border); max-width: 720px; margin: 0 auto;
+  }
+  .brunch-kicker { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--sunset-gold); text-align: center; margin-bottom: 14px; }
+  .brunch-h1 { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; color: var(--text-dark); text-align: center; line-height: 1.3; margin-bottom: 10px; }
+  .brunch-sub { font-size: 14px; color: var(--text-mid); text-align: center; font-style: italic; margin-bottom: 6px; }
+  .brunch-meta { font-size: 12px; color: var(--text-light); text-align: center; margin-bottom: 28px; }
+  .brunch-rule { width: 40px; height: 2px; background: var(--sunset-gold); margin: 0 auto 28px; }
+  .brunch-body p { font-size: 15px; line-height: 2; color: var(--text-dark); margin-bottom: 20px; }
+  .brunch-body h2 { font-family: 'Playfair Display', serif; font-size: 19px; margin: 30px 0 14px; color: var(--slate); }
+  .brunch-body blockquote { border-left: 3px solid var(--sunset-gold); padding: 4px 0 4px 16px; margin: 20px 0; color: var(--text-mid); font-style: italic; font-size: 15px; }
+  .brunch-fig { margin: 22px 0; text-align: center; }
+  .brunch-fig img { max-width: 100%; border-radius: 6px; }
+  .brunch-close { text-align: center; font-family: 'Playfair Display', serif; font-style: italic; color: var(--text-light); margin-top: 30px; font-size: 14px; }
+  .brunch-tools { display: flex; gap: 10px; justify-content: center; margin: 18px 0; flex-wrap: wrap; }
+  .brunch-note { font-size: 11px; color: var(--text-light); text-align: center; margin-top: 12px; }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--deep-navy); color: white; padding: 12px 22px; border-radius: 24px; font-size: 13px; z-index: 700; opacity: 0; transition: opacity 0.25s, transform 0.25s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+  /* ── MOBILE ── */
+  @media (max-width: 720px) {
+    .city-layout { grid-template-columns: 1fr; }
+    .prep-panel { position: static; }
+    .comm-cols { grid-template-columns: 1fr; }
+    .diary-cols { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .hero { padding: 30px 16px 26px; }
+    .hero-stats { gap: 20px; }
+    .container { padding: 16px 12px; }
+    .hotels-grid { grid-template-columns: 1fr; }
+    .tips-grid { grid-template-columns: 1fr; }
+    .cost-grid { grid-template-columns: repeat(2, 1fr); }
+    .route-bar { padding: 12px 16px; }
+    .fx-bar { gap: 14px; }
+    .brunch-paper { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- FX BAR -->
+<div class="fx-bar" id="fxBar">
+  <span class="fx-meta">💱 실시간 환율</span>
+  <span class="fx-meta" id="fxLoading">불러오는 중…</span>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">✈ 노을 &amp; 타이거의 단둘 여행</div>
+  <h1 class="hero-title">유럽, 2025 가을</h1>
+  <div class="hero-subtitle">런던 · 파리 · 뮌헨 · 피렌체 · 로마</div>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="hero-stat-num">18</span><span class="hero-stat-label">박 19일</span></div>
+    <div class="hero-stat"><span class="hero-stat-num">5</span><span class="hero-stat-label">개 도시</span></div>
+    <div class="hero-stat"><span class="hero-stat-num">9/25</span><span class="hero-stat-label">출발</span></div>
+    <div class="hero-stat"><span class="hero-stat-num">10/12</span><span class="hero-stat-label">귀국</span></div>
+  </div>
+</div>
+
+<!-- ROUTE BAR -->
+<div class="route-bar">
+  <div class="route-inner" id="routeInner"></div>
+</div>
+
+<!-- NAV TABS -->
+<nav class="nav-tabs">
+  <button class="nav-tab active" onclick="showTab('schedule', this)">📅 일정</button>
+  <button class="nav-tab" onclick="showTab('hotels', this)">🏨 숙소</button>
+  <button class="nav-tab" onclick="showTab('transport', this)">🚄 교통</button>
+  <button class="nav-tab" onclick="showTab('cost', this)">💰 비용</button>
+  <button class="nav-tab" onclick="showTab('tips', this)">💡 팁</button>
+  <button class="nav-tab" onclick="showTab('community', this)">🌍 커뮤니티</button>
+  <button class="nav-tab" onclick="showTab('diary', this)">📔 일기</button>
+</nav>
+
+<!-- ── TAB: 일정 ── -->
+<div id="schedule" class="tab-section active">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-icon">🌤</span>
+      <span class="section-title">도시별 실시간 날씨</span>
+      <span class="section-sub">Open-Meteo</span>
+    </div>
+    <div class="weather-strip" id="weatherStrip"><span class="hint">날씨 불러오는 중…</span></div>
+
+    <div class="section-header">
+      <span class="section-icon">📅</span>
+      <span class="section-title">전체 일정 · 날짜별</span>
+      <span class="section-sub">날짜 클릭 → 상세 · 도시 클릭 → 도시탭</span>
+    </div>
+    <div class="citychip-row" id="cityChipRow"></div>
+    <p class="hint">👆 도시를 누르면 아래 도시별 탭으로 이동해요. 날짜 카드를 누르면 옆으로 펼쳐지며 숙소·교통이 먼저 보여요.</p>
+    <div class="hscroll" id="hscroll"></div>
+
+    <div class="section-header">
+      <span class="section-icon">🗂</span>
+      <span class="section-title">도시별 상세 일정</span>
+      <span class="section-sub">+ 로 투어·일정 추가</span>
+    </div>
+    <div class="subtabs" id="citySubtabs"></div>
+    <div id="cityPanels"></div>
+  </div>
+</div>
+
+<!-- ── TAB: 숙소 ── -->
+<div id="hotels" class="tab-section">
+  <div class="container">
+    <div class="section-header"><span class="section-icon">🏨</span><span class="section-title">숙소 정보</span></div>
+    <div class="hotels-grid" id="hotelsGrid"></div>
+  </div>
+</div>
+
+<!-- ── TAB: 교통 ── -->
+<div id="transport" class="tab-section">
+  <div class="container">
+    <div class="section-header"><span class="section-icon">✈️</span><span class="section-title">주요 이동 교통편</span></div>
+    <div class="transport-list" id="transportList"></div>
+    <div class="section-header" style="margin-top:28px"><span class="section-icon">📱</span><span class="section-title">필수 앱 &amp; 예약 앱</span></div>
+    <div class="tips-grid">
+      <div class="tip-card"><div class="tip-title">🚂 유로스타</div><div class="tip-text">런던 ↔ 파리 유로스타 예매. 출발 최소 1시간 전 도착 필수.</div></div>
+      <div class="tip-card"><div class="tip-title">🚄 DB (Deutsche Bahn)</div><div class="tip-text">파리 → 뮌헨 TGV 예매. 독일철도 공식 앱.</div></div>
+      <div class="tip-card"><div class="tip-title">🚄 Italo</div><div class="tip-text">이탈리아 고속열차. 피렌체→로마, 로마→밀라노 예매.</div></div>
+      <div class="tip-card"><div class="tip-title">🗺 Google Maps</div><div class="tip-text">오프라인 지도 미리 다운로드 필수 (도시별로 저장).</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TAB: 비용 ── -->
+<div id="cost" class="tab-section">
+  <div class="container">
+    <div class="section-header"><span class="section-icon">💰</span><span class="section-title">예산 &amp; 비용 정리</span></div>
+    <div class="cost-grid">
+      <div class="cost-card"><div class="cost-card-label">런던 숙소</div><div class="cost-card-amount">1,178</div><div class="cost-card-unit">천원 (2곳)</div></div>
+      <div class="cost-card"><div class="cost-card-label">파리 숙소</div><div class="cost-card-amount">784</div><div class="cost-card-unit">천원</div></div>
+      <div class="cost-card"><div class="cost-card-label">뮌헨 숙소</div><div class="cost-card-amount">1,020</div><div class="cost-card-unit">천원</div></div>
+      <div class="cost-card"><div class="cost-card-label">피렌체 숙소</div><div class="cost-card-amount">—</div><div class="cost-card-unit">현지 결제</div></div>
+      <div class="cost-card"><div class="cost-card-label">로마 숙소</div><div class="cost-card-amount">1,260</div><div class="cost-card-unit">천원</div></div>
+      <div class="cost-card"><div class="cost-card-label">뮌헨 일정</div><div class="cost-card-amount">224</div><div class="cost-card-unit">천원</div></div>
+      <div class="cost-card"><div class="cost-card-label">Italo 기차</div><div class="cost-card-amount">42</div><div class="cost-card-unit">천원</div></div>
+      <div class="cost-card"><div class="cost-card-label">로마 짐보관</div><div class="cost-card-amount">50</div><div class="cost-card-unit">천원 (약)</div></div>
+    </div>
+    <div class="cost-total" style="margin-top:12px">
+      <span class="cost-total-label">숙소 합계 (확인분)</span>
+      <span class="cost-total-amount">약 425만원+</span>
+    </div>
+    <div style="margin-top:10px; font-size:11px; color:var(--text-light); padding: 0 4px;">
+      ※ 항공권, 현지 식비, 교통카드, 입장료, 쇼핑 비용 별도. 피렌체 숙소 현지 결제 금액 미포함.
+    </div>
+  </div>
+</div>
+
+<!-- ── TAB: 팁 ── -->
+<div id="tips" class="tab-section">
+  <div class="container">
+    <div class="section-header"><span class="section-icon">💡</span><span class="section-title">여행 필수 체크리스트</span></div>
+    <div class="tips-grid">
+      <div class="tip-card"><div class="tip-title">⚠️ 신분증 지참 필수</div><div class="tip-text">피렌체 &amp; 로마 숙소 체크인 시 사진이 있는 신분증 + 결제에 사용한 카드 반드시 지참.</div></div>
+      <div class="tip-card"><div class="tip-title">🚂 유로스타 주의</div><div class="tip-text">9/29 런던→파리 유로스타. <strong>10:30까지 역 도착 필수.</strong> 출입국 수속 있음.</div></div>
+      <div class="tip-card"><div class="tip-title">✈️ 뮌헨 조기 출발</div><div class="tip-text">10/5 뮌헨→피렌체 항공편 <strong>07:55 출발.</strong> 공항은 최소 2시간 전 도착.</div></div>
+      <div class="tip-card"><div class="tip-title">🧳 짐 보관</div><div class="tip-text">파리 루프라라: 짐 보관 가능.<br>피렌체→로마 Italo 예약 시 짐 보관 요청 완료.</div></div>
+      <div class="tip-card"><div class="tip-title">📱 오프라인 지도</div><div class="tip-text">Google Maps에서 런던·파리·뮌헨·피렌체·로마 오프라인 지도 미리 다운로드.</div></div>
+      <div class="tip-card"><div class="tip-title">💳 해외 결제 카드</div><div class="tip-text">트래블월렛 or 트래블로그 등 해외 수수료 없는 카드 필수. 현금도 소량 준비.</div></div>
+      <div class="tip-card"><div class="tip-title">🏨 한인 민박 식사</div><div class="tip-text">런던 파크 런던: 한식 아침/저녁 제공.<br>파리 루프라라: 식사 제공 없음.</div></div>
+      <div class="tip-card"><div class="tip-title">🚇 런던 교통</div><div class="tip-text">Oyster 카드 or 비자 컨택리스 카드로 지하철/버스 이용. 히드로 익스프레스 비쌈 주의.</div></div>
+      <div class="tip-card"><div class="tip-title">🇮🇹 이탈리아 기차</div><div class="tip-text">Italo 앱으로 티켓 QR 미리 저장. 검표원에게 바로 보여줄 수 있도록 준비.</div></div>
+    </div>
+    <div class="section-header" style="margin-top:28px"><span class="section-icon">📞</span><span class="section-title">긴급 연락처</span></div>
+    <div class="tips-grid">
+      <div class="tip-card" style="border-left-color:var(--dusk-coral)"><div class="tip-title">🏨 런던 한인 민박</div><div class="tip-text">카카오톡: dickie.kim / dickey0345</div></div>
+      <div class="tip-card" style="border-left-color:var(--paris)"><div class="tip-title">🏨 파리 루프라라</div><div class="tip-text">+82 01074721235<br>카카오톡: minseo-kim</div></div>
+      <div class="tip-card" style="border-left-color:var(--florence)"><div class="tip-title">🏨 피렌체 숙소</div><div class="tip-text">hotelsangiorgio.firenze@gmail.com</div></div>
+      <div class="tip-card" style="border-left-color:var(--rome)"><div class="tip-title">🏨 로마 숙소</div><div class="tip-text">++39 320 407 9326</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TAB: 커뮤니티 ── -->
+<div id="community" class="tab-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-icon">🌍</span>
+      <span class="section-title">커뮤니티 추천 · 도시별</span>
+      <span class="section-sub">유랑·트립어드바이저·구글 등 참고</span>
+    </div>
+    <p class="hint">여행 커뮤니티에서 자주 언급되는 주요 방문지와 맛집을 정리했어요. 방문한 곳은 일기·일정에 기록해보세요.</p>
+    <div id="communityWrap"></div>
+  </div>
+</div>
+
+<!-- ── TAB: 일기 ── -->
+<div id="diary" class="tab-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-icon">📔</span>
+      <span class="section-title">여행 일기</span>
+      <span class="section-sub">엄마 &amp; 아들, 매일의 순간</span>
+    </div>
+    <div class="diary-toolbar">
+      <button class="add-btn" onclick="openDiaryModal()">✏️ 오늘의 일기 쓰기</button>
+      <button class="btn btn-ghost" onclick="openBrunch()">✍️ 브런치 발행</button>
+      <button class="btn btn-ghost" onclick="openEbook()">📖 전자책 초안</button>
+    </div>
+
+    <div class="diary-cols">
+      <div>
+        <div class="diary-col-head">
+          <span class="avatar" style="background:#FDECEF">👩</span>
+          <span class="who">엄마</span>
+          <span class="cnt" id="momCnt"></span>
+        </div>
+        <div class="postit-wrap" id="momWrap"></div>
+      </div>
+      <div>
+        <div class="diary-col-head">
+          <span class="avatar" style="background:#E8F1FB">🧑</span>
+          <span class="who">아들</span>
+          <span class="cnt" id="sonCnt"></span>
+        </div>
+        <div class="postit-wrap" id="sonWrap"></div>
+      </div>
+    </div>
+
+    <!-- BRUNCH OUTPUT -->
+    <div class="brunch-out" id="brunchOut">
+      <div class="section-header"><span class="section-icon">✍️</span><span class="section-title">브런치 발행 미리보기</span></div>
+      <div class="brunch-tools">
+        <select class="field" id="brunchScope" style="max-width:200px" onchange="renderBrunch()">
+          <option value="all">전체 일기 모아서</option>
+        </select>
+        <select class="field" id="brunchVoice" style="max-width:160px" onchange="renderBrunch()">
+          <option value="both">엄마+아들 함께</option>
+          <option value="mom">엄마 시점</option>
+          <option value="son">아들 시점</option>
+        </select>
+        <button class="btn btn-primary" onclick="copyBrunch()">📋 복사하기</button>
+        <button class="btn btn-ghost" onclick="closeBrunch()">닫기</button>
+      </div>
+      <div class="brunch-paper" id="brunchPaper"></div>
+      <div class="brunch-note">※ '글선생' 프로젝트의 브런치 문체 설정에 맞춰 문단·톤을 조정할 수 있어요. (제목/부제/도입·본문·맺음 구조)</div>
+    </div>
+  </div>
+</div>
+
+<!-- DIARY MODAL -->
+<div class="modal-back" id="diaryModal">
+  <div class="modal">
+    <h3 id="diaryModalTitle">✏️ 오늘의 일기</h3>
+    <div class="row">
+      <div class="field"><label>누가</label>
+        <select id="dWho"><option value="mom">👩 엄마</option><option value="son">🧑 아들</option></select>
+      </div>
+      <div class="field"><label>날짜 / 일차</label>
+        <select id="dDay"></select>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:10px"><label>제목</label>
+      <input id="dTitle" placeholder="예: 에펠탑 아래에서">
+    </div>
+    <div class="field" style="margin-bottom:10px"><label>오늘의 느낌</label>
+      <textarea id="dBody" rows="6" placeholder="지금 이 순간의 느낌을 적어보세요…"></textarea>
+    </div>
+    <div class="field" style="margin-bottom:10px"><label>사진 업로드</label>
+      <input type="file" id="dPhotos" accept="image/*" multiple onchange="handlePhotoPick(event)">
+      <div class="photo-preview" id="photoPreview"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveDiary()">저장</button>
+      <button class="btn btn-ghost" onclick="closeDiaryModal()">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- IMAGE VIEWER -->
+<div class="imgmodal" id="imgModal" onclick="this.classList.remove('open')"><img id="imgModalImg" src="" alt=""></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════ DATA ══════════════════ */
+const CITIES = {
+  london:   { name:'런던', en:'London', flag:'🏙', country:'영국',     ccy:'GBP', color:'#5B7FA6', cls:'london',   lat:51.5074, lon:-0.1278 },
+  paris:    { name:'파리', en:'Paris',  flag:'🗼', country:'프랑스',   ccy:'EUR', color:'#C4788A', cls:'paris',    lat:48.8566, lon:2.3522 },
+  munich:   { name:'뮌헨', en:'Munich', flag:'🍺', country:'독일',     ccy:'EUR', color:'#6B9E7A', cls:'munich',   lat:48.1351, lon:11.5820 },
+  florence: { name:'피렌체', en:'Florence', flag:'🌸', country:'이탈리아', ccy:'EUR', color:'#D4735A', cls:'florence', lat:43.7696, lon:11.2558 },
+  rome:     { name:'로마', en:'Rome',   flag:'🏛', country:'이탈리아', ccy:'EUR', color:'#B5832A', cls:'rome',     lat:41.9028, lon:12.4964 },
+};
+const CITY_ORDER = ['london','paris','munich','florence','rome'];
+
+// route bar cities (incl. transit points)
+const ROUTE = [
+  { flag:'🇰🇷', name:'서울', date:'9/25', plain:true },
+  { line:'plane' },
+  { key:'london', flag:'🏙', name:'런던', date:'9/25~9/29' },
+  { line:'train' },
+  { key:'paris', flag:'🗼', name:'파리', date:'9/29~10/1' },
+  { line:'train' },
+  { key:'munich', flag:'🍺', name:'뮌헨', date:'10/1~10/5' },
+  { line:'plane' },
+  { key:'florence', flag:'🌸', name:'피렌체', date:'10/5~10/7' },
+  { line:'train' },
+  { key:'rome', flag:'🏛', name:'로마', date:'10/7~10/11' },
+  { line:'train' },
+  { flag:'✈', name:'밀라노', date:'10/11 출발', plain:true },
+  { line:'plane' },
+  { flag:'🇰🇷', name:'인천', date:'10/12', plain:true },
+];
+
+// Base itinerary — transport & hotel surfaced to top, activities as list.
+const DAYS = [
+  { d:1, date:'9/25', wd:'금', city:'london', transit:'transit', badges:['이동','런던'],
+    title:'인천 출발 → 런던 히드로 도착',
+    transport:{ icon:'✈️', text:'대한항공 <strong>KE0907</strong> · 10:55 인천 출발 → 17:20 히드로 T4 도착' },
+    hotel:{ text:'히드로 체크인 · Premier Inn Heathrow (T4)' },
+    acts:[ {ic:'🚇', t:'히드로 공항 → 숙소 이동 (히드로 익스프레스 or 지하철)'} ] },
+  { d:2, date:'9/26', wd:'토', city:'london', badges:['런던'],
+    title:'자연사박물관 · 하이드파크 · 버킹엄궁전',
+    hotel:{ text:'히드로 OUT → <strong>파크 런던 (시내)</strong> 체크인 17:00' },
+    acts:[ {ic:'🍱', t:'식사: 한인 밥집 아침/저녁 · 카톡 dickie.kim'} ] },
+  { d:3, date:'9/27', wd:'일', city:'london', badges:['런던'],
+    title:'영국박물관 · 내셔널갤러리 · 뮤지컬', acts:[] },
+  { d:4, date:'9/28', wd:'월', city:'london', badges:['런던'],
+    title:'해리포터 투어 · 타워브릿지', acts:[] },
+  { d:5, date:'9/29', wd:'화', city:'paris', badges:['런던','→','파리'],
+    title:'런던 출발 → 파리 이동 (유로스타)',
+    transport:{ icon:'🚂', text:'<strong>유로스타</strong> 12:31 런던 출발 → 15:59 파리 북역 · <strong>10:30까지 역 도착</strong>' },
+    hotel:{ text:'루프라라 1호점 (파리시내 한인민박) 체크인 16:00 · 짐보관 가능' },
+    acts:[ {ic:'🚇', t:'파리 도착 후: 에펠탑 산책, 개선문, 세느강'}, {ic:'📞', t:'연락처 +82 01074721235 · 카톡 minseo-kim'} ] },
+  { d:6, date:'9/30', wd:'수', city:'paris', badges:['파리'],
+    title:'루브르 · 노트르담 성당', acts:[] },
+  { d:7, date:'10/1', wd:'목', city:'munich', badges:['파리','→','뮌헨'],
+    title:'파리 출발 → 뮌헨 이동 (TGV)',
+    transport:{ icon:'🚄', text:'<strong>TGV 9577</strong> · 15:55 파리 동역 출발 → 21:36 뮌헨 중앙역 · 앱: DB' },
+    hotel:{ text:'Aparthotel Adagio Access München City 체크인 15:00' },
+    acts:[] },
+  { d:8, date:'10/2', wd:'금', city:'munich', badges:['뮌헨'],
+    title:'올림픽공원 · FC Bayern Store', acts:[] },
+  { d:9, date:'10/3', wd:'토', city:'munich', badges:['뮌헨'],
+    title:'추크슈피체 알프스 정상 · 아이브제 호수', acts:[] },
+  { d:10, date:'10/4', wd:'일', city:'munich', badges:['뮌헨'],
+    title:'알리안츠 아레나 투어 · BMW 박물관',
+    acts:[ {ic:'💰', t:'비용: 224,270원'} ] },
+  { d:11, date:'10/5', wd:'월', city:'florence', badges:['뮌헨','→','피렌체'],
+    title:'뮌헨 출발 → 피렌체 이동 (비행기)',
+    transport:{ icon:'✈️', text:'<strong>Lufthansa LH</strong> · 07:55 뮌헨 MUC 출발 → 피렌체 FLR (약 1:15)' },
+    hotel:{ text:'Hotel San Giorgio & Olimpic 체크인 14:00 · 신분증 지참' },
+    acts:[ {ic:'⚠️', t:'사진 있는 신분증 지참 필수'} ] },
+  { d:12, date:'10/6', wd:'화', city:'florence', badges:['피렌체'],
+    title:'피사 당일치기 · 오후 피렌체 산책', acts:[] },
+  { d:13, date:'10/7', wd:'수', city:'rome', badges:['피렌체','→','로마'],
+    title:'피렌체 → 로마 이동 (Italo)',
+    transport:{ icon:'🚄', text:'<strong>Italo 8902</strong> 12:28 Firenze S.M.N. 출발 → 로마 (약 2시간반) · 앱: Italo' },
+    hotel:{ text:"Mandruchello's 아파트 (바티칸 근처) 체크인 14:00 · 침실 2개" },
+    acts:[ {ic:'💳', t:'KRW 49,872원 · 사진 신분증 + 결제카드 지참'} ] },
+  { d:14, date:'10/8', wd:'목', city:'rome', badges:['로마'],
+    title:'바티칸 박물관 & 성 베드로 성당', acts:[] },
+  { d:15, date:'10/9', wd:'금', city:'rome', badges:['로마'],
+    title:'콜로세움 · 포로 로마노 탐방', acts:[] },
+  { d:16, date:'10/10', wd:'토', city:'rome', badges:['로마'],
+    title:'로마 자유 일정', acts:[] },
+  { d:17, date:'10/11', wd:'일', city:'rome', transit:'transit', badges:['로마','→','밀라노'],
+    title:'로마 → 밀라노 이동 · 밀라노 공항 출발',
+    transport:{ icon:'🚄', text:'<strong>Italo</strong> 10:05 Roma Termini → 밀라노 Centrale, 공항철도로 공항 이동' },
+    acts:[ {ic:'✈️', t:'밀라노 공항 출발'} ] },
+  { d:18, date:'10/12', wd:'월', city:'rome', transit:'transit', badges:['귀국'],
+    title:'인천 도착 · 귀국 🏠', acts:[] },
+];
+
+const PREP = {
+  london: { must:['Oyster/컨택리스 카드 (히드로 익스프레스 비쌈)','우천 대비 우산·방수 겉옷','뮤지컬 사전 예약','해리포터 스튜디오 투어 예약'],
+    tip:['자연사·영국박물관·내셔널갤러리 무료','파크런던 한식 아침/저녁 확인','일요일 상점 영업시간 짧음'] },
+  paris: { must:['유로스타 10:30까지 도착·여권 지참','뮤지엄 패스 or 루브르 온라인 예약','소매치기 주의 (지하철·에펠탑)'],
+    tip:['루프라라 짐 보관 가능','노트르담 주변·세느강 야경','물·화장실 유료 대비 잔돈'] },
+  munich: { must:['DB 앱·TGV 좌석 확인','추크슈피체 당일 날씨 반드시 확인','알리안츠 아레나·BMW 투어 예약'],
+    tip:['10/5 07:55 항공 → 새벽 이동 준비','아이브제 호수 방한 준비','맥주홀 예약 권장'] },
+  florence: { must:['숙소 체크인 신분증 필수','두오모 쿠폴라 예약','피사 첫차 시간 확인'],
+    tip:['우피치·아카데미아 예약','가죽시장 흥정','좁은 골목 캐리어 주의'] },
+  rome: { must:['바티칸 박물관 예약 필수 (수요일 일반알현 혼잡)','콜로세움+포로로마노 통합권 예약','체크인 신분증+결제카드 지참'],
+    tip:['로마패스 검토','트레비·스페인계단 소매치기 주의','성당 방문 시 어깨·무릎 가리기'] },
+};
+
+const HOTELS = [
+  { city:'london', label:'🏙 런던 (1박)', name:'Premier Inn Heathrow Ai 트리플룸', dates:'9/25 IN 16:00 → 9/26 OUT 12:00',
+    rows:[['📍','Terminal 4, Sheffield Road, 히스로, 런던 TW6 3FH'],['📞','+4433323'],['🍴','조식 포함 확인'],['🔖','예약: 아고다']], cost:'137,087원' },
+  { city:'london', label:'🏙 런던 (3박)', name:'파크 런던 — 시내 한인민박 (링컨스 스위트 A)', dates:'9/26 IN 17:00 → 9/29 OUT 11:00',
+    rows:[['🍱','한인 밥집 아침/저녁 식사 제공'],['📱','카톡: dickie.kim / dickey0345'],['🔖','예약: 마이리얼트립']], cost:'1,040,526원' },
+  { city:'paris', label:'🗼 파리 (2박)', name:'루프라라 1호점 (시내 한인민박)', dates:'9/29 IN 16:00 → 10/1 OUT 11:30',
+    rows:[['📍','4 Rue Robert de Flers, 75015 Paris'],['🧳','짐 보관 가능'],['📞','+82 01074721235'],['📱','카카오톡: minseo-kim'],['🔖','예약: 마이리얼트립']], cost:'784,283원' },
+  { city:'munich', label:'🍺 뮌헨 (4박)', name:'Aparthotel Adagio Access München City', dates:'10/1 IN 15:00 → 10/5 OUT 11:00',
+    rows:[['📍','Am Oberwiesenfeld 20, Milbertshofen-Am Hart, München'],['🛏','Studio 2 Persons Double Bed'],['🔖','예약: 아고다']], cost:'1,020,000원' },
+  { city:'florence', label:'🌸 피렌체 (2박)', name:'Hotel San Giorgio & Olimpic', dates:'10/5 IN 14:00 → 10/7 OUT 11:00',
+    rows:[['📍','Via San Antonino 3, Centro Storico, Firenze 50123'],['📡','무료 Wifi'],['⚠️','사진 있는 신분증 지참 필수'],['📧','hotelsangiorgio.firenze@gmail.com'],['🔖','예약: 아고다']], cost:'현지 결제' },
+  { city:'rome', label:'🏛 로마 (4박)', name:"Mandruchello's 아파트 (바티칸 근처)", dates:'10/7 IN 14:00 → 10/11 OUT 10:00',
+    rows:[['📍','22 Via Sebastiano Veniero, Città del Vaticano, Roma 00192'],['🛏','침실 2개, 프라이빗 욕실'],['📡','무료 Wifi'],['💳','사진 신분증 + 결제카드 지참'],['📞','+39 320 407 9326'],['🔖','예약: 아고다']], cost:'1,259,668원' },
+];
+
+const TRANSPORT = [
+  { icon:'✈️', route:'서울 인천 → 런던 히드로', detail:'<strong>대한항공 KE0907</strong><br>9/25(금) 10:55 인천 → 17:20 히드로 T4' },
+  { icon:'🚂', route:'런던 → 파리 (유로스타)', detail:'9/29(화) <strong>12:31 런던 → 15:59 파리 북역</strong><br>⚠️ 10:30까지 역 도착 필수', app:'📱 앱: 유로스타' },
+  { icon:'🚄', route:'파리 → 뮌헨 (TGV)', detail:'<strong>TGV 9577</strong> · 10/1(목) 15:55 파리 동역 → 21:36 뮌헨 중앙역', app:'📱 앱: DB' },
+  { icon:'✈️', route:'뮌헨 → 피렌체 (비행기)', detail:'<strong>Lufthansa LH</strong> · 10/5(월) 07:55 MUC → FLR (약 1:15)' },
+  { icon:'🚄', route:'피렌체 → 로마 (Italo)', detail:'<strong>Italo 8902</strong> · 10/7(수) 12:28 Firenze S.M.N. → 로마 (약 2시간반)', app:'📱 앱: Italo', cost:'42,176원' },
+  { icon:'🚄', route:'로마 → 밀라노 (Italo)', detail:'<strong>Italo</strong> · 10/11(일) 10:05 Roma Termini → 밀라노 Centrale<br>이후 공항철도로 공항 이동', app:'📱 앱: Italo' },
+  { icon:'✈️', route:'밀라노 → 인천 (귀국)', detail:'10/11(일) 밀라노 공항 출발 → 10/12(월) 인천 도착' },
+];
+
+const COMMUNITY = {
+  london: {
+    spots:[ ['영국박물관','로제타석·이집트관, 무료. 개장 직후가 한산'], ['내셔널 갤러리','고흐 해바라기·터너. 트라팔가 광장 옆'],
+      ['버로우 마켓','런던 최고 먹거리 시장, 점심 추천'], ['타워브릿지·타워','템즈 야경 명소'], ['노팅힐·포토벨로','주말 앤틱마켓·파스텔 골목'] ],
+    food:[ ['Dishoom','봄베이식 인도요리, 아침 베이컨난 유명 (웨이팅)'], ['Flat Iron','합리적 스테이크'], ['Poppies','전통 피시앤칩스'], ['한인 밥집(파크런던)','한식 아침/저녁 제공'] ]
+  },
+  paris: {
+    spots:[ ['에펠탑 트로카데로','야경·정각 반짝임 포인트'], ['루브르','모나리자·드농관, 온라인 예약'], ['오르세 미술관','인상파 컬렉션'],
+      ['몽마르뜨·사크레쾨르','언덕 전망·화가광장'], ['생제르맹·세느강변','산책·서점·카페'] ],
+    food:[ ['L\'As du Fallafel','마레지구 팔라펠 (현지 줄서는 맛집)'], ['Angelina','핫초코·몽블랑'], ['Bouillon Chartier','합리적 전통 프렌치'], ['Du Pain et des Idées','크루아상·에스카르고 페이스트리'] ]
+  },
+  munich: {
+    spots:[ ['마리엔광장·신시청사','글로켄슈필 인형시계'], ['영국정원','도심 최대 공원·서핑 파도'], ['BMW 벨트/박물관','자동차 마니아 성지'],
+      ['님펜부르크 궁전','바로크 정원'], ['추크슈피체','독일 최고봉, 날씨 필수 확인'] ],
+    food:[ ['Hofbräuhaus','대표 맥주홀·학세'], ['Augustiner Bräustuben','현지인 픽 맥주홀'], ['Viktualienmarkt','시내 먹거리 시장'], ['Vinzenzmurr','현지 소시지·간편식'] ]
+  },
+  florence: {
+    spots:[ ['두오모(쿠폴라)','피렌체 상징, 쿠폴라 예약'], ['우피치 미술관','보티첼리 비너스의 탄생'], ['미켈란젤로 광장','도시 전경 일몰 명소'],
+      ['베키오 다리','아르노강 위 금세공 다리'], ['피사(당일)','기울어진 탑, 첫차 추천'] ],
+    food:[ ['All\'Antico Vinaio','명물 파니니 (긴 웨이팅)'], ['Trattoria Mario','점심만 여는 현지 트라토리아'], ['Gelateria dei Neri','젤라또'], ['Mercato Centrale','2층 푸드코트'] ]
+  },
+  rome: {
+    spots:[ ['콜로세움·포로로마노','통합권 예약'], ['바티칸 박물관·시스티나','예약 필수, 성베드로 성당'], ['트레비 분수','동전 던지기 명소'],
+      ['판테온','완벽 보존 고대 신전, 무료'], ['스페인 계단·나보나 광장','산책·분수'] ],
+    food:[ ['Roscioli','카르보나라·살루미 (예약)'], ['Pizzarium','바닌 로마식 조각피자'], ['Da Enzo al 29','트라스테베레 정통 로마요리'], ['Giolitti','로마 대표 젤라또'] ]
+  }
+};
+
+/* ══════════════════ STORAGE ══════════════════ */
+const LS = {
+  acts: 'noleu_added_acts_v1',
+  diary: 'noleu_diary_v1',
+};
+function load(key, def){ try { return JSON.parse(localStorage.getItem(key)) || def; } catch(e){ return def; } }
+function save(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){ toast('저장 공간이 부족해요 (사진 용량 확인)'); } }
+let addedActs = load(LS.acts, {});   // { dayNum: [ {ic,t,type,time} ] }
+let diary = load(LS.diary, []);       // [ {id, who, day, date, title, body, photos:[dataURL] } ]
+
+/* ══════════════════ HELPERS ══════════════════ */
+function esc(s){ return (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),1900); }
+function dayLabel(d){ const day=DAYS.find(x=>x.d===d); return day ? `D${day.d} · ${day.date}(${day.wd}) ${CITIES[day.city].name}` : `D${d}`; }
+
+/* ══════════════════ RENDER: ROUTE BAR ══════════════════ */
+function renderRoute(){
+  const el = document.getElementById('routeInner');
+  el.innerHTML = ROUTE.map(r=>{
+    if(r.line){ const ic = r.line==='plane' ? '✈' : (r.line==='train'?'🚄':'🚂');
+      return `<div class="route-line ${r.line}"><span class="route-line-icon">${ic}</span></div>`; }
+    const c = r.key ? CITIES[r.key] : null;
+    const dotStyle = r.plain ? 'background:#E8F4F8; font-size:14px;' : `background:${c.color}; border-color:white;`;
+    const nameStyle = c ? `color:${c.color}` : '';
+    const click = r.key ? `onclick="gotoCity('${r.key}')"` : '';
+    return `<div class="route-city" ${click}>
+      <div class="route-dot" style="${dotStyle}">${r.flag}</div>
+      <div class="route-city-name" style="${nameStyle}">${r.name}</div>
+      <div class="route-city-date">${r.date}</div></div>`;
+  }).join('');
+}
+
+/* ══════════════════ RENDER: CITY CHIPS ══════════════════ */
+function renderCityChips(){
+  document.getElementById('cityChipRow').innerHTML = CITY_ORDER.map(k=>{
+    const c=CITIES[k];
+    return `<button class="citychip" onclick="gotoCity('${k}')"><span class="dot" style="background:${c.color}"></span>${c.flag} ${c.name}</button>`;
+  }).join('');
+}
+
+/* ══════════════════ RENDER: HORIZONTAL DAY TIMELINE ══════════════════ */
+function dayActs(day){ return (day.acts||[]).concat(addedActs[day.d]||[]); }
+
+function renderHscroll(){
+  document.getElementById('hscroll').innerHTML = DAYS.map(day=>{
+    const c = CITIES[day.city];
+    const cls = day.transit ? 'transit' : c.cls;
+    const color = day.transit ? '#8B96A8' : c.color;
+    const badges = day.badges.map(b=>{
+      if(b==='→') return '<span style="color:#8B96A8">→</span>';
+      const bc = badgeColor(b);
+      return `<span class="city-badge" style="background:${bc}">${b}</span>`;
+    }).join(' ');
+    const detailRows = [];
+    if(day.transport) detailRows.push(`<div class="detail-row"><span class="detail-icon">${day.transport.icon}</span><span class="detail-text">${day.transport.text}</span></div>`);
+    if(day.hotel) detailRows.push(`<div class="detail-row"><span class="detail-icon">🏨</span><span class="detail-text">${day.hotel.text}</span></div>`);
+    dayActs(day).forEach(a=> detailRows.push(`<div class="detail-row"><span class="detail-icon">${a.ic||'•'}</span><span class="detail-text">${esc(a.t)}</span></div>`));
+    return `<div class="hday" style="border-top-color:${color}" onclick="toggleHday(this, event)" data-city="${day.city}">
+      <div class="hday-top">
+        <div class="hday-num" style="background:${color}"><b>D${day.d}</b><span>${day.date}</span></div>
+        <div class="hday-cityline"><span class="hday-city" style="color:${color}">${day.transit?'이동':c.name}</span><span class="hday-wd">${day.wd}요일</span></div>
+      </div>
+      <div class="hday-name">${esc(day.title)}</div>
+      <div class="hday-detail">
+        <div class="day-meta" style="margin-bottom:8px">${badges}</div>
+        <div class="day-details">${detailRows.join('')}</div>
+        <button class="hday-jump" onclick="gotoCity('${day.city}', event)">🗂 ${c.name} 도시탭 열기 →</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function badgeColor(b){ const map={'런던':'#5B7FA6','파리':'#C4788A','뮌헨':'#6B9E7A','피렌체':'#D4735A','로마':'#B5832A','이동':'#8B96A8','밀라노':'#8B96A8','귀국':'#8B96A8'}; return map[b]||'#8B96A8'; }
+function toggleHday(el, ev){
+  if(ev && ev.target.closest('.hday-jump')) return;
+  const was = el.classList.contains('expanded');
+  document.querySelectorAll('.hday.expanded').forEach(x=>x.classList.remove('expanded'));
+  if(!was){ el.classList.add('expanded'); el.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'}); }
+}
+
+/* ══════════════════ RENDER: CITY SUB-TABS ══════════════════ */
+function renderCitySubtabs(){
+  document.getElementById('citySubtabs').innerHTML = CITY_ORDER.map((k,i)=>{
+    const c=CITIES[k];
+    return `<button class="subtab ${i===0?'active':''}" data-city="${k}" onclick="showCityPanel('${k}', this)"><span style="color:${c.color}">${c.flag}</span> ${c.name}</button>`;
+  }).join('');
+  document.getElementById('cityPanels').innerHTML = CITY_ORDER.map((k,i)=>renderCityPanel(k,i===0)).join('');
+}
+function renderCityPanel(k, active){
+  const c=CITIES[k];
+  const prep=PREP[k];
+  return `<div class="subpanel ${active?'active':''}" id="panel-${k}">
+    <button class="add-btn" onclick="openAddForm('${k}')">＋ 일정·투어 추가</button>
+    <div class="addform" id="addform-${k}">
+      <div class="row">
+        <div class="field" style="flex:0 0 120px"><label>날짜</label><select id="af-day-${k}"></select></div>
+        <div class="field" style="flex:0 0 110px"><label>시간</label><input id="af-time-${k}" placeholder="09:30"></div>
+        <div class="field" style="flex:0 0 130px"><label>종류</label>
+          <select id="af-type-${k}"><option value="🎫">🎫 투어</option><option value="📸">📸 관광</option><option value="🍽">🍽 식사</option><option value="🚈">🚈 교통</option><option value="🛍">🛍 쇼핑</option><option value="📌">📌 기타</option></select></div>
+      </div>
+      <div class="field" style="margin-bottom:10px"><label>내용</label><input id="af-text-${k}" placeholder="예: 알리안츠 아레나 스타디움 투어 예약 (14:00)"></div>
+      <div class="form-actions"><button class="btn btn-primary" onclick="addActivity('${k}')">추가</button><button class="btn btn-ghost" onclick="closeAddForm('${k}')">취소</button></div>
+    </div>
+    <div class="city-layout">
+      <div class="timeline" id="ctimeline-${k}">${renderCityTimeline(k)}</div>
+      <div class="prep-panel" style="border-top:3px solid ${c.color}">
+        <div class="prep-head">🎒 ${c.name} 준비 &amp; 팁</div>
+        <div class="prep-sub">✅ 준비할 것</div>
+        ${prep.must.map(m=>`<div class="prep-item"><span class="ic">✔️</span><span>${m}</span></div>`).join('')}
+        <div class="prep-sub">💡 현지 팁</div>
+        ${prep.tip.map(m=>`<div class="prep-item"><span class="ic">•</span><span>${m}</span></div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+function renderCityTimeline(k){
+  const days = DAYS.filter(d=>d.city===k);
+  if(!days.length) return '<p class="hint">일정이 없어요.</p>';
+  return days.map((day,idx)=>{
+    const c=CITIES[k]; const last = idx===days.length-1;
+    const rows=[];
+    if(day.transport) rows.push(`<div class="detail-row"><span class="detail-icon">${day.transport.icon}</span><span class="detail-text">${day.transport.text}</span></div>`);
+    if(day.hotel) rows.push(`<div class="detail-row"><span class="detail-icon">🏨</span><span class="detail-text">${day.hotel.text}</span></div>`);
+    (day.acts||[]).forEach(a=> rows.push(`<div class="detail-row"><span class="detail-icon">${a.ic||'•'}</span><span class="detail-text">${esc(a.t)}</span></div>`));
+    (addedActs[day.d]||[]).forEach((a,ai)=> rows.push(`<div class="detail-row added"><span class="detail-icon">${a.ic||'📌'}</span><span class="detail-text">${a.time?`<strong>${esc(a.time)}</strong> · `:''}${esc(a.t)}</span><span class="detail-del" onclick="delActivity(${day.d},${ai})" title="삭제">✕</span></div>`));
+    return `<div class="day-block">
+      <div class="day-left"><div class="day-circle ${c.cls}"><span class="day-num">D${day.d}</span><span class="day-date">${day.date}</span></div>${last?'':`<div class="day-line ${c.cls}-line"></div>`}</div>
+      <div class="day-right ${c.cls}-border">
+        <div class="day-meta"><span class="day-weekday">${day.wd}</span><span class="city-badge ${c.cls}">${c.name}</span></div>
+        <div class="day-title">${esc(day.title)}</div>
+        ${rows.length?`<div class="day-details">${rows.join('')}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════ ADD ACTIVITY ══════════════════ */
+function fillDaySelect(sel, cityKey){
+  const days = cityKey ? DAYS.filter(d=>d.city===cityKey) : DAYS;
+  sel.innerHTML = days.map(d=>`<option value="${d.d}">D${d.d} · ${d.date}(${d.wd})</option>`).join('');
+}
+function openAddForm(k){ const f=document.getElementById('addform-'+k); fillDaySelect(document.getElementById('af-day-'+k), k); f.classList.add('open'); }
+function closeAddForm(k){ document.getElementById('addform-'+k).classList.remove('open'); }
+function addActivity(k){
+  const d = +document.getElementById('af-day-'+k).value;
+  const time = document.getElementById('af-time-'+k).value.trim();
+  const ic = document.getElementById('af-type-'+k).value;
+  const t = document.getElementById('af-text-'+k).value.trim();
+  if(!t){ toast('내용을 입력해주세요'); return; }
+  if(!addedActs[d]) addedActs[d]=[];
+  addedActs[d].push({ ic, t, time });
+  save(LS.acts, addedActs);
+  document.getElementById('af-text-'+k).value=''; document.getElementById('af-time-'+k).value='';
+  closeAddForm(k);
+  refreshTimelines();
+  toast('일정이 추가됐어요 ✨');
+}
+function delActivity(dayNum, idx){
+  if(!addedActs[dayNum]) return;
+  addedActs[dayNum].splice(idx,1);
+  if(!addedActs[dayNum].length) delete addedActs[dayNum];
+  save(LS.acts, addedActs);
+  refreshTimelines();
+}
+function refreshTimelines(){
+  CITY_ORDER.forEach(k=>{ const el=document.getElementById('ctimeline-'+k); if(el) el.innerHTML=renderCityTimeline(k); });
+  renderHscroll();
+}
+
+/* ══════════════════ NAV ══════════════════ */
+function showTab(name, btn){
+  document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function showCityPanel(k, btn){
+  document.querySelectorAll('.subpanel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.subtab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+k).classList.add('active');
+  if(btn) btn.classList.add('active');
+  else { const b=document.querySelector(`.subtab[data-city="${k}"]`); if(b) b.classList.add('active'); }
+}
+function gotoCity(k, ev){
+  if(ev) ev.stopPropagation();
+  showTab('schedule', document.querySelector('.nav-tab'));
+  showCityPanel(k, null);
+  setTimeout(()=>{ document.getElementById('citySubtabs').scrollIntoView({behavior:'smooth', block:'start'}); }, 60);
+}
+
+/* ══════════════════ RENDER: HOTELS / TRANSPORT / COMMUNITY ══════════════════ */
+function renderHotels(){
+  document.getElementById('hotelsGrid').innerHTML = HOTELS.map(h=>{
+    const c=CITIES[h.city];
+    return `<div class="hotel-card" style="border-top-color:${c.color}">
+      <div class="hotel-city-label" style="color:${c.color}">${h.label}</div>
+      <div class="hotel-name">${esc(h.name)}</div>
+      <div class="hotel-dates">${esc(h.dates)}</div>
+      <div class="hotel-info">${h.rows.map(r=>`<div class="hotel-row"><span>${r[0]}</span><span>${esc(r[1])}</span></div>`).join('')}</div>
+      <div class="hotel-cost">${esc(h.cost)}</div>
+    </div>`;
+  }).join('');
+}
+function renderTransport(){
+  document.getElementById('transportList').innerHTML = TRANSPORT.map(t=>`
+    <div class="transport-item">
+      <div class="transport-icon-big">${t.icon}</div>
+      <div class="transport-body">
+        <div class="transport-route">${esc(t.route)}</div>
+        <div class="transport-detail">${t.detail}</div>
+        ${t.app?`<div class="transport-app">${esc(t.app)}</div>`:''}
+      </div>
+      ${t.cost?`<div class="transport-cost-badge">${esc(t.cost)}</div>`:''}
+    </div>`).join('');
+}
+function renderCommunity(){
+  document.getElementById('communityWrap').innerHTML = CITY_ORDER.map(k=>{
+    const c=CITIES[k]; const d=COMMUNITY[k];
+    return `<div class="comm-city" style="border-top-color:${c.color}">
+      <div class="comm-city-head"><span style="font-size:20px">${c.flag}</span><span class="comm-city-name">${c.name}</span><span class="city-badge" style="background:${c.color}">${c.country}</span></div>
+      <div class="comm-city-src">커뮤니티·여행 카페 자주 언급 · 방문 전 최신 영업/예약 확인 권장</div>
+      <div class="comm-cols">
+        <div><div class="comm-col-head">📍 주요 방문지</div>
+          ${d.spots.map(s=>`<div class="comm-entry"><div class="comm-entry-name">${esc(s[0])}</div><div class="comm-entry-desc">${esc(s[1])}</div></div>`).join('')}
+        </div>
+        <div><div class="comm-col-head">🍽 맛집</div>
+          ${d.food.map(s=>`<div class="comm-entry"><div class="comm-entry-name">${esc(s[0])}</div><div class="comm-entry-desc">${esc(s[1])}</div></div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════ DIARY ══════════════════ */
+let pendingPhotos = [];
+let editingId = null;
+
+function openDiaryModal(who){
+  editingId=null; pendingPhotos=[];
+  document.getElementById('diaryModalTitle').textContent='✏️ 오늘의 일기';
+  fillDaySelect(document.getElementById('dDay'), null);
+  if(who) document.getElementById('dWho').value=who;
+  document.getElementById('dTitle').value=''; document.getElementById('dBody').value='';
+  document.getElementById('photoPreview').innerHTML=''; document.getElementById('dPhotos').value='';
+  document.getElementById('diaryModal').classList.add('open');
+}
+function editDiary(id){
+  const e=diary.find(x=>x.id===id); if(!e) return;
+  editingId=id; pendingPhotos=(e.photos||[]).slice();
+  document.getElementById('diaryModalTitle').textContent='✏️ 일기 수정';
+  fillDaySelect(document.getElementById('dDay'), null);
+  document.getElementById('dWho').value=e.who;
+  document.getElementById('dDay').value=e.day;
+  document.getElementById('dTitle').value=e.title;
+  document.getElementById('dBody').value=e.body;
+  renderPhotoPreview();
+  document.getElementById('diaryModal').classList.add('open');
+}
+function closeDiaryModal(){ document.getElementById('diaryModal').classList.remove('open'); }
+
+function handlePhotoPick(ev){
+  const files=[...ev.target.files];
+  let remaining=files.length;
+  if(!remaining) return;
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{ resizeImage(e.target.result, 900, dataUrl=>{ pendingPhotos.push(dataUrl); renderPhotoPreview(); }); };
+    reader.readAsDataURL(file);
+  });
+}
+function resizeImage(src, maxW, cb){
+  const img=new Image();
+  img.onload=()=>{
+    let w=img.width, h=img.height;
+    if(w>maxW){ h=Math.round(h*maxW/w); w=maxW; }
+    const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+    cv.getContext('2d').drawImage(img,0,0,w,h);
+    cb(cv.toDataURL('image/jpeg', 0.8));
+  };
+  img.onerror=()=>cb(src);
+  img.src=src;
+}
+function renderPhotoPreview(){
+  document.getElementById('photoPreview').innerHTML = pendingPhotos.map((p,i)=>
+    `<div class="pp"><img src="${p}"><button class="rm" onclick="removePendingPhoto(${i})">✕</button></div>`).join('');
+}
+function removePendingPhoto(i){ pendingPhotos.splice(i,1); renderPhotoPreview(); }
+
+function saveDiary(){
+  const who=document.getElementById('dWho').value;
+  const day=+document.getElementById('dDay').value;
+  const title=document.getElementById('dTitle').value.trim();
+  const body=document.getElementById('dBody').value.trim();
+  if(!title && !body){ toast('제목이나 내용을 입력해주세요'); return; }
+  const dayObj=DAYS.find(x=>x.d===day);
+  if(editingId){
+    const e=diary.find(x=>x.id===editingId);
+    Object.assign(e,{who,day,date:dayObj.date,title,body,photos:pendingPhotos.slice()});
+  } else {
+    diary.push({ id:'e'+Date.now()+Math.floor(performance.now()), who, day, date:dayObj.date, title, body, photos:pendingPhotos.slice() });
+  }
+  save(LS.diary, diary);
+  closeDiaryModal(); renderDiary();
+  toast('일기가 저장됐어요 📔');
+}
+function delDiary(id){
+  diary=diary.filter(x=>x.id!==id); save(LS.diary, diary); renderDiary();
+}
+function renderDiary(){
+  ['mom','son'].forEach(who=>{
+    const entries=diary.filter(e=>e.who===who).sort((a,b)=>a.day-b.day);
+    document.getElementById(who+'Cnt').textContent = entries.length? `${entries.length}편` : '';
+    const wrap=document.getElementById(who+'Wrap');
+    if(!entries.length){ wrap.innerHTML=`<div class="diary-empty">아직 기록이 없어요.<br>매일의 순간을 남겨보세요 🌿</div>`; return; }
+    wrap.innerHTML = entries.map(e=>`
+      <div class="postit ${who}">
+        <span class="pin">📌</span>
+        <div class="postit-actions"><button onclick="editDiary('${e.id}')" title="수정">✎</button><button onclick="delDiary('${e.id}')" title="삭제">🗑</button></div>
+        <div class="postit-date">${dayLabel(e.day)}</div>
+        ${e.title?`<div class="postit-title">${esc(e.title)}</div>`:''}
+        <div class="postit-body">${esc(e.body)}</div>
+        ${e.photos&&e.photos.length?`<div class="postit-photos">${e.photos.map(p=>`<img src="${p}" onclick="viewImage('${p}')">`).join('')}</div>`:''}
+      </div>`).join('');
+  });
+}
+function viewImage(src){ document.getElementById('imgModalImg').src=src; document.getElementById('imgModal').classList.add('open'); }
+
+/* ══════════════════ BRUNCH PUBLISH ══════════════════ */
+function openBrunch(){
+  if(!diary.length){ toast('먼저 일기를 작성해주세요 ✏️'); return; }
+  // populate day scope options
+  const days=[...new Set(diary.map(e=>e.day))].sort((a,b)=>a-b);
+  const sel=document.getElementById('brunchScope');
+  sel.innerHTML = `<option value="all">전체 일기 모아서</option>` + days.map(d=>`<option value="${d}">${dayLabel(d)}</option>`).join('');
+  document.getElementById('brunchOut').classList.add('open');
+  renderBrunch();
+  document.getElementById('brunchOut').scrollIntoView({behavior:'smooth'});
+}
+function closeBrunch(){ document.getElementById('brunchOut').classList.remove('open'); }
+
+function buildBrunch(){
+  const scope=document.getElementById('brunchScope').value;
+  const voice=document.getElementById('brunchVoice').value;
+  let entries=diary.slice().sort((a,b)=>a.day-b.day || (a.who>b.who?1:-1));
+  if(scope!=='all') entries=entries.filter(e=>e.day===+scope);
+  if(voice!=='both') entries=entries.filter(e=>e.who===voice);
+  if(!entries.length) return null;
+
+  const cities=[...new Set(entries.map(e=>CITIES[DAYS.find(d=>d.d===e.day).city].name))];
+  const dates=entries.map(e=>e.date);
+  const firstTitle = entries.find(e=>e.title)?.title;
+  const whoName = v=> v==='mom'?'엄마':'아들';
+
+  // Title & subtitle (Brunch 스타일: 감성적 제목 + 부제)
+  let h1, sub;
+  if(scope==='all'){
+    h1 = `유럽, 우리 둘이 걸은 열여덟 밤`;
+    sub = `${cities.join(' · ')} — 엄마와 아들의 여행 일기`;
+  } else {
+    const cityName = CITIES[DAYS.find(d=>d.d===+scope).city].name;
+    h1 = firstTitle || `${cityName}에서의 하루`;
+    sub = `${dayLabel(+scope)}`;
+  }
+  const metaLine = `${dates[0]}${dates.length>1?` – ${dates[dates.length-1]}`:''} · ${cities.join(', ')}`;
+
+  // Body: group by day, weave mom/son
+  const byDay={};
+  entries.forEach(e=>{ (byDay[e.day]=byDay[e.day]||[]).push(e); });
+  const dayNums=Object.keys(byDay).map(Number).sort((a,b)=>a-b);
+
+  let blocks=[];
+  // intro
+  blocks.push({type:'p', html: intro(cities, dates)});
+  dayNums.forEach(dn=>{
+    const dl=DAYS.find(d=>d.d===dn);
+    const cityName=CITIES[dl.city].name;
+    if(scope==='all') blocks.push({type:'h2', html:`${dl.date}, ${cityName}`});
+    byDay[dn].sort((a,b)=> a.who>b.who?1:-1).forEach(e=>{
+      if(e.title && scope!=='all') blocks.push({type:'h2', html:esc(e.title)});
+      if(voice==='both') blocks.push({type:'label', html:`${e.who==='mom'?'👩 엄마':'🧑 아들'}의 기록`});
+      splitParas(e.body).forEach((para,i)=>{
+        if(i===0 && para.length<60) blocks.push({type:'quote', html:esc(para)});
+        else blocks.push({type:'p', html:esc(para)});
+      });
+      (e.photos||[]).forEach(p=> blocks.push({type:'img', html:p}));
+    });
+  });
+  // closing
+  blocks.push({type:'close', html: closing(cities)});
+
+  return { h1, sub, metaLine, blocks };
+}
+function intro(cities, dates){
+  return `${dates[0]}, 우리는 ${cities[0]}의 아침 공기 속에서 여행을 시작했다. 계획표 위의 글자들이 하나씩 진짜 골목과 냄새와 표정으로 바뀌어 가는 동안, 나는 이 순간을 오래 기억하고 싶어 이렇게 몇 줄을 남긴다.`;
+}
+function closing(cities){
+  return `${cities[cities.length-1]}의 밤이 저물고, 우리가 함께 걸은 길들이 마음에 남는다. 다음 페이지에서 또 이어질 이야기.`;
+}
+function splitParas(txt){ return (txt||'').split(/\n\s*\n|\n/).map(s=>s.trim()).filter(Boolean); }
+
+function renderBrunch(){
+  const data=buildBrunch();
+  const paper=document.getElementById('brunchPaper');
+  if(!data){ paper.innerHTML='<p class="hint">선택한 조건에 해당하는 일기가 없어요.</p>'; return; }
+  let body=data.blocks.map(b=>{
+    if(b.type==='h2') return `<h2>${b.html}</h2>`;
+    if(b.type==='quote') return `<blockquote>${b.html}</blockquote>`;
+    if(b.type==='label') return `<p style="font-size:12px;color:var(--text-light);font-weight:700;margin-bottom:6px">${b.html}</p>`;
+    if(b.type==='img') return `<div class="brunch-fig"><img src="${b.html}"></div>`;
+    if(b.type==='close') return `<div class="brunch-close">${b.html}</div>`;
+    return `<p>${b.html}</p>`;
+  }).join('');
+  paper.innerHTML=`
+    <div class="brunch-kicker">TRAVEL ESSAY · 노을의 유럽</div>
+    <div class="brunch-h1">${esc(data.h1)}</div>
+    <div class="brunch-sub">${esc(data.sub)}</div>
+    <div class="brunch-meta">${esc(data.metaLine)}</div>
+    <div class="brunch-rule"></div>
+    <div class="brunch-body">${body}</div>`;
+}
+function copyBrunch(){
+  const data=buildBrunch();
+  if(!data){ toast('복사할 내용이 없어요'); return; }
+  let lines=[data.h1, data.sub, '', data.metaLine, '─────────────', ''];
+  data.blocks.forEach(b=>{
+    if(b.type==='img') { lines.push('[사진]'); return; }
+    if(b.type==='h2') { lines.push('', '■ '+strip(b.html), ''); return; }
+    if(b.type==='quote') { lines.push('“'+strip(b.html)+'”'); return; }
+    if(b.type==='label') { lines.push(strip(b.html)+' —'); return; }
+    if(b.type==='close') { lines.push('', strip(b.html)); return; }
+    lines.push(strip(b.html), '');
+  });
+  const text=lines.join('\n');
+  navigator.clipboard.writeText(text).then(()=>toast('브런치 글이 복사됐어요 📋'),
+    ()=>{ // fallback
+      const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); toast('복사됐어요 📋'); }catch(e){ toast('복사 실패 - 길게 눌러 복사해주세요'); }
+      document.body.removeChild(ta);
+    });
+}
+function strip(html){ const d=document.createElement('div'); d.innerHTML=html; return d.textContent||''; }
+
+/* ══════════════════ E-BOOK DRAFT ══════════════════ */
+function openEbook(){
+  if(!diary.length){ toast('일기를 먼저 작성해주세요'); return; }
+  // reuse brunch panel with all + both, and add a book cover note
+  document.getElementById('brunchScope').value='all';
+  document.getElementById('brunchVoice').value='both';
+  openBrunch();
+  toast('전체 일기를 전자책 원고 형태로 모았어요 📖');
+}
+
+/* ══════════════════ FREE APIs ══════════════════ */
+async function loadFx(){
+  const bar=document.getElementById('fxBar');
+  const fmt=n=>Math.round(n).toLocaleString('ko-KR');
+  try{
+    const r=await fetch('https://open.er-api.com/v6/latest/USD');
+    const j=await r.json();
+    if(!j.rates) throw 0;
+    const krw=j.rates.KRW, gbp=j.rates.GBP, eur=j.rates.EUR;
+    const usdKrw=krw, gbpKrw=krw/gbp, eurKrw=krw/eur;
+    const upd=j.time_last_update_utc ? j.time_last_update_utc.slice(5,16) : '';
+    bar.innerHTML=`<span class="fx-meta">💱 실시간 환율 (원)</span>
+      <span class="fx-item"><span class="fx-flag">🇺🇸</span><span class="fx-code">USD</span><span class="fx-val">${fmt(usdKrw)}<small>원</small></span></span>
+      <span class="fx-item"><span class="fx-flag">🇬🇧</span><span class="fx-code">GBP</span><span class="fx-val">${fmt(gbpKrw)}<small>원</small></span></span>
+      <span class="fx-item"><span class="fx-flag">🇪🇺</span><span class="fx-code">EUR</span><span class="fx-val">${fmt(eurKrw)}<small>원</small></span></span>
+      <span class="fx-meta">${upd} 기준</span>`;
+  }catch(e){
+    bar.innerHTML=`<span class="fx-meta">💱 환율</span>
+      <span class="fx-item"><span class="fx-flag">🇺🇸</span><span class="fx-code">USD</span><span class="fx-val">~1,380<small>원</small></span></span>
+      <span class="fx-item"><span class="fx-flag">🇬🇧</span><span class="fx-code">GBP</span><span class="fx-val">~1,750<small>원</small></span></span>
+      <span class="fx-item"><span class="fx-flag">🇪🇺</span><span class="fx-code">EUR</span><span class="fx-val">~1,490<small>원</small></span></span>
+      <span class="fx-meta">오프라인 · 참고치</span>`;
+  }
+}
+const WMO={0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',48:'🌫',51:'🌦',53:'🌦',55:'🌧',61:'🌦',63:'🌧',65:'🌧',66:'🌧',67:'🌧',71:'🌨',73:'🌨',75:'❄️',77:'🌨',80:'🌦',81:'🌧',82:'⛈',85:'🌨',86:'❄️',95:'⛈',96:'⛈',99:'⛈'};
+async function loadWeather(){
+  const strip=document.getElementById('weatherStrip');
+  const results=await Promise.all(CITY_ORDER.map(async k=>{
+    const c=CITIES[k];
+    try{
+      const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1`);
+      const j=await r.json();
+      const t=Math.round(j.current.temperature_2m);
+      const code=j.current.weather_code;
+      const hi=Math.round(j.daily.temperature_2m_max[0]); const lo=Math.round(j.daily.temperature_2m_min[0]);
+      return {k, ok:true, emoji:WMO[code]||'🌡', t, hi, lo};
+    }catch(e){ return {k, ok:false}; }
+  }));
+  strip.innerHTML=results.map(w=>{
+    const c=CITIES[w.k];
+    if(!w.ok) return `<div class="weather-chip" style="border-top-color:${c.color}"><span class="weather-emoji">🌡</span><div class="weather-body"><span class="weather-city">${c.flag} ${c.name}</span><span class="weather-temp"><small>불러오기 실패</small></span></div></div>`;
+    return `<div class="weather-chip" style="border-top-color:${c.color}">
+      <span class="weather-emoji">${w.emoji}</span>
+      <div class="weather-body"><span class="weather-city">${c.flag} ${c.name}</span>
+      <span class="weather-temp">${w.t}° <small>H${w.hi}° L${w.lo}°</small></span></div></div>`;
+  }).join('');
+}
+
+/* ══════════════════ INIT ══════════════════ */
+function init(){
+  renderRoute();
+  renderCityChips();
+  renderHscroll();
+  renderCitySubtabs();
+  renderHotels();
+  renderTransport();
+  renderCommunity();
+  renderDiary();
+  loadFx();
+  loadWeather();
+}
+init();
+</script>
+</body>
+</html>
