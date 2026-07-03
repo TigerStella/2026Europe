@@ -146,6 +146,10 @@
   .section-icon { font-size: 18px; }
   .section-title { font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-mid); }
   .section-sub { font-size: 11px; color: var(--text-light); font-weight: 400; letter-spacing: 0; text-transform: none; margin-left: auto; }
+  .mini-refresh { margin-left: auto; background: var(--mist); border: 1px solid var(--border); color: var(--text-mid); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 14px; cursor: pointer; font-family: inherit; }
+  .mini-refresh:hover { background: var(--border); }
+  .fx-refresh { background: rgba(255,255,255,0.14); border: none; color: rgba(255,255,255,0.85); font-size: 11px; padding: 2px 8px; border-radius: 12px; cursor: pointer; font-family: inherit; }
+  .fx-refresh:hover { background: rgba(255,255,255,0.28); }
 
   /* ── TIMELINE (vertical) ── */
   .timeline { display: flex; flex-direction: column; gap: 0; }
@@ -476,7 +480,7 @@
     <div class="section-header">
       <span class="section-icon">🌤</span>
       <span class="section-title">도시별 실시간 날씨</span>
-      <span class="section-sub">Open-Meteo</span>
+      <button class="mini-refresh" onclick="loadWeather()" title="날씨 새로고침">🔄 새로고침</button>
     </div>
     <div class="weather-strip" id="weatherStrip"><span class="hint">날씨 불러오는 중…</span></div>
 
@@ -1597,51 +1601,50 @@ function zipStore(files){
 }
 
 /* ══════════════════ FREE APIs ══════════════════ */
+async function fetchJSON(url, ms=8000){
+  const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(), ms);
+  try{ const r=await fetch(url, {signal:ctrl.signal, cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); }
+  finally{ clearTimeout(t); }
+}
+const fxRow=(flag,code,val)=>`<span class="fx-item"><span class="fx-flag">${flag}</span><span class="fx-code">${code}</span><span class="fx-val">${val}<small>원</small></span></span>`;
 async function loadFx(){
   const bar=document.getElementById('fxBar');
   const fmt=n=>Math.round(n).toLocaleString('ko-KR');
-  try{
-    const r=await fetch('https://open.er-api.com/v6/latest/USD');
-    const j=await r.json();
-    if(!j.rates) throw 0;
-    const krw=j.rates.KRW, gbp=j.rates.GBP, eur=j.rates.EUR;
-    const usdKrw=krw, gbpKrw=krw/gbp, eurKrw=krw/eur;
-    const upd=j.time_last_update_utc ? j.time_last_update_utc.slice(5,16) : '';
-    bar.innerHTML=`<span class="fx-meta">💱 실시간 환율 (원)</span>
-      <span class="fx-item"><span class="fx-flag">🇺🇸</span><span class="fx-code">USD</span><span class="fx-val">${fmt(usdKrw)}<small>원</small></span></span>
-      <span class="fx-item"><span class="fx-flag">🇬🇧</span><span class="fx-code">GBP</span><span class="fx-val">${fmt(gbpKrw)}<small>원</small></span></span>
-      <span class="fx-item"><span class="fx-flag">🇪🇺</span><span class="fx-code">EUR</span><span class="fx-val">${fmt(eurKrw)}<small>원</small></span></span>
-      <span class="fx-meta">${upd} 기준</span>`;
-  }catch(e){
-    bar.innerHTML=`<span class="fx-meta">💱 환율</span>
-      <span class="fx-item"><span class="fx-flag">🇺🇸</span><span class="fx-code">USD</span><span class="fx-val">~1,380<small>원</small></span></span>
-      <span class="fx-item"><span class="fx-flag">🇬🇧</span><span class="fx-code">GBP</span><span class="fx-val">~1,750<small>원</small></span></span>
-      <span class="fx-item"><span class="fx-flag">🇪🇺</span><span class="fx-code">EUR</span><span class="fx-val">~1,490<small>원</small></span></span>
-      <span class="fx-meta">오프라인 · 참고치</span>`;
-  }
+  bar.innerHTML=`<span class="fx-meta">💱 환율 불러오는 중…</span>`;
+  const render=(usd,gbp,eur,meta)=>{ bar.innerHTML=
+    `<span class="fx-meta">💱 실시간 환율 (원)</span>${fxRow('🇺🇸','USD',fmt(usd))}${fxRow('🇬🇧','GBP',fmt(gbp))}${fxRow('🇪🇺','EUR',fmt(eur))}<span class="fx-meta">${meta}</span><button class="fx-refresh" onclick="loadFx()" title="새로고침">🔄</button>`; };
+  // 1순위: open.er-api.com
+  try{ const j=await fetchJSON('https://open.er-api.com/v6/latest/USD');
+    if(j&&j.rates&&j.rates.KRW){ const {KRW,GBP,EUR}=j.rates; render(KRW, KRW/GBP, KRW/EUR, (j.time_last_update_utc?j.time_last_update_utc.slice(5,16):'')+' 기준'); return; }
+  }catch(e){}
+  // 2순위: frankfurter (ECB)
+  try{ const j=await fetchJSON('https://api.frankfurter.app/latest?from=USD&to=KRW,GBP,EUR');
+    if(j&&j.rates&&j.rates.KRW){ const {KRW,GBP,EUR}=j.rates; render(KRW, KRW/GBP, KRW/EUR, (j.date||'')+' ECB 기준'); return; }
+  }catch(e){}
+  // 실패: 참고치 + 다시 시도
+  bar.innerHTML=`<span class="fx-meta">💱 환율(참고치)</span>${fxRow('🇺🇸','USD','~1,380')}${fxRow('🇬🇧','GBP','~1,750')}${fxRow('🇪🇺','EUR','~1,490')}<button class="fx-refresh" onclick="loadFx()">다시 시도</button>`;
 }
 const WMO={0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',48:'🌫',51:'🌦',53:'🌦',55:'🌧',61:'🌦',63:'🌧',65:'🌧',66:'🌧',67:'🌧',71:'🌨',73:'🌨',75:'❄️',77:'🌨',80:'🌦',81:'🌧',82:'⛈',85:'🌨',86:'❄️',95:'⛈',96:'⛈',99:'⛈'};
 async function loadWeather(){
   const strip=document.getElementById('weatherStrip');
-  const results=await Promise.all(CITY_ORDER.map(async k=>{
+  strip.innerHTML=`<span class="hint">날씨 불러오는 중…</span>`;
+  const one=async k=>{
     const c=CITIES[k];
-    try{
-      const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1`);
-      const j=await r.json();
-      const t=Math.round(j.current.temperature_2m);
-      const code=j.current.weather_code;
-      const hi=Math.round(j.daily.temperature_2m_max[0]); const lo=Math.round(j.daily.temperature_2m_min[0]);
-      return {k, ok:true, emoji:WMO[code]||'🌡', t, hi, lo};
-    }catch(e){ return {k, ok:false}; }
-  }));
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1`;
+    for(let attempt=0; attempt<2; attempt++){
+      try{ const j=await fetchJSON(url);
+        return {k, ok:true, emoji:WMO[j.current.weather_code]||'🌡', t:Math.round(j.current.temperature_2m), hi:Math.round(j.daily.temperature_2m_max[0]), lo:Math.round(j.daily.temperature_2m_min[0])};
+      }catch(e){ if(attempt===0) continue; }
+    }
+    return {k, ok:false};
+  };
+  const results=await Promise.all(CITY_ORDER.map(one));
+  const anyOk=results.some(w=>w.ok);
   strip.innerHTML=results.map(w=>{
     const c=CITIES[w.k];
-    if(!w.ok) return `<div class="weather-chip" style="border-top-color:${c.color}"><span class="weather-emoji">🌡</span><div class="weather-body"><span class="weather-city">${c.flag} ${c.name}</span><span class="weather-temp"><small>불러오기 실패</small></span></div></div>`;
-    return `<div class="weather-chip" style="border-top-color:${c.color}">
-      <span class="weather-emoji">${w.emoji}</span>
-      <div class="weather-body"><span class="weather-city">${c.flag} ${c.name}</span>
-      <span class="weather-temp">${w.t}° <small>H${w.hi}° L${w.lo}°</small></span></div></div>`;
-  }).join('');
+    if(!w.ok) return `<div class="weather-chip" style="border-top-color:${c.color}"><span class="weather-emoji">🌡</span><div class="weather-body"><span class="weather-city">${c.flag} ${c.name}</span><span class="weather-temp"><small>—</small></span></div></div>`;
+    return `<div class="weather-chip" style="border-top-color:${c.color}"><span class="weather-emoji">${w.emoji}</span><div class="weather-body"><span class="weather-city">${c.flag} ${c.name}</span><span class="weather-temp">${w.t}° <small>H${w.hi}° L${w.lo}°</small></span></div></div>`;
+  }).join('') + (anyOk?'':`<div class="weather-chip" style="cursor:pointer" onclick="loadWeather()"><span class="weather-emoji">🔄</span><div class="weather-body"><span class="weather-city">연결 실패</span><span class="weather-temp"><small>눌러서 다시 시도</small></span></div></div>`);
 }
 
 /* ══════════════════ INIT ══════════════════ */
