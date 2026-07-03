@@ -565,13 +565,12 @@
       <div class="tip-card"><div class="tip-title">🚇 런던 교통</div><div class="tip-text">Oyster 카드 or 비자 컨택리스 카드로 지하철/버스 이용. 히드로 익스프레스 비쌈 주의.</div></div>
       <div class="tip-card"><div class="tip-title">🇮🇹 이탈리아 기차</div><div class="tip-text">Italo 앱으로 티켓 QR 미리 저장. 검표원에게 바로 보여줄 수 있도록 준비.</div></div>
     </div>
-    <div class="section-header" style="margin-top:28px"><span class="section-icon">📞</span><span class="section-title">긴급 연락처</span></div>
-    <div class="tips-grid">
-      <div class="tip-card" style="border-left-color:var(--dusk-coral)"><div class="tip-title">🏨 런던 한인 민박</div><div class="tip-text">카카오톡: dickie.kim / dickey0345</div></div>
-      <div class="tip-card" style="border-left-color:var(--paris)"><div class="tip-title">🏨 파리 루프라라</div><div class="tip-text">+82 01074721235<br>카카오톡: minseo-kim</div></div>
-      <div class="tip-card" style="border-left-color:var(--florence)"><div class="tip-title">🏨 피렌체 숙소</div><div class="tip-text">hotelsangiorgio.firenze@gmail.com</div></div>
-      <div class="tip-card" style="border-left-color:var(--rome)"><div class="tip-title">🏨 로마 숙소</div><div class="tip-text">++39 320 407 9326</div></div>
+    <div class="section-header" style="margin-top:28px">
+      <span class="section-icon">📞</span><span class="section-title">긴급 연락처</span>
+      <button class="mini-refresh" onclick="openContacts()" title="연락처 입력/수정">✏️ 편집</button>
     </div>
+    <p class="hint">🔒 연락처는 공개 저장소에 저장되지 않고 <strong>이 브라우저에만</strong> 보관돼요. (백업 파일로만 이동)</p>
+    <div class="tips-grid" id="contactsWrap"></div>
   </div>
 </div>
 
@@ -723,6 +722,19 @@
   </div>
 </div>
 
+<!-- CONTACTS MODAL -->
+<div class="modal-back" id="contactsModal">
+  <div class="modal">
+    <h3>🔒 비공개 연락처</h3>
+    <div class="brunch-note" style="text-align:left;margin:0 0 14px">공개 저장소에는 저장되지 않고 <strong>이 브라우저에만</strong> 보관됩니다. 백업(💾)에 포함돼 다른 기기로 옮길 수 있어요.</div>
+    <div id="contactsFields"></div>
+    <div class="form-actions" style="margin-top:6px">
+      <button class="btn btn-primary" onclick="saveContacts()">저장</button>
+      <button class="btn btn-ghost" onclick="closeContacts()">취소</button>
+    </div>
+  </div>
+</div>
+
 <!-- IMAGE VIEWER -->
 <div class="imgmodal" id="imgModal" onclick="this.classList.remove('open')"><img id="imgModalImg" src="" alt=""></div>
 
@@ -768,7 +780,7 @@ const DAYS = [
   { d:2, date:'9/26', wd:'토', city:'london', badges:['런던'],
     title:'자연사박물관 · 하이드파크 · 버킹엄궁전',
     hotel:{ text:'히드로 OUT → <strong>파크 런던 (시내)</strong> 체크인 17:00' },
-    acts:[ {ic:'🍱', t:'식사: 한인 밥집 아침/저녁 · 카톡 dickie.kim'} ] },
+    acts:[ {ic:'🍱', t:'식사: 한인 밥집 아침/저녁 제공 (연락처는 팁 탭 › 긴급 연락처)'} ] },
   { d:3, date:'9/27', wd:'일', city:'london', badges:['런던'],
     title:'영국박물관 · 내셔널갤러리 · 뮤지컬', acts:[] },
   { d:4, date:'9/28', wd:'월', city:'london', badges:['런던'],
@@ -777,7 +789,7 @@ const DAYS = [
     title:'런던 출발 → 파리 이동 (유로스타)',
     transport:{ icon:'🚂', text:'<strong>유로스타</strong> 12:31 런던 출발 → 15:59 파리 북역 · <strong>10:30까지 역 도착</strong>' },
     hotel:{ text:'루프라라 1호점 (파리시내 한인민박) 체크인 16:00 · 짐보관 가능' },
-    acts:[ {ic:'🚇', t:'파리 도착 후: 에펠탑 산책, 개선문, 세느강'}, {ic:'📞', t:'연락처 +82 01074721235 · 카톡 minseo-kim'} ] },
+    acts:[ {ic:'🚇', t:'파리 도착 후: 에펠탑 산책, 개선문, 세느강'}, {ic:'📞', t:'숙소 연락처는 팁 탭 › 긴급 연락처 참고 (비공개)'} ] },
   { d:6, date:'9/30', wd:'수', city:'paris', badges:['파리'],
     title:'루브르 · 노트르담 성당', acts:[] },
   { d:7, date:'10/1', wd:'목', city:'munich', badges:['파리','→','뮌헨'],
@@ -833,17 +845,17 @@ const PREP = {
 
 const HOTELS = [
   { city:'london', label:'🏙 런던 (1박)', name:'Premier Inn Heathrow Ai 트리플룸', dates:'9/25 IN 16:00 → 9/26 OUT 12:00',
-    rows:[['📍','Terminal 4, Sheffield Road, 히스로, 런던 TW6 3FH'],['📞','+4433323'],['🍴','조식 포함 확인'],['🔖','예약: 아고다']], cost:'137,087원' },
+    rows:[['📍','Terminal 4, Sheffield Road, 히스로, 런던 TW6 3FH'],['📞','@london_premier'],['🍴','조식 포함 확인'],['🔖','예약: 아고다']], cost:'137,087원' },
   { city:'london', label:'🏙 런던 (3박)', name:'파크 런던 — 시내 한인민박 (링컨스 스위트 A)', dates:'9/26 IN 17:00 → 9/29 OUT 11:00',
-    rows:[['🍱','한인 밥집 아침/저녁 식사 제공'],['📱','카톡: dickie.kim / dickey0345'],['🔖','예약: 마이리얼트립']], cost:'1,040,526원' },
+    rows:[['🍱','한인 밥집 아침/저녁 식사 제공'],['📱','@london_minbak'],['🔖','예약: 마이리얼트립']], cost:'1,040,526원' },
   { city:'paris', label:'🗼 파리 (2박)', name:'루프라라 1호점 (시내 한인민박)', dates:'9/29 IN 16:00 → 10/1 OUT 11:30',
-    rows:[['📍','4 Rue Robert de Flers, 75015 Paris'],['🧳','짐 보관 가능'],['📞','+82 01074721235'],['📱','카카오톡: minseo-kim'],['🔖','예약: 마이리얼트립']], cost:'784,283원' },
+    rows:[['📍','4 Rue Robert de Flers, 75015 Paris'],['🧳','짐 보관 가능'],['📞','@paris_luprara'],['🔖','예약: 마이리얼트립']], cost:'784,283원' },
   { city:'munich', label:'🍺 뮌헨 (4박)', name:'Aparthotel Adagio Access München City', dates:'10/1 IN 15:00 → 10/5 OUT 11:00',
     rows:[['📍','Am Oberwiesenfeld 20, Milbertshofen-Am Hart, München'],['🛏','Studio 2 Persons Double Bed'],['🔖','예약: 아고다']], cost:'1,020,000원' },
   { city:'florence', label:'🌸 피렌체 (2박)', name:'Hotel San Giorgio & Olimpic', dates:'10/5 IN 14:00 → 10/7 OUT 11:00',
-    rows:[['📍','Via San Antonino 3, Centro Storico, Firenze 50123'],['📡','무료 Wifi'],['⚠️','사진 있는 신분증 지참 필수'],['📧','hotelsangiorgio.firenze@gmail.com'],['🔖','예약: 아고다']], cost:'현지 결제' },
+    rows:[['📍','Via San Antonino 3, Centro Storico, Firenze 50123'],['📡','무료 Wifi'],['⚠️','사진 있는 신분증 지참 필수'],['📧','@florence_hotel'],['🔖','예약: 아고다']], cost:'현지 결제' },
   { city:'rome', label:'🏛 로마 (4박)', name:"Mandruchello's 아파트 (바티칸 근처)", dates:'10/7 IN 14:00 → 10/11 OUT 10:00',
-    rows:[['📍','22 Via Sebastiano Veniero, Città del Vaticano, Roma 00192'],['🛏','침실 2개, 프라이빗 욕실'],['📡','무료 Wifi'],['💳','사진 신분증 + 결제카드 지참'],['📞','+39 320 407 9326'],['🔖','예약: 아고다']], cost:'1,259,668원' },
+    rows:[['📍','22 Via Sebastiano Veniero, Città del Vaticano, Roma 00192'],['🛏','침실 2개, 프라이빗 욕실'],['📡','무료 Wifi'],['💳','사진 신분증 + 결제카드 지참'],['📞','@rome_apt'],['🔖','예약: 아고다']], cost:'1,259,668원' },
 ];
 
 const TRANSPORT = [
@@ -889,6 +901,7 @@ const LS = {
   acts: 'noleu_added_acts_v1',
   diary: 'noleu_diary_v1',
   settings: 'noleu_settings_v1',
+  contacts: 'noleu_contacts_v1',
 };
 function load(key, def){ try { const v=JSON.parse(localStorage.getItem(key)); return (v===null||v===undefined)?def:v; } catch(e){ return def; } }
 function save(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){ toast('저장 공간이 부족해요 (사진 용량 확인)'); } }
@@ -901,6 +914,18 @@ settings = Object.assign({}, DEFAULT_SETTINGS, settings);
 // normalize legacy photo format (string -> {src,cap})
 function normPhotos(arr){ return (arr||[]).map(p => typeof p==='string' ? {src:p, cap:''} : {src:p.src, cap:p.cap||''}); }
 diary.forEach(e => { e.photos = normPhotos(e.photos); });
+
+// 비공개 연락처 (공개 저장소에 저장 안 함, 브라우저 localStorage에만 보관)
+let contacts = load(LS.contacts, {}); // { slotId: '값' }
+const CONTACT_SLOTS = [
+  { id:'london_premier', title:'🏙 런던 Premier Inn (히드로)', color:'var(--london)',   ph:'전화번호' },
+  { id:'london_minbak',  title:'🏙 런던 한인민박 (파크런던)',  color:'var(--london)',   ph:'카카오톡 ID' },
+  { id:'paris_luprara',  title:'🗼 파리 루프라라',            color:'var(--paris)',    ph:'전화 · 카카오톡' },
+  { id:'florence_hotel', title:'🌸 피렌체 San Giorgio',       color:'var(--florence)', ph:'이메일' },
+  { id:'rome_apt',       title:'🏛 로마 아파트',              color:'var(--rome)',     ph:'전화번호' },
+];
+function pcVal(id){ return contacts[id] ? esc(contacts[id]) : '<span style="color:#b7b0a6">🔒 비공개</span>'; }
+function resolveContact(v){ return (typeof v==='string' && v[0]==='@') ? (contacts[v.slice(1)] ? esc(contacts[v.slice(1)]) : '<span style="color:#b7b0a6">🔒 비공개 (팁 탭)</span>') : esc(v); }
 
 /* ══════════════════ HELPERS ══════════════════ */
 function esc(s){ return (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -1090,7 +1115,7 @@ function renderHotels(){
       <div class="hotel-city-label" style="color:${c.color}">${h.label}</div>
       <div class="hotel-name">${esc(h.name)}</div>
       <div class="hotel-dates">${esc(h.dates)}</div>
-      <div class="hotel-info">${h.rows.map(r=>`<div class="hotel-row"><span>${r[0]}</span><span>${esc(r[1])}</span></div>`).join('')}</div>
+      <div class="hotel-info">${h.rows.map(r=>`<div class="hotel-row"><span>${r[0]}</span><span>${resolveContact(r[1])}</span></div>`).join('')}</div>
       <div class="hotel-cost">${esc(h.cost)}</div>
     </div>`;
   }).join('');
@@ -1123,6 +1148,29 @@ function renderCommunity(){
       </div>
     </div>`;
   }).join('');
+}
+
+/* ══════════════════ CONTACTS (private) ══════════════════ */
+function renderContacts(){
+  const wrap=document.getElementById('contactsWrap'); if(!wrap) return;
+  wrap.innerHTML = CONTACT_SLOTS.map(s=>`
+    <div class="tip-card" style="border-left-color:${s.color}">
+      <div class="tip-title">${s.title}</div>
+      <div class="tip-text">${pcVal(s.id)}</div>
+    </div>`).join('');
+}
+function openContacts(){
+  document.getElementById('contactsFields').innerHTML = CONTACT_SLOTS.map(s=>`
+    <div class="field" style="margin-bottom:10px"><label>${s.title}</label>
+      <input id="ct-${s.id}" placeholder="${s.ph}" value="${esc(contacts[s.id]||'')}"></div>`).join('');
+  document.getElementById('contactsModal').classList.add('open');
+}
+function closeContacts(){ document.getElementById('contactsModal').classList.remove('open'); }
+function saveContacts(){
+  CONTACT_SLOTS.forEach(s=>{ const v=document.getElementById('ct-'+s.id).value.trim(); if(v) contacts[s.id]=v; else delete contacts[s.id]; });
+  save(LS.contacts, contacts);
+  closeContacts(); renderContacts(); renderHotels();
+  toast('연락처를 저장했어요 🔒');
 }
 
 /* ══════════════════ DIARY ══════════════════ */
@@ -1390,7 +1438,7 @@ function saveSettings(){
 function downloadBlob(blob, name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 800); }
 function stamp(){ const d=new Date(); const p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`; }
 function exportData(){
-  const payload={ app:'noleu-europe', version:1, exportedAt:new Date().toISOString(), addedActs, diary, settings };
+  const payload={ app:'noleu-europe', version:1, exportedAt:new Date().toISOString(), addedActs, diary, settings, contacts };
   downloadBlob(new Blob([JSON.stringify(payload,null,2)], {type:'application/json'}), `noleu-europe-backup-${stamp()}.json`);
   toast('백업 파일을 저장했어요 💾');
 }
@@ -1400,14 +1448,19 @@ function importData(ev){
   reader.onload=e=>{
     try{
       const j=JSON.parse(e.target.result);
-      if(!j || (!j.diary && !j.addedActs)) throw 0;
-      if(!confirm('현재 데이터를 백업 파일 내용으로 교체할까요?\n(현재 일기·추가일정이 대체됩니다)')){ ev.target.value=''; return; }
-      addedActs = j.addedActs || {};
-      diary = (j.diary||[]); diary.forEach(x=>x.photos=normPhotos(x.photos));
-      settings = Object.assign({}, DEFAULT_SETTINGS, j.settings||{});
-      save(LS.acts, addedActs); save(LS.diary, diary); save(LS.settings, settings);
-      refreshTimelines(); renderDiary();
-      toast('복원 완료 ✅');
+      if(!j || j.app!=='noleu-europe') throw 0;
+      const hasBig = ('diary' in j) || ('addedActs' in j);
+      const msg = hasBig
+        ? '백업 파일로 일기·일정·설정을 이 기기에 복원할까요?\n(현재 일기·추가일정이 대체됩니다)'
+        : '이 파일의 연락처를 이 기기에 불러올까요?';
+      if(!confirm(msg)){ ev.target.value=''; return; }
+      // 파일에 존재하는 항목만 적용 (연락처 전용 파일은 일기를 건드리지 않음)
+      if('addedActs' in j){ addedActs=j.addedActs||{}; save(LS.acts, addedActs); }
+      if('diary' in j){ diary=(j.diary||[]); diary.forEach(x=>x.photos=normPhotos(x.photos)); save(LS.diary, diary); }
+      if('settings' in j){ settings=Object.assign({}, DEFAULT_SETTINGS, j.settings||{}); save(LS.settings, settings); }
+      if('contacts' in j){ contacts=Object.assign({}, contacts, j.contacts||{}); save(LS.contacts, contacts); }
+      refreshTimelines(); renderDiary(); renderContacts(); renderHotels();
+      toast('불러오기 완료 ✅');
     }catch(err){ toast('올바른 백업 파일이 아니에요'); }
     ev.target.value='';
   };
@@ -1656,6 +1709,7 @@ function init(){
   renderHotels();
   renderTransport();
   renderCommunity();
+  renderContacts();
   renderDiary();
   loadFx();
   loadWeather();
