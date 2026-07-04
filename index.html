@@ -114,6 +114,26 @@
     text-transform: uppercase;
     margin-top: 4px;
   }
+  .hero-flights {
+    display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+    margin: 0 auto 22px; position: relative;
+  }
+  .hero-flight {
+    font-size: 12px; color: rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.16);
+    padding: 5px 12px; border-radius: 20px;
+  }
+  .hero-flight b { color: var(--sunset-gold); }
+
+  /* back to top */
+  .to-top {
+    position: fixed; right: 18px; bottom: 20px; z-index: 300;
+    width: 46px; height: 46px; border-radius: 50%; border: none; cursor: pointer;
+    background: var(--deep-navy); color: white; font-size: 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    opacity: 0; transform: translateY(10px); pointer-events: none; transition: opacity 0.25s, transform 0.25s;
+  }
+  .to-top.show { opacity: 0.95; transform: translateY(0); pointer-events: auto; }
+  .to-top:hover { background: var(--slate); }
 
   /* ── CITY ROUTE BAR ── */
   .route-bar {
@@ -263,6 +283,59 @@
   .prep-item:last-child { border-bottom: none; }
   .prep-item .ic { flex-shrink: 0; }
   .prep-sub { font-size: 10px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin: 14px 0 4px; }
+
+  /* time-axis timeline (city tab) */
+  .tl-list { display: flex; flex-direction: column; gap: 0; margin-top: 8px; }
+  .tl-row {
+    display: grid; grid-template-columns: 46px 14px 1fr; align-items: start; gap: 8px;
+    padding: 7px 0; position: relative;
+  }
+  .tl-row + .tl-row { border-top: 1px dashed var(--border); }
+  .tl-row.added { background: #FFFBF3; border-radius: 8px; padding: 7px 8px; margin: 2px 0; border-top: none; }
+  .tl-time { font-size: 11px; font-weight: 700; color: var(--slate); text-align: right; padding-top: 1px; font-variant-numeric: tabular-nums; }
+  .tl-time.none { color: var(--text-light); font-weight: 400; }
+  .tl-axis { position: relative; display: flex; justify-content: center; }
+  .tl-dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 4px; }
+  .tl-main { display: flex; gap: 6px; font-size: 12px; color: var(--text-mid); align-items: flex-start; }
+  .tl-ic { flex-shrink: 0; }
+  .tl-text { flex: 1; line-height: 1.5; }
+  .tl-text strong { color: var(--text-dark); }
+  .tl-kind { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 10px; margin-left: 4px; vertical-align: middle; }
+  .tl-kind.move { background: #FFF8ED; color: #8A6200; } .tl-kind.hotel { background: #EAF3EE; color: #3C6B4F; }
+  .tl-del { cursor: pointer; color: var(--text-light); font-size: 12px; flex-shrink: 0; }
+  .tl-del:hover { color: var(--dusk-coral); }
+
+  /* related info: tiles + list */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .tile {
+    background: white; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden;
+    display: flex; flex-direction: column; position: relative;
+  }
+  .tile-thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; background: #ECE7E0; display: block; }
+  .tile-thumb.book { aspect-ratio: 3/4.4; object-fit: contain; padding: 8px; }
+  .tile-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .tile-title { font-size: 12px; font-weight: 700; color: var(--text-dark); line-height: 1.4; }
+  .tile-sub { font-size: 11px; color: var(--text-light); }
+  .tile-del { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; border: none; background: rgba(0,0,0,0.45); color: white; cursor: pointer; font-size: 12px; line-height: 1; }
+  .tile-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 34px; color: white; text-shadow: 0 2px 8px rgba(0,0,0,0.5); pointer-events: none; }
+  .tile-thumbwrap { position: relative; cursor: pointer; }
+  .read-btn { margin-top: auto; border: 1.5px solid var(--border); background: var(--ivory); color: var(--text-mid); border-radius: 8px; padding: 6px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .read-btn.done { background: var(--munich); border-color: var(--munich); color: white; }
+  .add-tile {
+    border: 2px dashed var(--border); border-radius: 12px; background: transparent; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 120px;
+    color: var(--text-light); font-size: 13px; font-weight: 700; font-family: inherit;
+  }
+  .add-tile:hover { border-color: var(--sunset-gold); color: var(--dusk-coral); }
+  .add-tile .plus { font-size: 26px; }
+  .rel-list { display: flex; flex-direction: column; gap: 8px; }
+  .rel-row { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
+  .rel-row a { color: var(--slate); font-weight: 700; font-size: 13px; text-decoration: none; flex: 1; word-break: break-all; }
+  .rel-row a:hover { color: var(--dusk-coral); }
+  .rel-row .rel-link { font-size: 11px; color: var(--text-light); }
+  .book-result { display: flex; gap: 10px; padding: 8px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; align-items: center; }
+  .book-result:hover { background: var(--mist); }
+  .book-result img { width: 40px; height: 58px; object-fit: contain; flex-shrink: 0; background: #eee; }
 
   .add-btn {
     display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, var(--sunset-gold), var(--dusk-coral));
@@ -448,8 +521,12 @@
 <!-- HERO -->
 <div class="hero">
   <div class="hero-eyebrow">✈ 노을 &amp; 타이거의 단둘 여행</div>
-  <h1 class="hero-title">유럽, 2025 가을</h1>
+  <h1 class="hero-title">2026 유럽 여행</h1>
   <div class="hero-subtitle">런던 · 파리 · 뮌헨 · 피렌체 · 로마</div>
+  <div class="hero-flights">
+    <span class="hero-flight">🛫 9/25 인천→런던 <b>22:55</b></span>
+    <span class="hero-flight">🛬 10/11 밀라노→인천 <b>22:00</b></span>
+  </div>
   <div class="hero-stats">
     <div class="hero-stat"><span class="hero-stat-num">18</span><span class="hero-stat-label">박 19일</span></div>
     <div class="hero-stat"><span class="hero-stat-num">5</span><span class="hero-stat-label">개 도시</span></div>
@@ -471,6 +548,7 @@
   <button class="nav-tab" onclick="showTab('cost', this)">💰 비용</button>
   <button class="nav-tab" onclick="showTab('tips', this)">💡 팁</button>
   <button class="nav-tab" onclick="showTab('community', this)">🌍 커뮤니티</button>
+  <button class="nav-tab" onclick="showTab('related', this)">🔗 관련정보</button>
   <button class="nav-tab" onclick="showTab('diary', this)">📔 일기</button>
 </nav>
 
@@ -584,6 +662,36 @@
     </div>
     <p class="hint">여행 커뮤니티에서 자주 언급되는 주요 방문지와 맛집을 정리했어요. 방문한 곳은 일기·일정에 기록해보세요.</p>
     <div id="communityWrap"></div>
+  </div>
+</div>
+
+<!-- ── TAB: 관련정보 ── -->
+<div id="related" class="tab-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-icon">📺</span>
+      <span class="section-title">유튜브 영상</span>
+      <span class="section-sub">여행 준비 영상 모음</span>
+    </div>
+    <p class="hint">+ 타일을 눌러 유튜브 URL을 붙여넣으면 영상이 추가돼요. 타일을 누르면 영상이 열립니다.</p>
+    <div class="tiles" id="videoTiles"></div>
+
+    <div class="section-header" style="margin-top:32px">
+      <span class="section-icon">📚</span>
+      <span class="section-title">도서 리스트</span>
+      <span class="section-sub">Google Books 검색</span>
+    </div>
+    <p class="hint">+ 타일 → 책 제목으로 검색해 표지와 함께 추가. 다 읽으면 <strong>읽음</strong> 버튼을 눌러 체크하세요.</p>
+    <div class="tiles" id="bookTiles"></div>
+
+    <div class="section-header" style="margin-top:32px">
+      <span class="section-icon">✍️</span>
+      <span class="section-title">블로그 · 글</span>
+      <span class="section-sub">제목 + 링크</span>
+    </div>
+    <p class="hint">+ 글 추가로 참고한 블로그의 제목과 링크를 모아두세요.</p>
+    <button class="add-btn" onclick="openBlogModal()">＋ 글 추가</button>
+    <div class="rel-list" id="blogList"></div>
   </div>
 </div>
 
@@ -735,9 +843,57 @@
   </div>
 </div>
 
+<!-- VIDEO ADD MODAL -->
+<div class="modal-back" id="videoModal">
+  <div class="modal">
+    <h3>📺 유튜브 영상 추가</h3>
+    <div class="field" style="margin-bottom:10px"><label>유튜브 URL</label>
+      <input id="vUrl" placeholder="https://youtu.be/... 또는 https://www.youtube.com/watch?v=..."></div>
+    <div class="field" style="margin-bottom:12px"><label>메모 (선택)</label>
+      <input id="vTitle" placeholder="예: 유럽 3주 코스 정리"></div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="addVideo()">추가</button>
+      <button class="btn btn-ghost" onclick="closeModal('videoModal')">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOOK SEARCH MODAL -->
+<div class="modal-back" id="bookModal">
+  <div class="modal">
+    <h3>📚 책 검색해서 추가</h3>
+    <div class="row" style="align-items:flex-end">
+      <div class="field" style="flex:1"><label>제목·저자 검색</label>
+        <input id="bQuery" placeholder="예: 유럽 여행" onkeydown="if(event.key==='Enter')searchBooks()"></div>
+      <button class="btn btn-primary" onclick="searchBooks()">검색</button>
+    </div>
+    <div id="bookResults" style="margin-top:12px; display:flex; flex-direction:column; gap:8px; max-height:52vh; overflow-y:auto"></div>
+    <div class="form-actions" style="margin-top:12px">
+      <button class="btn btn-ghost" onclick="addBookManual()">직접 입력</button>
+      <button class="btn btn-ghost" onclick="closeModal('bookModal')">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- BLOG ADD MODAL -->
+<div class="modal-back" id="blogModal">
+  <div class="modal">
+    <h3>✍️ 블로그 글 추가</h3>
+    <div class="field" style="margin-bottom:10px"><label>제목</label>
+      <input id="blTitle" placeholder="예: 로마 3일 완벽 코스"></div>
+    <div class="field" style="margin-bottom:12px"><label>링크(URL)</label>
+      <input id="blUrl" placeholder="https://..."></div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="addBlog()">추가</button>
+      <button class="btn btn-ghost" onclick="closeModal('blogModal')">취소</button>
+    </div>
+  </div>
+</div>
+
 <!-- IMAGE VIEWER -->
 <div class="imgmodal" id="imgModal" onclick="this.classList.remove('open')"><img id="imgModalImg" src="" alt=""></div>
 
+<button class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="맨 위로">↑</button>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -774,12 +930,12 @@ const ROUTE = [
 const DAYS = [
   { d:1, date:'9/25', wd:'금', city:'london', transit:'transit', badges:['이동','런던'],
     title:'인천 출발 → 런던 히드로 도착',
-    transport:{ icon:'✈️', text:'대한항공 <strong>KE0907</strong> · 10:55 인천 출발 → 17:20 히드로 T4 도착' },
-    hotel:{ text:'히드로 체크인 · Premier Inn Heathrow (T4)' },
+    transport:{ icon:'✈️', time:'10:55', text:'대한항공 <strong>KE0907</strong> · 10:55 인천 출발 → 17:20 히드로 T4 도착' },
+    hotel:{ time:'16:00', text:'히드로 체크인 · Premier Inn Heathrow (T4)' },
     acts:[ {ic:'🚇', t:'히드로 공항 → 숙소 이동 (히드로 익스프레스 or 지하철)'} ] },
   { d:2, date:'9/26', wd:'토', city:'london', badges:['런던'],
     title:'자연사박물관 · 하이드파크 · 버킹엄궁전',
-    hotel:{ text:'히드로 OUT → <strong>파크 런던 (시내)</strong> 체크인 17:00' },
+    hotel:{ time:'17:00', text:'히드로 OUT → <strong>파크 런던 (시내)</strong> 체크인 17:00' },
     acts:[ {ic:'🍱', t:'식사: 한인 밥집 아침/저녁 제공 (연락처는 팁 탭 › 긴급 연락처)'} ] },
   { d:3, date:'9/27', wd:'일', city:'london', badges:['런던'],
     title:'영국박물관 · 내셔널갤러리 · 뮤지컬', acts:[] },
@@ -787,15 +943,15 @@ const DAYS = [
     title:'해리포터 투어 · 타워브릿지', acts:[] },
   { d:5, date:'9/29', wd:'화', city:'paris', badges:['런던','→','파리'],
     title:'런던 출발 → 파리 이동 (유로스타)',
-    transport:{ icon:'🚂', text:'<strong>유로스타</strong> 12:31 런던 출발 → 15:59 파리 북역 · <strong>10:30까지 역 도착</strong>' },
-    hotel:{ text:'루프라라 1호점 (파리시내 한인민박) 체크인 16:00 · 짐보관 가능' },
+    transport:{ icon:'🚂', time:'12:31', text:'<strong>유로스타</strong> 12:31 런던 출발 → 15:59 파리 북역 · <strong>10:30까지 역 도착</strong>' },
+    hotel:{ time:'16:00', text:'루프라라 1호점 (파리시내 한인민박) 체크인 16:00 · 짐보관 가능' },
     acts:[ {ic:'🚇', t:'파리 도착 후: 에펠탑 산책, 개선문, 세느강'}, {ic:'📞', t:'숙소 연락처는 팁 탭 › 긴급 연락처 참고 (비공개)'} ] },
   { d:6, date:'9/30', wd:'수', city:'paris', badges:['파리'],
     title:'루브르 · 노트르담 성당', acts:[] },
   { d:7, date:'10/1', wd:'목', city:'munich', badges:['파리','→','뮌헨'],
     title:'파리 출발 → 뮌헨 이동 (TGV)',
-    transport:{ icon:'🚄', text:'<strong>TGV 9577</strong> · 15:55 파리 동역 출발 → 21:36 뮌헨 중앙역 · 앱: DB' },
-    hotel:{ text:'Aparthotel Adagio Access München City 체크인 15:00' },
+    transport:{ icon:'🚄', time:'15:55', text:'<strong>TGV 9577</strong> · 15:55 파리 동역 출발 → 21:36 뮌헨 중앙역 · 앱: DB' },
+    hotel:{ time:'15:00', text:'Aparthotel Adagio Access München City 체크인 15:00' },
     acts:[] },
   { d:8, date:'10/2', wd:'금', city:'munich', badges:['뮌헨'],
     title:'올림픽공원 · FC Bayern Store', acts:[] },
@@ -806,15 +962,15 @@ const DAYS = [
     acts:[ {ic:'💰', t:'비용: 224,270원'} ] },
   { d:11, date:'10/5', wd:'월', city:'florence', badges:['뮌헨','→','피렌체'],
     title:'뮌헨 출발 → 피렌체 이동 (비행기)',
-    transport:{ icon:'✈️', text:'<strong>Lufthansa LH</strong> · 07:55 뮌헨 MUC 출발 → 피렌체 FLR (약 1:15)' },
-    hotel:{ text:'Hotel San Giorgio & Olimpic 체크인 14:00 · 신분증 지참' },
+    transport:{ icon:'✈️', time:'07:55', text:'<strong>Lufthansa LH</strong> · 07:55 뮌헨 MUC 출발 → 피렌체 FLR (약 1:15)' },
+    hotel:{ time:'14:00', text:'Hotel San Giorgio & Olimpic 체크인 14:00 · 신분증 지참' },
     acts:[ {ic:'⚠️', t:'사진 있는 신분증 지참 필수'} ] },
   { d:12, date:'10/6', wd:'화', city:'florence', badges:['피렌체'],
     title:'피사 당일치기 · 오후 피렌체 산책', acts:[] },
   { d:13, date:'10/7', wd:'수', city:'rome', badges:['피렌체','→','로마'],
     title:'피렌체 → 로마 이동 (Italo)',
-    transport:{ icon:'🚄', text:'<strong>Italo 8902</strong> 12:28 Firenze S.M.N. 출발 → 로마 (약 2시간반) · 앱: Italo' },
-    hotel:{ text:"Mandruchello's 아파트 (바티칸 근처) 체크인 14:00 · 침실 2개" },
+    transport:{ icon:'🚄', time:'12:28', text:'<strong>Italo 8902</strong> 12:28 Firenze S.M.N. 출발 → 로마 (약 2시간반) · 앱: Italo' },
+    hotel:{ time:'14:00', text:"Mandruchello's 아파트 (바티칸 근처) 체크인 14:00 · 침실 2개" },
     acts:[ {ic:'💳', t:'KRW 49,872원 · 사진 신분증 + 결제카드 지참'} ] },
   { d:14, date:'10/8', wd:'목', city:'rome', badges:['로마'],
     title:'바티칸 박물관 & 성 베드로 성당', acts:[] },
@@ -824,8 +980,8 @@ const DAYS = [
     title:'로마 자유 일정', acts:[] },
   { d:17, date:'10/11', wd:'일', city:'rome', transit:'transit', badges:['로마','→','밀라노'],
     title:'로마 → 밀라노 이동 · 밀라노 공항 출발',
-    transport:{ icon:'🚄', text:'<strong>Italo</strong> 10:05 Roma Termini → 밀라노 Centrale, 공항철도로 공항 이동' },
-    acts:[ {ic:'✈️', t:'밀라노 공항 출발'} ] },
+    transport:{ icon:'🚄', time:'10:05', text:'<strong>Italo</strong> 10:05 Roma Termini → 밀라노 Centrale, 공항철도로 공항 이동' },
+    acts:[ {ic:'✈️', time:'22:00', t:'밀라노 → 인천 출발 (22:00)'} ] },
   { d:18, date:'10/12', wd:'월', city:'rome', transit:'transit', badges:['귀국'],
     title:'인천 도착 · 귀국 🏠', acts:[] },
 ];
@@ -902,6 +1058,7 @@ const LS = {
   diary: 'noleu_diary_v1',
   settings: 'noleu_settings_v1',
   contacts: 'noleu_contacts_v1',
+  related: 'noleu_related_v1',
 };
 function load(key, def){ try { const v=JSON.parse(localStorage.getItem(key)); return (v===null||v===undefined)?def:v; } catch(e){ return def; } }
 function save(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){ toast('저장 공간이 부족해요 (사진 용량 확인)'); } }
@@ -924,6 +1081,11 @@ const CONTACT_SLOTS = [
   { id:'florence_hotel', title:'🌸 피렌체 San Giorgio',       color:'var(--florence)', ph:'이메일' },
   { id:'rome_apt',       title:'🏛 로마 아파트',              color:'var(--rome)',     ph:'전화번호' },
 ];
+// 관련정보 (유튜브·도서·블로그) — localStorage 보관
+let related = load(LS.related, null);
+if(!related || typeof related!=='object'){ related = { videos:[{id:'6PC8FqfRi1E', url:'https://youtu.be/6PC8FqfRi1E', title:'유럽 여행 참고 영상'}], books:[], blogs:[] }; save(LS.related, related); }
+related.videos = related.videos||[]; related.books = related.books||[]; related.blogs = related.blogs||[];
+
 function pcVal(id){ return contacts[id] ? esc(contacts[id]) : '<span style="color:#b7b0a6">🔒 비공개</span>'; }
 function resolveContact(v){ return (typeof v==='string' && v[0]==='@') ? (contacts[v.slice(1)] ? esc(contacts[v.slice(1)]) : '<span style="color:#b7b0a6">🔒 비공개 (팁 탭)</span>') : esc(v); }
 
@@ -1031,22 +1193,38 @@ function renderCityPanel(k, active){
     </div>
   </div>`;
 }
+function timeKey(t){ const m=/^\s*(\d{1,2}):(\d{2})/.exec(t||''); return m ? (+m[1])*60+(+m[2]) : 9999; }
+// 하루의 일정을 시간순으로 자동 배치 (숙소 체크인·기차/비행 시간·추가 일정)
+function dayTimedItems(day){
+  const items=[];
+  if(day.transport) items.push({time:day.transport.time||'', icon:day.transport.icon, html:day.transport.text, kind:'move'});
+  if(day.hotel) items.push({time:day.hotel.time||'', icon:'🏨', html:day.hotel.text, kind:'hotel'});
+  (day.acts||[]).forEach(a=> items.push({time:a.time||'', icon:a.ic||'•', html:esc(a.t), kind:'act'}));
+  (addedActs[day.d]||[]).forEach((a,ai)=> items.push({time:a.time||'', icon:a.ic||'📌', html:esc(a.t), kind:'added', dayNum:day.d, idx:ai}));
+  return items.map((it,i)=>({...it, _i:i})).sort((a,b)=> (timeKey(a.time)-timeKey(b.time)) || (a._i-b._i));
+}
 function renderCityTimeline(k){
   const days = DAYS.filter(d=>d.city===k);
   if(!days.length) return '<p class="hint">일정이 없어요.</p>';
   return days.map((day,idx)=>{
     const c=CITIES[k]; const last = idx===days.length-1;
-    const rows=[];
-    if(day.transport) rows.push(`<div class="detail-row"><span class="detail-icon">${day.transport.icon}</span><span class="detail-text">${day.transport.text}</span></div>`);
-    if(day.hotel) rows.push(`<div class="detail-row"><span class="detail-icon">🏨</span><span class="detail-text">${day.hotel.text}</span></div>`);
-    (day.acts||[]).forEach(a=> rows.push(`<div class="detail-row"><span class="detail-icon">${a.ic||'•'}</span><span class="detail-text">${esc(a.t)}</span></div>`));
-    (addedActs[day.d]||[]).forEach((a,ai)=> rows.push(`<div class="detail-row added"><span class="detail-icon">${a.ic||'📌'}</span><span class="detail-text">${a.time?`<strong>${esc(a.time)}</strong> · `:''}${esc(a.t)}</span><span class="detail-del" onclick="delActivity(${day.d},${ai})" title="삭제">✕</span></div>`));
+    const items=dayTimedItems(day);
+    const rows=items.map(it=>{
+      const timed = timeKey(it.time)!==9999;
+      const badge = it.kind==='move' ? '<span class="tl-kind move">이동</span>' : (it.kind==='hotel' ? '<span class="tl-kind hotel">숙소</span>' : '');
+      const del = it.kind==='added' ? `<span class="tl-del" onclick="delActivity(${it.dayNum},${it.idx})" title="삭제">✕</span>` : '';
+      return `<div class="tl-row ${it.kind==='added'?'added':''}">
+        <span class="tl-time ${timed?'':'none'}">${timed?esc(it.time):'·'}</span>
+        <span class="tl-axis"><span class="tl-dot" style="background:${c.color}"></span></span>
+        <span class="tl-main"><span class="tl-ic">${it.icon}</span><span class="tl-text">${it.html}${badge}</span>${del}</span>
+      </div>`;
+    }).join('');
     return `<div class="day-block">
       <div class="day-left"><div class="day-circle ${c.cls}"><span class="day-num">D${day.d}</span><span class="day-date">${day.date}</span></div>${last?'':`<div class="day-line ${c.cls}-line"></div>`}</div>
       <div class="day-right ${c.cls}-border">
         <div class="day-meta"><span class="day-weekday">${day.wd}</span><span class="city-badge ${c.cls}">${c.name}</span></div>
         <div class="day-title">${esc(day.title)}</div>
-        ${rows.length?`<div class="day-details">${rows.join('')}</div>`:''}
+        ${rows?`<div class="tl-list">${rows}</div>`:''}
       </div>
     </div>`;
   }).join('');
@@ -1172,6 +1350,103 @@ function saveContacts(){
   closeContacts(); renderContacts(); renderHotels();
   toast('연락처를 저장했어요 🔒');
 }
+
+/* ══════════════════ RELATED INFO (video/book/blog) ══════════════════ */
+function saveRelated(){ save(LS.related, related); }
+function ytId(url){
+  if(!url) return null;
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|v\/))([A-Za-z0-9_-]{11})/) || url.match(/^([A-Za-z0-9_-]{11})$/);
+  return m ? m[1] : null;
+}
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+function renderRelated(){ renderVideos(); renderBooks(); renderBlogs(); }
+
+function renderVideos(){
+  const el=document.getElementById('videoTiles'); if(!el) return;
+  const tiles = related.videos.map((v,i)=>`
+    <div class="tile">
+      <button class="tile-del" onclick="delVideo(${i})" title="삭제">✕</button>
+      <div class="tile-thumbwrap" onclick="window.open('https://youtu.be/${v.id}','_blank')">
+        <img class="tile-thumb" src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg" alt="" loading="lazy"
+             onerror="this.src='https://img.youtube.com/vi/${v.id}/0.jpg'">
+        <span class="tile-play">▶</span>
+      </div>
+      <div class="tile-body"><div class="tile-title">${esc(v.title||'유튜브 영상')}</div></div>
+    </div>`).join('');
+  el.innerHTML = tiles + `<button class="add-tile" onclick="openModal('videoModal')"><span class="plus">＋</span>영상 추가</button>`;
+}
+function openModal(id){ const el=document.getElementById(id); el.classList.add('open'); }
+function addVideo(){
+  const url=document.getElementById('vUrl').value.trim();
+  const id=ytId(url);
+  if(!id){ toast('유효한 유튜브 URL이 아니에요'); return; }
+  related.videos.push({ id, url, title:document.getElementById('vTitle').value.trim() });
+  saveRelated(); renderVideos();
+  document.getElementById('vUrl').value=''; document.getElementById('vTitle').value='';
+  closeModal('videoModal'); toast('영상이 추가됐어요 📺');
+}
+function delVideo(i){ related.videos.splice(i,1); saveRelated(); renderVideos(); }
+
+function renderBooks(){
+  const el=document.getElementById('bookTiles'); if(!el) return;
+  const tiles = related.books.map((b,i)=>`
+    <div class="tile">
+      <button class="tile-del" onclick="delBook(${i})" title="삭제">✕</button>
+      ${b.thumb?`<img class="tile-thumb book" src="${esc(b.thumb)}" alt="" loading="lazy">`:`<div class="tile-thumb book" style="display:flex;align-items:center;justify-content:center;font-size:30px">📖</div>`}
+      <div class="tile-body">
+        <div class="tile-title">${esc(b.title)}</div>
+        ${b.authors?`<div class="tile-sub">${esc(b.authors)}</div>`:''}
+        <button class="read-btn ${b.read?'done':''}" onclick="toggleRead(${i})">${b.read?'✓ 읽음':'읽음 표시'}</button>
+      </div>
+    </div>`).join('');
+  el.innerHTML = tiles + `<button class="add-tile" onclick="openBookModal()"><span class="plus">＋</span>책 추가</button>`;
+}
+function toggleRead(i){ related.books[i].read=!related.books[i].read; saveRelated(); renderBooks(); }
+function delBook(i){ related.books.splice(i,1); saveRelated(); renderBooks(); }
+function openBookModal(){ document.getElementById('bQuery').value=''; document.getElementById('bookResults').innerHTML=''; openModal('bookModal'); setTimeout(()=>document.getElementById('bQuery').focus(),50); }
+async function searchBooks(){
+  const q=document.getElementById('bQuery').value.trim();
+  const box=document.getElementById('bookResults');
+  if(!q){ box.innerHTML='<p class="hint">검색어를 입력하세요.</p>'; return; }
+  box.innerHTML='<p class="hint">검색 중…</p>';
+  try{
+    const j=await fetchJSON('https://www.googleapis.com/books/v1/volumes?maxResults=10&q='+encodeURIComponent(q));
+    const items=(j.items||[]).map(it=>{ const v=it.volumeInfo||{}; return { title:v.title||'제목없음', authors:(v.authors||[]).join(', '), thumb:(v.imageLinks?(v.imageLinks.thumbnail||v.imageLinks.smallThumbnail):'' ).replace('http://','https://') }; });
+    if(!items.length){ box.innerHTML='<p class="hint">결과가 없어요. \'직접 입력\'을 이용하세요.</p>'; return; }
+    box.innerHTML=items.map((b,i)=>`<div class="book-result" onclick='pickBook(${JSON.stringify(b).replace(/'/g,"&#39;")})'>
+      ${b.thumb?`<img src="${esc(b.thumb)}">`:'<div style="width:40px;height:58px;background:#eee;display:flex;align-items:center;justify-content:center">📖</div>'}
+      <div><div style="font-size:13px;font-weight:700">${esc(b.title)}</div><div style="font-size:11px;color:var(--text-light)">${esc(b.authors)}</div></div>
+    </div>`).join('');
+  }catch(e){ box.innerHTML='<p class="hint">검색 실패(네트워크). \'직접 입력\'을 이용하세요.</p>'; }
+}
+function pickBook(b){ related.books.push({ title:b.title, authors:b.authors, thumb:b.thumb||'', read:false }); saveRelated(); renderBooks(); closeModal('bookModal'); toast('책이 추가됐어요 📚'); }
+function addBookManual(){
+  const t=prompt('책 제목을 입력하세요'); if(!t) return;
+  const a=prompt('저자 (선택)')||'';
+  related.books.push({ title:t.trim(), authors:a.trim(), thumb:'', read:false }); saveRelated(); renderBooks(); closeModal('bookModal'); toast('책이 추가됐어요 📚');
+}
+
+function renderBlogs(){
+  const el=document.getElementById('blogList'); if(!el) return;
+  if(!related.blogs.length){ el.innerHTML='<p class="hint" style="padding:8px">아직 글이 없어요. + 글 추가로 모아보세요.</p>'; return; }
+  el.innerHTML = related.blogs.map((b,i)=>`
+    <div class="rel-row">
+      <span style="font-size:16px">🔖</span>
+      <a href="${esc(b.url)}" target="_blank" rel="noopener">${esc(b.title)}<div class="rel-link">${esc(b.url)}</div></a>
+      <span class="tl-del" onclick="delBlog(${i})" title="삭제">✕</span>
+    </div>`).join('');
+}
+function openBlogModal(){ document.getElementById('blTitle').value=''; document.getElementById('blUrl').value=''; openModal('blogModal'); }
+function addBlog(){
+  const t=document.getElementById('blTitle').value.trim();
+  let u=document.getElementById('blUrl').value.trim();
+  if(!t||!u){ toast('제목과 링크를 입력하세요'); return; }
+  if(!/^https?:\/\//.test(u)) u='https://'+u;
+  related.blogs.push({ title:t, url:u }); saveRelated(); renderBlogs();
+  closeModal('blogModal'); toast('글이 추가됐어요 ✍️');
+}
+function delBlog(i){ related.blogs.splice(i,1); saveRelated(); renderBlogs(); }
 
 /* ══════════════════ DIARY ══════════════════ */
 let pendingPhotos = [];
@@ -1438,7 +1713,7 @@ function saveSettings(){
 function downloadBlob(blob, name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 800); }
 function stamp(){ const d=new Date(); const p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`; }
 function exportData(){
-  const payload={ app:'noleu-europe', version:1, exportedAt:new Date().toISOString(), addedActs, diary, settings, contacts };
+  const payload={ app:'noleu-europe', version:1, exportedAt:new Date().toISOString(), addedActs, diary, settings, contacts, related };
   downloadBlob(new Blob([JSON.stringify(payload,null,2)], {type:'application/json'}), `noleu-europe-backup-${stamp()}.json`);
   toast('백업 파일을 저장했어요 💾');
 }
@@ -1459,7 +1734,8 @@ function importData(ev){
       if('diary' in j){ diary=(j.diary||[]); diary.forEach(x=>x.photos=normPhotos(x.photos)); save(LS.diary, diary); }
       if('settings' in j){ settings=Object.assign({}, DEFAULT_SETTINGS, j.settings||{}); save(LS.settings, settings); }
       if('contacts' in j){ contacts=Object.assign({}, contacts, j.contacts||{}); save(LS.contacts, contacts); }
-      refreshTimelines(); renderDiary(); renderContacts(); renderHotels();
+      if('related' in j && j.related){ related=Object.assign({videos:[],books:[],blogs:[]}, j.related); save(LS.related, related); }
+      refreshTimelines(); renderDiary(); renderContacts(); renderHotels(); renderRelated();
       toast('불러오기 완료 ✅');
     }catch(err){ toast('올바른 백업 파일이 아니에요'); }
     ev.target.value='';
@@ -1700,6 +1976,14 @@ async function loadWeather(){
   }).join('') + (anyOk?'':`<div class="weather-chip" style="cursor:pointer" onclick="loadWeather()"><span class="weather-emoji">🔄</span><div class="weather-body"><span class="weather-city">연결 실패</span><span class="weather-temp"><small>눌러서 다시 시도</small></span></div></div>`);
 }
 
+/* ══════════════════ BACK TO TOP ══════════════════ */
+function initToTop(){
+  const btn=document.getElementById('toTop');
+  const onScroll=()=>{ (window.scrollY>320) ? btn.classList.add('show') : btn.classList.remove('show'); };
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+}
+
 /* ══════════════════ INIT ══════════════════ */
 function init(){
   renderRoute();
@@ -1710,7 +1994,9 @@ function init(){
   renderTransport();
   renderCommunity();
   renderContacts();
+  renderRelated();
   renderDiary();
+  initToTop();
   loadFx();
   loadWeather();
 }
