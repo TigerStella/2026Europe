@@ -524,8 +524,8 @@
   <h1 class="hero-title">2026 유럽 여행</h1>
   <div class="hero-subtitle">런던 · 파리 · 뮌헨 · 피렌체 · 로마</div>
   <div class="hero-flights">
-    <span class="hero-flight">🛫 9/25 인천→런던 <b>22:55</b></span>
-    <span class="hero-flight">🛬 10/11 밀라노→인천 <b>22:00</b></span>
+    <span class="hero-flight">🛫 9/25 인천 <b>10:55</b> → 런던 17:20</span>
+    <span class="hero-flight">🛬 10/11 밀라노 <b>22:00</b> → 인천 10/12 16:40</span>
   </div>
   <div class="hero-stats">
     <div class="hero-stat"><span class="hero-stat-num">18</span><span class="hero-stat-label">박 19일</span></div>
@@ -930,7 +930,7 @@ const ROUTE = [
 const DAYS = [
   { d:1, date:'9/25', wd:'금', city:'london', transit:'transit', badges:['이동','런던'],
     title:'인천 출발 → 런던 히드로 도착',
-    transport:{ icon:'✈️', time:'10:55', text:'대한항공 <strong>KE0907</strong> · 10:55 인천 출발 → 17:20 히드로 T4 도착' },
+    transport:{ icon:'✈️', time:'10:55', text:'대한항공 <strong>KE0907</strong> · 10:55 인천(ICN·T2) 출발 → 17:20 히드로(LHR·T4) 도착<br>총 14시간 25분 · 수하물 1개 · 일반석(U)' },
     hotel:{ time:'16:00', text:'히드로 체크인 · Premier Inn Heathrow (T4)' },
     acts:[ {ic:'🚇', t:'히드로 공항 → 숙소 이동 (히드로 익스프레스 or 지하철)'} ] },
   { d:2, date:'9/26', wd:'토', city:'london', badges:['런던'],
@@ -981,7 +981,7 @@ const DAYS = [
   { d:17, date:'10/11', wd:'일', city:'rome', transit:'transit', badges:['로마','→','밀라노'],
     title:'로마 → 밀라노 이동 · 밀라노 공항 출발',
     transport:{ icon:'🚄', time:'10:05', text:'<strong>Italo</strong> 10:05 Roma Termini → 밀라노 Centrale, 공항철도로 공항 이동' },
-    acts:[ {ic:'✈️', time:'22:00', t:'밀라노 → 인천 출발 (22:00)'} ] },
+    acts:[ {ic:'✈️', time:'22:00', t:'밀라노 말펜사(MXP·T1) 22:00 출발 → 10/12(월) 인천(ICN·T2) 16:40 도착 · 총 11시간 40분 · 수하물 1개 · 일반석(H)'} ] },
   { d:18, date:'10/12', wd:'월', city:'rome', transit:'transit', badges:['귀국'],
     title:'인천 도착 · 귀국 🏠', acts:[] },
 ];
@@ -1015,13 +1015,13 @@ const HOTELS = [
 ];
 
 const TRANSPORT = [
-  { icon:'✈️', route:'서울 인천 → 런던 히드로', detail:'<strong>대한항공 KE0907</strong><br>9/25(금) 10:55 인천 → 17:20 히드로 T4' },
+  { icon:'✈️', route:'서울 인천 → 런던 히드로', detail:'<strong>대한항공 KE0907</strong><br>9/25(금) 10:55 인천(ICN·T2) → 17:20 히드로(LHR·T4)<br>총 14시간 25분 · 수하물 1개 · 일반석(U)' },
   { icon:'🚂', route:'런던 → 파리 (유로스타)', detail:'9/29(화) <strong>12:31 런던 → 15:59 파리 북역</strong><br>⚠️ 10:30까지 역 도착 필수', app:'📱 앱: 유로스타' },
   { icon:'🚄', route:'파리 → 뮌헨 (TGV)', detail:'<strong>TGV 9577</strong> · 10/1(목) 15:55 파리 동역 → 21:36 뮌헨 중앙역', app:'📱 앱: DB' },
   { icon:'✈️', route:'뮌헨 → 피렌체 (비행기)', detail:'<strong>Lufthansa LH</strong> · 10/5(월) 07:55 MUC → FLR (약 1:15)' },
   { icon:'🚄', route:'피렌체 → 로마 (Italo)', detail:'<strong>Italo 8902</strong> · 10/7(수) 12:28 Firenze S.M.N. → 로마 (약 2시간반)', app:'📱 앱: Italo', cost:'42,176원' },
   { icon:'🚄', route:'로마 → 밀라노 (Italo)', detail:'<strong>Italo</strong> · 10/11(일) 10:05 Roma Termini → 밀라노 Centrale<br>이후 공항철도로 공항 이동', app:'📱 앱: Italo' },
-  { icon:'✈️', route:'밀라노 → 인천 (귀국)', detail:'10/11(일) 밀라노 공항 출발 → 10/12(월) 인천 도착' },
+  { icon:'✈️', route:'밀라노 → 인천 (귀국)', detail:'10/11(일) 22:00 밀라노 말펜사(MXP·T1) 출발 → 10/12(월) 16:40 인천(ICN·T2) 도착<br>총 11시간 40분 · 수하물 1개 · 일반석(H)' },
 ];
 
 const COMMUNITY = {
