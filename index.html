@@ -51,7 +51,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'MaruBuri', 'Noto Sans KR', sans-serif;
     background: var(--ivory);
     color: var(--text-dark);
     line-height: 1.6;
@@ -598,8 +598,8 @@
   .brunch-body h2,.brunch-body h3{font-family:'MaruBuri','Nanum Myeongjo',serif;}
   .brunch-body .hand{font-family:'gw-saeeum','Noto Sans KR',cursive !important;font-style:normal;}
   .brunch-cap{font-family:'gw-saeeum','Noto Sans KR',cursive;text-align:center;font-size:13px;color:var(--text-light);margin-top:6px;}
-  .fx-up{color:#FF9E86;font-size:10px;font-weight:700;margin-left:3px;}
-  .fx-down{color:#8FB8EC;font-size:10px;font-weight:700;margin-left:3px;}
+  .fx-up{color:#FF5D5D;font-size:11px;font-weight:800;margin-left:4px;}
+  .fx-down{color:#5C93F0;font-size:11px;font-weight:800;margin-left:4px;}
   .fx-flat{color:rgba(255,255,255,0.4);font-size:10px;margin-left:3px;}
   .dday-badge{display:inline-block;background:linear-gradient(135deg,var(--sunset-gold),var(--dusk-coral));color:#fff;font-size:12px;font-weight:700;padding:4px 12px;border-radius:16px;margin:-4px 0 12px;}
 </style>
@@ -1874,14 +1874,21 @@ function renderBooks(){
 }
 function toggleRead(i){ related.books[i].read=!related.books[i].read; saveRelated(); renderBooks(); }
 function delBook(i){ related.books.splice(i,1); saveRelated(); renderBooks(); }
+function gbMap(j){ return (j.items||[]).map(it=>{const v=it.volumeInfo||{};return {title:v.title||'',authors:(v.authors||[]).join(', '),thumb:(v.imageLinks?(v.imageLinks.thumbnail||v.imageLinks.smallThumbnail||''):'').replace('http://','https://')};}); }
+async function bookLookup(q){
+  let list=[];
+  try{ list=gbMap(await fetchJSON('https://www.googleapis.com/books/v1/volumes?country=KR&langRestrict=ko&maxResults=10&q='+encodeURIComponent(q))); }catch(e){}
+  if(!list.length){ try{ list=gbMap(await fetchJSON('https://www.googleapis.com/books/v1/volumes?country=KR&maxResults=10&q='+encodeURIComponent(q))); }catch(e){} }
+  if(!list.length){ try{ const j=await fetchJSON('https://openlibrary.org/search.json?limit=10&q='+encodeURIComponent(q));
+    list=(j.docs||[]).map(d=>({title:d.title||'',authors:(d.author_name||[]).join(', '),thumb:d.cover_i?('https://covers.openlibrary.org/b/id/'+d.cover_i+'-M.jpg'):''})); }catch(e){} }
+  return list;
+}
 async function findCover(i){
   const b=related.books[i]; if(!b) return; toast('표지 찾는 중…');
-  try{
-    const j=await fetchJSON('https://www.googleapis.com/books/v1/volumes?maxResults=5&q='+encodeURIComponent(b.title));
-    const hit=(j.items||[]).map(it=>it.volumeInfo||{}).find(v=>v.imageLinks);
-    if(hit&&hit.imageLinks){ b.thumb=(hit.imageLinks.thumbnail||hit.imageLinks.smallThumbnail||'').replace('http://','https://'); if(!b.authors&&hit.authors) b.authors=hit.authors.join(', '); saveRelated(); renderBooks(); toast('표지를 찾았어요 📚'); }
-    else toast('표지를 못 찾았어요 · 검색으로 다시 추가해보세요');
-  }catch(e){ toast('검색 실패(네트워크)'); }
+  const list=await bookLookup(b.title);
+  const hit=list.find(x=>x.thumb);
+  if(hit){ b.thumb=hit.thumb; if(!b.authors&&hit.authors) b.authors=hit.authors; saveRelated(); renderBooks(); toast('표지를 찾았어요 📚'); }
+  else toast('표지를 못 찾았어요 · 직접 입력해보세요');
 }
 function openBookModal(){ document.getElementById('bQuery').value=''; document.getElementById('bookResults').innerHTML=''; openModal('bookModal'); setTimeout(()=>document.getElementById('bQuery').focus(),50); }
 async function searchBooks(){
@@ -1890,8 +1897,7 @@ async function searchBooks(){
   if(!q){ box.innerHTML='<p class="hint">검색어를 입력하세요.</p>'; return; }
   box.innerHTML='<p class="hint">검색 중…</p>';
   try{
-    const j=await fetchJSON('https://www.googleapis.com/books/v1/volumes?maxResults=10&q='+encodeURIComponent(q));
-    const items=(j.items||[]).map(it=>{ const v=it.volumeInfo||{}; return { title:v.title||'제목없음', authors:(v.authors||[]).join(', '), thumb:(v.imageLinks?(v.imageLinks.thumbnail||v.imageLinks.smallThumbnail):'' ).replace('http://','https://') }; });
+    const items=await bookLookup(q);
     if(!items.length){ box.innerHTML='<p class="hint">결과가 없어요. \'직접 입력\'을 이용하세요.</p>'; return; }
     box.innerHTML=items.map((b,i)=>`<div class="book-result" onclick='pickBook(${JSON.stringify(b).replace(/'/g,"&#39;")})'>
       ${b.thumb?`<img src="${esc(b.thumb)}">`:'<div style="width:40px;height:58px;background:#eee;display:flex;align-items:center;justify-content:center">📖</div>'}
@@ -2591,9 +2597,10 @@ const fxRow=(flag,code,val,delta)=>`<span class="fx-item"><span class="fx-flag">
 function fxDateBack(n){ const d=new Date(Date.now()-n*86400000); const p=x=>String(x).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; }
 function fxDelta(cur, prev){
   if(prev==null) return '';
-  const d=Math.round(cur)-Math.round(prev); const abs=Math.abs(d);
-  if(abs===0) return `<span class="fx-flat">▬0</span>`;
-  return d>0 ? `<span class="fx-up">▲${abs.toLocaleString('ko-KR')}</span>` : `<span class="fx-down">▼${abs.toLocaleString('ko-KR')}</span>`;
+  const pct=(cur-prev)/prev*100; const a=Math.abs(pct);
+  if(a<0.005) return `<span class="fx-flat">0.00%</span>`;
+  const t=a.toFixed(2)+'%';
+  return pct>0 ? `<span class="fx-up">▲ +${t}</span>` : `<span class="fx-down">▼ -${t}</span>`;
 }
 async function loadFx(){
   const bar=document.getElementById('fxBar');
@@ -2678,6 +2685,6 @@ init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-05b</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-05c</div>
 </body>
 </html>
