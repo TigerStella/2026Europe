@@ -1,5 +1,5 @@
 /* 노을과 타이거의 유럽여행 — service worker (오프라인 지원) */
-const CACHE = 'noleu-europe-v2';
+const CACHE = 'noleu-europe-v3';
 const ASSETS = ['./', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -21,17 +21,21 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
 
-  // 페이지 이동: 캐시 우선(오프라인 즉시 실행) + 백그라운드로 최신본 갱신
+  // 페이지 이동: 네트워크 우선(온라인=항상 최신) + 4초 내 응답 없거나 오프라인이면 저장본
   if (req.mode === 'navigate') {
-    e.respondWith(
-      caches.match('./').then((cached) => {
-        const net = fetch(req).then((res) => {
-          if (res && res.status === 200) { const cp = res.clone(); caches.open(CACHE).then((c) => c.put('./', cp)); }
-          return res;
-        }).catch(() => cached);
-        return cached || net;
-      })
-    );
+    e.respondWith((async () => {
+      try {
+        const res = await Promise.race([
+          fetch(req),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 4000)),
+        ]);
+        if (res && res.status === 200) { const cp = res.clone(); (await caches.open(CACHE)).put('./', cp); }
+        return res;
+      } catch (err) {
+        const cached = await caches.match('./');
+        return cached || fetch(req);
+      }
+    })());
     return;
   }
 
