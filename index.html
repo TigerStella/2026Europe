@@ -287,12 +287,13 @@
   /* time-axis timeline (city tab) */
   .tl-list { display: flex; flex-direction: column; gap: 0; margin-top: 8px; }
   .tl-row {
-    display: grid; grid-template-columns: 46px 14px 1fr; align-items: start; gap: 8px;
+    display: grid; grid-template-columns: 52px 14px 1fr; align-items: start; gap: 8px;
     padding: 7px 0; position: relative;
   }
   .tl-row + .tl-row { border-top: 1px dashed var(--border); }
   .tl-row.added { background: #FFFBF3; border-radius: 8px; padding: 7px 8px; margin: 2px 0; border-top: none; }
-  .tl-time { font-size: 11px; font-weight: 700; color: var(--slate); text-align: right; padding-top: 1px; font-variant-numeric: tabular-nums; }
+  .tl-time { font-size: 11px; font-weight: 700; color: var(--slate); text-align: right; padding-top: 1px; font-variant-numeric: tabular-nums; line-height: 1.3; }
+  .tl-time small { display: block; font-size: 10px; font-weight: 400; color: var(--text-light); }
   .tl-time.none { color: var(--text-light); font-weight: 400; }
   .tl-axis { position: relative; display: flex; justify-content: center; }
   .tl-dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 4px; }
@@ -336,6 +337,25 @@
   .book-result { display: flex; gap: 10px; padding: 8px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; align-items: center; }
   .book-result:hover { background: var(--mist); }
   .book-result img { width: 40px; height: 58px; object-fit: contain; flex-shrink: 0; background: #eee; }
+
+  /* checklist */
+  .ck-cat { background: white; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 6px 16px; margin-bottom: 12px; }
+  .ck-cat.must { border: 1.5px solid #F1C6BC; background: #FFFAF8; }
+  .ck-cat-head { display: flex; align-items: center; gap: 8px; padding: 12px 0 8px; border-bottom: 1px solid var(--border); }
+  .ck-cat-name { font-size: 14px; font-weight: 700; color: var(--text-dark); }
+  .ck-cat-badge { font-size: 9px; font-weight: 700; color: white; background: var(--dusk-coral); padding: 2px 8px; border-radius: 10px; }
+  .ck-cat-count { font-size: 11px; color: var(--text-light); margin-left: auto; }
+  .ck-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px dashed var(--border); cursor: pointer; }
+  .ck-item:last-child { border-bottom: none; }
+  .ck-box { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white; margin-top: 1px; transition: all 0.15s; }
+  .ck-item.done .ck-box { background: var(--munich); border-color: var(--munich); }
+  .ck-item.done .ck-label { color: var(--text-light); text-decoration: line-through; }
+  .ck-label { font-size: 13px; color: var(--text-dark); line-height: 1.5; flex: 1; }
+  .ck-label small { display: block; font-size: 11px; color: var(--text-light); text-decoration: none; }
+  .ck-del { color: var(--text-light); font-size: 12px; cursor: pointer; padding: 0 2px; }
+  .ck-del:hover { color: var(--dusk-coral); }
+  .ck-progress-bar { height: 8px; background: var(--mist); border-radius: 6px; overflow: hidden; margin-bottom: 16px; }
+  .ck-progress-fill { height: 100%; background: linear-gradient(90deg, var(--sunset-gold), var(--munich)); transition: width 0.3s; }
 
   .add-btn {
     display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, var(--sunset-gold), var(--dusk-coral));
@@ -391,6 +411,14 @@
   .cost-total { background: var(--deep-navy); color: white; border-radius: 10px; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
   .cost-total-label { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.7; }
   .cost-total-amount { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--sunset-gold); }
+  .cost-cat { background: white; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 6px 14px; margin-bottom: 10px; }
+  .cost-cat-head { display: flex; justify-content: space-between; align-items: center; padding: 10px 0 8px; border-bottom: 1px solid var(--border); }
+  .cost-cat-name { font-size: 13px; font-weight: 700; color: var(--text-dark); }
+  .cost-cat-sum { font-size: 13px; font-weight: 700; color: var(--slate); font-variant-numeric: tabular-nums; }
+  .cost-line { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--border); }
+  .cost-line:last-child { border-bottom: none; }
+  .cost-line-name { font-size: 12px; color: var(--text-mid); flex: 1; }
+  .cost-line-amt { font-size: 12px; font-weight: 700; color: var(--text-dark); white-space: nowrap; font-variant-numeric: tabular-nums; }
 
   /* ── TIPS / COMMUNITY CARDS ── */
   .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
@@ -547,6 +575,7 @@
   <button class="nav-tab" onclick="showTab('transport', this)">🚄 교통</button>
   <button class="nav-tab" onclick="showTab('cost', this)">💰 비용</button>
   <button class="nav-tab" onclick="showTab('tips', this)">💡 팁</button>
+  <button class="nav-tab" onclick="showTab('checklist', this)">🎒 준비물</button>
   <button class="nav-tab" onclick="showTab('community', this)">🌍 커뮤니티</button>
   <button class="nav-tab" onclick="showTab('related', this)">🔗 관련정보</button>
   <button class="nav-tab" onclick="showTab('diary', this)">📔 일기</button>
@@ -607,23 +636,10 @@
 <!-- ── TAB: 비용 ── -->
 <div id="cost" class="tab-section">
   <div class="container">
-    <div class="section-header"><span class="section-icon">💰</span><span class="section-title">예산 &amp; 비용 정리</span></div>
-    <div class="cost-grid">
-      <div class="cost-card"><div class="cost-card-label">런던 숙소</div><div class="cost-card-amount">1,178</div><div class="cost-card-unit">천원 (2곳)</div></div>
-      <div class="cost-card"><div class="cost-card-label">파리 숙소</div><div class="cost-card-amount">784</div><div class="cost-card-unit">천원</div></div>
-      <div class="cost-card"><div class="cost-card-label">뮌헨 숙소</div><div class="cost-card-amount">1,020</div><div class="cost-card-unit">천원</div></div>
-      <div class="cost-card"><div class="cost-card-label">피렌체 숙소</div><div class="cost-card-amount">—</div><div class="cost-card-unit">현지 결제</div></div>
-      <div class="cost-card"><div class="cost-card-label">로마 숙소</div><div class="cost-card-amount">1,260</div><div class="cost-card-unit">천원</div></div>
-      <div class="cost-card"><div class="cost-card-label">뮌헨 일정</div><div class="cost-card-amount">224</div><div class="cost-card-unit">천원</div></div>
-      <div class="cost-card"><div class="cost-card-label">Italo 기차</div><div class="cost-card-amount">42</div><div class="cost-card-unit">천원</div></div>
-      <div class="cost-card"><div class="cost-card-label">로마 짐보관</div><div class="cost-card-amount">50</div><div class="cost-card-unit">천원 (약)</div></div>
-    </div>
-    <div class="cost-total" style="margin-top:12px">
-      <span class="cost-total-label">숙소 합계 (확인분)</span>
-      <span class="cost-total-amount">약 425만원+</span>
-    </div>
-    <div style="margin-top:10px; font-size:11px; color:var(--text-light); padding: 0 4px;">
-      ※ 항공권, 현지 식비, 교통카드, 입장료, 쇼핑 비용 별도. 피렌체 숙소 현지 결제 금액 미포함.
+    <div class="section-header"><span class="section-icon">💰</span><span class="section-title">예산 &amp; 비용 정리</span><span class="section-sub">사전 결제 확정분</span></div>
+    <div id="costWrap"></div>
+    <div style="margin-top:12px; font-size:11px; color:var(--text-light); padding: 0 4px;">
+      ※ 위 금액은 <strong>사전 결제 확정분</strong>이에요. 현지 식비·교통카드·입장료·투어·쇼핑 등은 별도입니다.
     </div>
   </div>
 </div>
@@ -649,6 +665,26 @@
     </div>
     <p class="hint">🔒 연락처는 공개 저장소에 저장되지 않고 <strong>이 브라우저에만</strong> 보관돼요. (백업 파일로만 이동)</p>
     <div class="tips-grid" id="contactsWrap"></div>
+  </div>
+</div>
+
+<!-- ── TAB: 준비물·체크리스트 ── -->
+<div id="checklist" class="tab-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-icon">🎒</span>
+      <span class="section-title">준비물 &amp; 체크리스트</span>
+      <span class="section-sub" id="checkProgress"></span>
+    </div>
+    <p class="hint">초5 아들 + 40대 워킹맘, <strong>세탁기 있는 숙소</strong> 기준 미니멀 패킹으로 구성했어요. 체크하면 이 브라우저에 저장돼요. 맨 아래에서 나만의 항목도 추가할 수 있어요.</p>
+    <div id="checklistWrap"></div>
+    <div class="section-header" style="margin-top:24px"><span class="section-icon">➕</span><span class="section-title">나만의 항목 추가</span></div>
+    <div class="addform open" style="display:block">
+      <div class="row">
+        <div class="field" style="flex:1"><label>항목</label><input id="ckNew" placeholder="예: 아이 여권 사본, 콘센트 어댑터" onkeydown="if(event.key==='Enter')addCheckItem()"></div>
+        <button class="btn btn-primary" style="align-self:flex-end" onclick="addCheckItem()">추가</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -706,6 +742,7 @@
     <div class="diary-toolbar">
       <button class="add-btn" onclick="openDiaryModal()">✏️ 오늘의 일기 쓰기</button>
       <button class="btn btn-ghost" onclick="openBrunch()">✍️ 브런치 발행</button>
+      <button class="btn btn-ghost" onclick="openBlogPub()">📝 블로그 발행</button>
       <button class="btn btn-ghost" onclick="openEbook()">📖 전자책 만들기</button>
       <span style="flex:1"></span>
       <button class="btn btn-ghost" onclick="exportData()" title="일기·사진·추가일정 백업">💾 백업</button>
@@ -758,6 +795,20 @@
       <div class="brunch-note">※ '글선생' 문체 설정에 맞춰 톤·서명을 조정할 수 있어요 → ⚙️ 설정. (제목·부제·도입·본문·인용·맺음 구조)</div>
     </div>
 
+    <!-- BLOG OUTPUT -->
+    <div class="brunch-out" id="blogOut">
+      <div class="section-header"><span class="section-icon">📝</span><span class="section-title">블로그 발행 미리보기</span></div>
+      <div class="brunch-tools">
+        <select class="field" id="blogScope" style="max-width:200px" onchange="renderBlogPub()">
+          <option value="all">전체 일기 모아서</option>
+        </select>
+        <button class="btn btn-primary" onclick="copyBlogPub()">📋 복사하기</button>
+        <button class="btn btn-ghost" onclick="closeBlogPub()">닫기</button>
+      </div>
+      <div class="brunch-paper" id="blogPaper"></div>
+      <div class="brunch-note">※ 블로그용 캐주얼 톤 — 날짜·도시별 소제목, 이모지, 하단 해시태그. 네이버/티스토리 등에 붙여넣기 좋아요.</div>
+    </div>
+
     <!-- E-BOOK OUTPUT -->
     <div class="brunch-out" id="ebookOut">
       <div class="section-header"><span class="section-icon">📖</span><span class="section-title">전자책 원고 미리보기</span></div>
@@ -785,10 +836,11 @@
       <div class="field"><label>누가</label>
         <select id="dWho"><option value="mom">👩 엄마</option><option value="son">🧑 아들</option></select>
       </div>
-      <div class="field"><label>날짜 / 일차</label>
-        <select id="dDay"></select>
+      <div class="field"><label>날짜 (달력)</label>
+        <input type="date" id="dDate" oninput="updateDDayHint()">
       </div>
     </div>
+    <div id="dDayHint" class="hint" style="margin:-4px 0 10px"></div>
     <div class="field" style="margin-bottom:10px"><label>제목</label>
       <input id="dTitle" placeholder="예: 에펠탑 아래에서">
     </div>
@@ -985,6 +1037,12 @@ const DAYS = [
   { d:18, date:'10/12', wd:'월', city:'rome', transit:'transit', badges:['귀국'],
     title:'인천 도착 · 귀국 🏠', acts:[] },
 ];
+const TRIP_YEAR = 2026;
+function mdToIso(md){ const [m,d]=md.split('/').map(Number); return `${TRIP_YEAR}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+DAYS.forEach(d=> d.iso = mdToIso(d.date));
+const ISO2DAY = {}; DAYS.forEach(d=> ISO2DAY[d.iso]=d);
+const WD_KR = ['일','월','화','수','목','금','토'];
+function isoLabel(iso){ if(!iso) return ''; const [y,m,d]=iso.split('-').map(Number); const wd = WD_KR[new Date(Date.UTC(y,m-1,d)).getUTCDay()]; return `${m}/${d}(${wd})`; }
 
 const PREP = {
   london: { must:['Oyster/컨택리스 카드 (히드로 익스프레스 비쌈)','우천 대비 우산·방수 겉옷','뮤지컬 사전 예약','해리포터 스튜디오 투어 예약'],
@@ -1024,6 +1082,25 @@ const TRANSPORT = [
   { icon:'✈️', route:'밀라노 → 인천 (귀국)', detail:'10/11(일) 22:00 밀라노 말펜사(MXP·T1) 출발 → 10/12(월) 16:40 인천(ICN·T2) 도착<br>총 11시간 40분 · 수하물 1개 · 일반석(H)' },
 ];
 
+// 사전 결제 확정 비용 (KRW) — Total 8,786,320
+const COSTS = [
+  { cat:'✈️ 항공', items:[ ['대한항공 인천-런던 / 밀라노 말펜사-인천 (왕복)', 2952800] ] },
+  { cat:'🛂 비자', items:[ ['영국 ETA 비자 (1인 27.99 USD)', 89520] ] },
+  { cat:'🚄 유럽 내 이동', items:[
+      ['유로스타 런던→파리 (9/29, €110)', 204459],
+      ['TGV 파리→뮌헨 (10/1, €119.41)', 217806],
+      ['뮌헨→피렌체 항공 (10/5 07:55, €293.94)', 534397],
+  ] },
+  { cat:'🏨 숙소', items:[
+      ['히드로 (9/25~9/26)', 137087],
+      ['런던 (9/26~9/29)', 1040526],
+      ['파리 (9/29~10/1)', 783283],
+      ['뮌헨 (10/1~10/5)', 1020000],
+      ['피렌체 (10/5~10/7)', 546774],
+      ['로마 (10/7~10/11)', 1259668],
+  ] },
+];
+
 const COMMUNITY = {
   london: {
     spots:[ ['영국박물관','로제타석·이집트관, 무료. 개장 직후가 한산'], ['내셔널 갤러리','고흐 해바라기·터너. 트라팔가 광장 옆'],
@@ -1059,6 +1136,7 @@ const LS = {
   settings: 'noleu_settings_v1',
   contacts: 'noleu_contacts_v1',
   related: 'noleu_related_v1',
+  checklist: 'noleu_checklist_v1',
 };
 function load(key, def){ try { const v=JSON.parse(localStorage.getItem(key)); return (v===null||v===undefined)?def:v; } catch(e){ return def; } }
 function save(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){ toast('저장 공간이 부족해요 (사진 용량 확인)'); } }
@@ -1070,7 +1148,7 @@ settings = Object.assign({}, DEFAULT_SETTINGS, settings);
 
 // normalize legacy photo format (string -> {src,cap})
 function normPhotos(arr){ return (arr||[]).map(p => typeof p==='string' ? {src:p, cap:''} : {src:p.src, cap:p.cap||''}); }
-diary.forEach(e => { e.photos = normPhotos(e.photos); });
+diary.forEach(e => { e.photos = normPhotos(e.photos); if(!e.iso){ const dd=DAYS.find(x=>x.d===e.day); e.iso = dd?dd.iso:(e.date?mdToIso(e.date):''); } });
 
 // 비공개 연락처 (공개 저장소에 저장 안 함, 브라우저 localStorage에만 보관)
 let contacts = load(LS.contacts, {}); // { slotId: '값' }
@@ -1093,6 +1171,9 @@ function resolveContact(v){ return (typeof v==='string' && v[0]==='@') ? (contac
 function esc(s){ return (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),1900); }
 function dayLabel(d){ const day=DAYS.find(x=>x.d===d); return day ? `D${day.d} · ${day.date}(${day.wd}) ${CITIES[day.city].name}` : `D${d}`; }
+function entryDay(e){ return e.iso ? ISO2DAY[e.iso] : DAYS.find(x=>x.d===e.day); }
+function entryLabel(e){ const day=entryDay(e); return day ? `D${day.d} · ${day.date}(${day.wd}) ${CITIES[day.city].name}` : (e.iso ? isoLabel(e.iso) : (e.date||'날짜 미정')); }
+function entryKey(e){ return e.iso || (entryDay(e)?entryDay(e).iso:'') || '9999'; }
 
 /* ══════════════════ RENDER: ROUTE BAR ══════════════════ */
 function renderRoute(){
@@ -1173,9 +1254,10 @@ function renderCityPanel(k, active){
     <button class="add-btn" onclick="openAddForm('${k}')">＋ 일정·투어 추가</button>
     <div class="addform" id="addform-${k}">
       <div class="row">
-        <div class="field" style="flex:0 0 120px"><label>날짜</label><select id="af-day-${k}"></select></div>
-        <div class="field" style="flex:0 0 110px"><label>시간</label><input id="af-time-${k}" placeholder="09:30"></div>
-        <div class="field" style="flex:0 0 130px"><label>종류</label>
+        <div class="field" style="flex:0 0 110px"><label>날짜</label><select id="af-day-${k}"></select></div>
+        <div class="field" style="flex:0 0 100px"><label>시작 시간</label><input type="time" id="af-time-${k}"></div>
+        <div class="field" style="flex:0 0 100px"><label>종료 시간</label><input type="time" id="af-end-${k}"></div>
+        <div class="field" style="flex:0 0 120px"><label>종류</label>
           <select id="af-type-${k}"><option value="🎫">🎫 투어</option><option value="📸">📸 관광</option><option value="🍽">🍽 식사</option><option value="🚈">🚈 교통</option><option value="🛍">🛍 쇼핑</option><option value="📌">📌 기타</option></select></div>
       </div>
       <div class="field" style="margin-bottom:10px"><label>내용</label><input id="af-text-${k}" placeholder="예: 알리안츠 아레나 스타디움 투어 예약 (14:00)"></div>
@@ -1199,8 +1281,8 @@ function dayTimedItems(day){
   const items=[];
   if(day.transport) items.push({time:day.transport.time||'', icon:day.transport.icon, html:day.transport.text, kind:'move'});
   if(day.hotel) items.push({time:day.hotel.time||'', icon:'🏨', html:day.hotel.text, kind:'hotel'});
-  (day.acts||[]).forEach(a=> items.push({time:a.time||'', icon:a.ic||'•', html:esc(a.t), kind:'act'}));
-  (addedActs[day.d]||[]).forEach((a,ai)=> items.push({time:a.time||'', icon:a.ic||'📌', html:esc(a.t), kind:'added', dayNum:day.d, idx:ai}));
+  (day.acts||[]).forEach(a=> items.push({time:a.time||'', end:a.endTime||'', icon:a.ic||'•', html:esc(a.t), kind:'act'}));
+  (addedActs[day.d]||[]).forEach((a,ai)=> items.push({time:a.time||'', end:a.endTime||'', icon:a.ic||'📌', html:esc(a.t), kind:'added', dayNum:day.d, idx:ai}));
   return items.map((it,i)=>({...it, _i:i})).sort((a,b)=> (timeKey(a.time)-timeKey(b.time)) || (a._i-b._i));
 }
 function renderCityTimeline(k){
@@ -1213,8 +1295,9 @@ function renderCityTimeline(k){
       const timed = timeKey(it.time)!==9999;
       const badge = it.kind==='move' ? '<span class="tl-kind move">이동</span>' : (it.kind==='hotel' ? '<span class="tl-kind hotel">숙소</span>' : '');
       const del = it.kind==='added' ? `<span class="tl-del" onclick="delActivity(${it.dayNum},${it.idx})" title="삭제">✕</span>` : '';
+      const timeCell = timed ? `${esc(it.time)}${it.end?`<small>~${esc(it.end)}</small>`:''}` : '·';
       return `<div class="tl-row ${it.kind==='added'?'added':''}">
-        <span class="tl-time ${timed?'':'none'}">${timed?esc(it.time):'·'}</span>
+        <span class="tl-time ${timed?'':'none'}">${timeCell}</span>
         <span class="tl-axis"><span class="tl-dot" style="background:${c.color}"></span></span>
         <span class="tl-main"><span class="tl-ic">${it.icon}</span><span class="tl-text">${it.html}${badge}</span>${del}</span>
       </div>`;
@@ -1240,13 +1323,14 @@ function closeAddForm(k){ document.getElementById('addform-'+k).classList.remove
 function addActivity(k){
   const d = +document.getElementById('af-day-'+k).value;
   const time = document.getElementById('af-time-'+k).value.trim();
+  const endTime = document.getElementById('af-end-'+k).value.trim();
   const ic = document.getElementById('af-type-'+k).value;
   const t = document.getElementById('af-text-'+k).value.trim();
   if(!t){ toast('내용을 입력해주세요'); return; }
   if(!addedActs[d]) addedActs[d]=[];
-  addedActs[d].push({ ic, t, time });
+  addedActs[d].push({ ic, t, time, endTime });
   save(LS.acts, addedActs);
-  document.getElementById('af-text-'+k).value=''; document.getElementById('af-time-'+k).value='';
+  document.getElementById('af-text-'+k).value=''; document.getElementById('af-time-'+k).value=''; document.getElementById('af-end-'+k).value='';
   closeAddForm(k);
   refreshTimelines();
   toast('일정이 추가됐어요 ✨');
@@ -1309,6 +1393,129 @@ function renderTransport(){
       </div>
       ${t.cost?`<div class="transport-cost-badge">${esc(t.cost)}</div>`:''}
     </div>`).join('');
+}
+function renderCost(){
+  const won=n=>n.toLocaleString('ko-KR');
+  let grand=0;
+  const html = COSTS.map(cat=>{
+    const sum=cat.items.reduce((a,b)=>a+b[1],0); grand+=sum;
+    return `<div class="cost-cat">
+      <div class="cost-cat-head"><span class="cost-cat-name">${cat.cat}</span><span class="cost-cat-sum">${won(sum)}원</span></div>
+      ${cat.items.map(it=>`<div class="cost-line"><span class="cost-line-name">${esc(it[0])}</span><span class="cost-line-amt">${won(it[1])}원</span></div>`).join('')}
+    </div>`;
+  }).join('');
+  document.getElementById('costWrap').innerHTML = html +
+    `<div class="cost-total" style="margin-top:12px"><span class="cost-total-label">사전 결제 합계</span><span class="cost-total-amount">${won(grand)}원</span></div>`;
+}
+
+/* ══════════════════ CHECKLIST (준비물) ══════════════════ */
+const CHECKLIST = [
+  { cat:'✅ 여권·서류', must:true, items:[
+    ['여권 (유효기간 6개월 이상)','엄마·아이 각각 확인'],
+    ['영국 ETA 승인 확인','런던 입국 필수 · 캡처/출력'],
+    ['항공권 E-티켓 (왕복)','대한항공 앱에도 저장'],
+    ['숙소 바우처 6곳','주소·연락처 오프라인 저장'],
+    ['기차·항공 티켓','유로스타·TGV·Italo·Lufthansa QR 저장'],
+    ['여권 사본 + 여권사진 2매','분실 대비 · 온라인 백업'],
+    ['해외여행자 보험','증권 캡처'],
+    ['체크인용 결제 카드','피렌체·로마 예약 카드 지참 필수'],
+  ]},
+  { cat:'💳 돈·카드', must:true, items:[
+    ['트래블월렛/트래블로그 카드','유로·파운드 미리 충전'],
+    ['신용카드 1장 (백업)','해외겸용 Visa/Master'],
+    ['소액 현금 (유로·파운드)','팁·화장실·비상용'],
+  ]},
+  { cat:'💊 상비약', must:true, items:[
+    ['해열진통제 (성인/아이용)','타이레놀·부루펜 등'],
+    ['종합감기약·기침약'],['지사제·소화제'],
+    ['밴드·연고·소독약','물집 대비'],
+    ['멀미약','장거리 이동'],['개인 처방약','영문 처방전이면 안심'],
+  ]},
+  { cat:'📱 전자기기', items:[
+    ['휴대폰 + 충전기'],['보조배터리','기내 반입 · 20000mAh 이하'],
+    ['유럽 멀티 어댑터','영국 BF형 + 유럽 C형 겸용'],
+    ['멀티 USB 충전기','콘센트 하나로 여러 개'],
+    ['이심(eSIM)/유심','유럽 데이터 · 미리 개통'],
+    ['아이 태블릿 + 오프라인 콘텐츠','이동·기내용 · 미리 충전'],['이어폰 2세트'],
+  ]},
+  { cat:'👕 의류 (미니멀·세탁 활용)', items:[
+    ['상의 3~4벌','레이어드 가능하게'],['하의 2~3벌'],
+    ['속옷·양말 3~4일치','현지 세탁'],
+    ['얇은 패딩/바람막이','가을 유럽 일교차'],
+    ['경량 우산 or 우비','런던 대비'],
+    ['편한 운동화','하루 2만보 · 길들인 신발'],
+    ['잠옷 (얇게)'],['모자·장갑','추크슈피체 정상(2962m) 대비'],
+  ]},
+  { cat:'🧺 세탁·정리 (꿀템)', items:[
+    ['세탁세제 소분 (캡슐/가루)','세탁기 있는 숙소 활용'],
+    ['빨래망·미니 빨랫줄·집게'],['압축팩·파우치','캐리어 정리'],
+    ['접이식 에코백','장보기·기념품'],['지퍼백 여러 장','간식·젖은 옷'],
+  ]},
+  { cat:'🎒 이동·보안', items:[
+    ['앞으로 메는 크로스백','소매치기 대비 (파리·로마)'],
+    ['캐리어 + 기내용','수하물 1개 규정 확인'],
+    ['자물쇠·와이어락'],['목베개·안대·귀마개','장거리 비행'],
+    ['휴대용 물티슈·손소독제'],
+  ]},
+  { cat:'🧴 세면·위생', items:[
+    ['세면도구 소분','유럽 숙소 미제공 많음'],['칫솔·치약'],
+    ['자외선차단제·립밤·수분크림','건조한 기내·날씨'],['개인·여성용품'],
+  ]},
+  { cat:'🧒 아이(타이거) 전용 (꿀템)', items:[
+    ['좋아하는 한국 간식','기내·이동 비상용'],
+    ['여행 일기장·색연필','하루 한 줄 · 이 앱 일기와 함께'],
+    ['심심풀이 (닌텐도/책/스티커)','이동·대기시간'],
+    ['텀블러/물병','유럽 물값 절약'],
+    ['아이 여벌옷 1세트','기내 가방에 · 비상용'],
+    ['작은 담요/인형','낯선 잠자리 적응'],
+  ]},
+  { cat:'🍜 있으면 편한 한국템', items:[
+    ['즉석밥·컵라면 소량'],['김·밑반찬·고추장 튜브'],['커피믹스·티백'],
+    ['종합비타민·유산균'],['옷걸이 몇 개'],['손톱깎이·반짇고리·순간접착제'],
+  ]},
+];
+const CK_CUSTOM_CAT='📝 나만의 준비물';
+let checklist = load(LS.checklist, null);
+if(!checklist || typeof checklist!=='object'){ checklist={ checked:{}, custom:[] }; }
+checklist.checked = checklist.checked||{}; checklist.custom = checklist.custom||[];
+function ckKey(cat,name){ return cat+'||'+name; }
+function saveChecklist(){ save(LS.checklist, checklist); }
+function renderChecklist(){
+  const wrap=document.getElementById('checklistWrap'); if(!wrap) return;
+  const cats = CHECKLIST.slice();
+  if(checklist.custom.length) cats.push({ cat:CK_CUSTOM_CAT, custom:true, items:checklist.custom.map(t=>[t]) });
+  let total=0, done=0;
+  const html = cats.map(cat=>{
+    const rows = cat.items.map(it=>{
+      const name=it[0], note=it[1]||'';
+      const key=ckKey(cat.cat, name); total++; const on=!!checklist.checked[key]; if(on) done++;
+      const del = cat.custom ? `<span class="ck-del" onclick="event.stopPropagation();delCheckItem('${esc(name).replace(/'/g,"\\'")}')" title="삭제">✕</span>` : '';
+      return `<div class="ck-item ${on?'done':''}" onclick="toggleCheck('${esc(cat.cat).replace(/'/g,"\\'")}','${esc(name).replace(/'/g,"\\'")}')">
+        <span class="ck-box">${on?'✓':''}</span>
+        <span class="ck-label">${esc(name)}${note?`<small>${esc(note)}</small>`:''}</span>${del}
+      </div>`;
+    }).join('');
+    const catDone = cat.items.filter(it=>checklist.checked[ckKey(cat.cat,it[0])]).length;
+    return `<div class="ck-cat ${cat.must?'must':''}">
+      <div class="ck-cat-head"><span class="ck-cat-name">${esc(cat.cat)}</span>${cat.must?'<span class="ck-cat-badge">필수</span>':''}<span class="ck-cat-count">${catDone}/${cat.items.length}</span></div>
+      ${rows}
+    </div>`;
+  }).join('');
+  const pct = total?Math.round(done/total*100):0;
+  wrap.innerHTML = `<div class="ck-progress-bar"><div class="ck-progress-fill" style="width:${pct}%"></div></div>` + html;
+  const pg=document.getElementById('checkProgress'); if(pg) pg.textContent=`${done}/${total} (${pct}%)`;
+}
+function toggleCheck(cat,name){ const key=ckKey(cat,name); checklist.checked[key]=!checklist.checked[key]; if(!checklist.checked[key]) delete checklist.checked[key]; saveChecklist(); renderChecklist(); }
+function addCheckItem(){
+  const inp=document.getElementById('ckNew'); const t=inp.value.trim(); if(!t) return;
+  if(!checklist.custom.includes(t)) checklist.custom.push(t);
+  saveChecklist(); inp.value=''; renderChecklist();
+  toast('항목이 추가됐어요 ✅');
+}
+function delCheckItem(name){
+  checklist.custom = checklist.custom.filter(x=>x!==name);
+  delete checklist.checked[ckKey(CK_CUSTOM_CAT,name)];
+  saveChecklist(); renderChecklist();
 }
 function renderCommunity(){
   document.getElementById('communityWrap').innerHTML = CITY_ORDER.map(k=>{
@@ -1452,25 +1659,31 @@ function delBlog(i){ related.blogs.splice(i,1); saveRelated(); renderBlogs(); }
 let pendingPhotos = [];
 let editingId = null;
 
+function updateDDayHint(){
+  const iso=document.getElementById('dDate').value;
+  const day=ISO2DAY[iso];
+  const el=document.getElementById('dDayHint');
+  el.innerHTML = day ? `📍 <strong>D${day.d} · ${CITIES[day.city].name}</strong> (${day.date} ${day.wd}요일)` : (iso?`여행 일정 밖의 날짜예요 (${isoLabel(iso)})`:'');
+}
 function openDiaryModal(who){
   editingId=null; pendingPhotos=[];
   document.getElementById('diaryModalTitle').textContent='✏️ 오늘의 일기';
-  fillDaySelect(document.getElementById('dDay'), null);
+  document.getElementById('dDate').value = DAYS[0].iso;
   if(who) document.getElementById('dWho').value=who;
   document.getElementById('dTitle').value=''; document.getElementById('dBody').value='';
   document.getElementById('photoPreview').innerHTML=''; document.getElementById('dPhotos').value='';
+  updateDDayHint();
   document.getElementById('diaryModal').classList.add('open');
 }
 function editDiary(id){
   const e=diary.find(x=>x.id===id); if(!e) return;
   editingId=id; pendingPhotos=(e.photos||[]).map(p=>({src:p.src, cap:p.cap||''}));
   document.getElementById('diaryModalTitle').textContent='✏️ 일기 수정';
-  fillDaySelect(document.getElementById('dDay'), null);
   document.getElementById('dWho').value=e.who;
-  document.getElementById('dDay').value=e.day;
+  document.getElementById('dDate').value=e.iso || (entryDay(e)?entryDay(e).iso:DAYS[0].iso);
   document.getElementById('dTitle').value=e.title;
   document.getElementById('dBody').value=e.body;
-  renderPhotoPreview();
+  renderPhotoPreview(); updateDDayHint();
   document.getElementById('diaryModal').classList.add('open');
 }
 function closeDiaryModal(){ document.getElementById('diaryModal').classList.remove('open'); }
@@ -1508,16 +1721,17 @@ function removePendingPhoto(i){ pendingPhotos.splice(i,1); renderPhotoPreview();
 
 function saveDiary(){
   const who=document.getElementById('dWho').value;
-  const day=+document.getElementById('dDay').value;
+  const iso=document.getElementById('dDate').value;
   const title=document.getElementById('dTitle').value.trim();
   const body=document.getElementById('dBody').value.trim();
+  if(!iso){ toast('날짜를 선택해주세요'); return; }
   if(!title && !body){ toast('제목이나 내용을 입력해주세요'); return; }
-  const dayObj=DAYS.find(x=>x.d===day);
+  const dd=ISO2DAY[iso];
+  const fields={ who, iso, day: dd?dd.d:null, date: dd?dd.date:isoLabel(iso), title, body, photos:pendingPhotos.slice() };
   if(editingId){
-    const e=diary.find(x=>x.id===editingId);
-    Object.assign(e,{who,day,date:dayObj.date,title,body,photos:pendingPhotos.slice()});
+    const e=diary.find(x=>x.id===editingId); Object.assign(e, fields);
   } else {
-    diary.push({ id:'e'+Date.now()+Math.floor(performance.now()), who, day, date:dayObj.date, title, body, photos:pendingPhotos.slice() });
+    diary.push({ id:'e'+Date.now()+Math.floor(performance.now()), ...fields });
   }
   save(LS.diary, diary);
   closeDiaryModal(); renderDiary();
@@ -1530,7 +1744,7 @@ function renderDiary(){
   const mw=document.getElementById('momWho'); if(mw) mw.textContent = `엄마 · ${settings.momName||'노을'}`;
   const sw=document.getElementById('sonWho'); if(sw) sw.textContent = `아들 · ${settings.sonName||'타이거'}`;
   ['mom','son'].forEach(who=>{
-    const entries=diary.filter(e=>e.who===who).sort((a,b)=>a.day-b.day);
+    const entries=diary.filter(e=>e.who===who).sort((a,b)=>entryKey(a)<entryKey(b)?-1:1);
     document.getElementById(who+'Cnt').textContent = entries.length? `${entries.length}편` : '';
     const wrap=document.getElementById(who+'Wrap');
     if(!entries.length){ wrap.innerHTML=`<div class="diary-empty">아직 기록이 없어요.<br>매일의 순간을 남겨보세요 🌿</div>`; return; }
@@ -1538,7 +1752,7 @@ function renderDiary(){
       <div class="postit ${who}">
         <span class="pin">📌</span>
         <div class="postit-actions"><button onclick="editDiary('${e.id}')" title="수정">✎</button><button onclick="delDiary('${e.id}')" title="삭제">🗑</button></div>
-        <div class="postit-date">${dayLabel(e.day)}</div>
+        <div class="postit-date">${esc(entryLabel(e))}</div>
         ${e.title?`<div class="postit-title">${esc(e.title)}</div>`:''}
         <div class="postit-body">${esc(e.body)}</div>
         ${e.photos&&e.photos.length?`<div class="postit-photos">${e.photos.map(p=>`<img src="${p.src}" title="${esc(p.cap)}" onclick="viewImage(this.src)">`).join('')}</div>`:''}
@@ -1550,10 +1764,11 @@ function viewImage(src){ document.getElementById('imgModalImg').src=src; documen
 /* ══════════════════ BRUNCH PUBLISH ══════════════════ */
 function openBrunch(){
   if(!diary.length){ toast('먼저 일기를 작성해주세요 ✏️'); return; }
-  // populate day scope options
-  const days=[...new Set(diary.map(e=>e.day))].sort((a,b)=>a-b);
+  // populate day scope options (ISO 날짜 기준)
+  const keys=[...new Set(diary.map(e=>entryKey(e)))].sort();
   const sel=document.getElementById('brunchScope');
-  sel.innerHTML = `<option value="all">전체 일기 모아서</option>` + days.map(d=>`<option value="${d}">${dayLabel(d)}</option>`).join('');
+  sel.innerHTML = `<option value="all">전체 일기 모아서</option>` + keys.map(k=>{ const e=diary.find(x=>entryKey(x)===k); return `<option value="${k}">${esc(entryLabel(e))}</option>`; }).join('');
+  closeBlogPub(); closeEbook();
   document.getElementById('brunchOut').classList.add('open');
   renderBrunch();
   document.getElementById('brunchOut').scrollIntoView({behavior:'smooth'});
@@ -1563,15 +1778,16 @@ function closeBrunch(){ document.getElementById('brunchOut').classList.remove('o
 function buildBrunch(){
   const scope=document.getElementById('brunchScope').value;
   const voice=document.getElementById('brunchVoice').value;
-  let entries=diary.slice().sort((a,b)=>a.day-b.day || (a.who>b.who?1:-1));
-  if(scope!=='all') entries=entries.filter(e=>e.day===+scope);
+  const cmp=(a,b)=> (entryKey(a)<entryKey(b)?-1:entryKey(a)>entryKey(b)?1:0) || (a.who>b.who?1:-1);
+  let entries=diary.slice().sort(cmp);
+  if(scope!=='all') entries=entries.filter(e=>entryKey(e)===scope);
   if(voice!=='both') entries=entries.filter(e=>e.who===voice);
   if(!entries.length) return null;
 
-  const cities=[...new Set(entries.map(e=>CITIES[DAYS.find(d=>d.d===e.day).city].name))];
-  const dates=entries.map(e=>e.date);
+  const cityName1=e=>{ const d=entryDay(e); return d?CITIES[d.city].name:''; };
+  const cities=[...new Set(entries.map(cityName1).filter(Boolean))];
+  const dates=entries.map(e=>{ const d=entryDay(e); return d?d.date:isoLabel(e.iso); });
   const firstTitle = entries.find(e=>e.title)?.title;
-  const whoName = v=> v==='mom'?'엄마':'아들';
 
   // Title & subtitle (Brunch 스타일: 감성적 제목 + 부제)
   const tone=document.getElementById('brunchTone')?.value || settings.tone || 'warm';
@@ -1580,27 +1796,26 @@ function buildBrunch(){
     h1 = settings.title || '유럽, 우리 둘이 걸은 열여덟 밤';
     sub = settings.subtitle || `${cities.join(' · ')} — 엄마와 아들의 여행 일기`;
   } else {
-    const cityName = CITIES[DAYS.find(d=>d.d===+scope).city].name;
-    h1 = firstTitle || `${cityName}에서의 하루`;
-    sub = `${dayLabel(+scope)}`;
+    const cn = cityName1(entries[0]);
+    h1 = firstTitle || `${cn||isoLabel(scope)}에서의 하루`;
+    sub = entryLabel(entries[0]);
   }
-  const metaLine = `${dates[0]}${dates.length>1?` – ${dates[dates.length-1]}`:''} · ${cities.join(', ')}`;
+  const metaLine = `${dates[0]||''}${dates.length>1?` – ${dates[dates.length-1]}`:''}${cities.length?` · ${cities.join(', ')}`:''}`;
 
-  // Body: group by day, weave mom/son
-  const byDay={};
-  entries.forEach(e=>{ (byDay[e.day]=byDay[e.day]||[]).push(e); });
-  const dayNums=Object.keys(byDay).map(Number).sort((a,b)=>a-b);
+  // Body: group by date (ISO), weave mom/son
+  const byKey={};
+  entries.forEach(e=>{ const k=entryKey(e); (byKey[k]=byKey[k]||[]).push(e); });
+  const keys=Object.keys(byKey).sort();
 
   const isBook = scope==='all';
   const sonName = settings.sonName || '타이거';
   let blocks=[];
   // intro
-  blocks.push({type:'p', html: intro(cities, dates, tone, isBook)});
-  dayNums.forEach(dn=>{
-    const dl=DAYS.find(d=>d.d===dn);
-    const cityName=CITIES[dl.city].name;
-    if(scope==='all') blocks.push({type:'h2', html:`${dl.date}, ${cityName}`});
-    byDay[dn].sort((a,b)=> a.who>b.who?1:-1).forEach(e=>{
+  blocks.push({type:'p', html: intro(cities.length?cities:['유럽'], dates, tone, isBook)});
+  keys.forEach(kk=>{
+    const first=byKey[kk][0]; const dl=entryDay(first); const cityName=dl?CITIES[dl.city].name:'';
+    if(scope==='all') blocks.push({type:'h2', html:`${dl?dl.date:isoLabel(kk)}${cityName?', '+cityName:''}`});
+    byKey[kk].sort((a,b)=> a.who>b.who?1:-1).forEach(e=>{
       if(e.title && scope!=='all') blocks.push({type:'h2', html:esc(e.title)});
       // 노을(엄마)의 글은 본문 서술로 흐르게 두고, 타이거(아들)의 기록만 짚어준다
       if(voice==='both' && e.who==='son') blocks.push({type:'label', html:`— ${esc(sonName)}의 기록`});
@@ -1682,6 +1897,77 @@ function copyBrunch(){
 }
 function strip(html){ const d=document.createElement('div'); d.innerHTML=html; return d.textContent||''; }
 
+/* ══════════════════ BLOG PUBLISH (캐주얼) ══════════════════ */
+function openBlogPub(){
+  if(!diary.length){ toast('먼저 일기를 작성해주세요 ✏️'); return; }
+  const keys=[...new Set(diary.map(e=>entryKey(e)))].sort();
+  const sel=document.getElementById('blogScope');
+  sel.innerHTML = `<option value="all">전체 일기 모아서</option>` + keys.map(k=>{ const e=diary.find(x=>entryKey(x)===k); return `<option value="${k}">${esc(entryLabel(e))}</option>`; }).join('');
+  closeBrunch(); closeEbook();
+  document.getElementById('blogOut').classList.add('open');
+  renderBlogPub();
+  document.getElementById('blogOut').scrollIntoView({behavior:'smooth'});
+}
+function closeBlogPub(){ document.getElementById('blogOut').classList.remove('open'); }
+function buildBlog(){
+  const scope=document.getElementById('blogScope').value;
+  const momName=settings.momName||'노을', sonName=settings.sonName||'타이거';
+  let entries=diary.slice().sort((a,b)=> (entryKey(a)<entryKey(b)?-1:entryKey(a)>entryKey(b)?1:0) || (a.who>b.who?1:-1));
+  if(scope!=='all') entries=entries.filter(e=>entryKey(e)===scope);
+  if(!entries.length) return null;
+  const cityNameOf=e=>{ const d=entryDay(e); return d?CITIES[d.city].name:''; };
+  const cities=[...new Set(entries.map(cityNameOf).filter(Boolean))];
+  const h1 = (settings.title||'유럽 여행') + (scope==='all'?' 기록':' · '+entryLabel(entries[0]));
+  const blocks=[];
+  blocks.push({type:'p', html:`안녕하세요 🙂 ${momName}입니다. ${sonName}(초5)와 둘이 떠난 유럽 여행 기록을 남겨요. ${cities.length?`이번 글은 <b>${cities.join(' · ')}</b> 이야기예요.`:''}`});
+  const byKey={}; entries.forEach(e=>{ (byKey[entryKey(e)]=byKey[entryKey(e)]||[]).push(e); });
+  Object.keys(byKey).sort().forEach(kk=>{
+    const first=byKey[kk][0]; const d=entryDay(first); const cn=d?CITIES[d.city].name:'';
+    blocks.push({type:'h2', html:`📅 ${d?`${d.date}(${d.wd}) · ${cn}`:isoLabel(kk)}`});
+    byKey[kk].forEach(e=>{
+      blocks.push({type:'who', html:`${e.who==='mom'?'👩 '+momName:'🧑 '+sonName}`});
+      if(e.title) blocks.push({type:'h3', html:esc(e.title)});
+      splitParas(e.body).forEach(p=> blocks.push({type:'p', html:esc(p)}));
+      (e.photos||[]).forEach(p=> blocks.push({type:'img', html:p.src, cap:p.cap}));
+    });
+  });
+  // hashtags
+  const tags=['유럽여행','아이와유럽여행','모자여행','초등맘여행'].concat(cities.map(c=>c.replace(/\s/g,''))).map(t=>'#'+t);
+  blocks.push({type:'tags', html:tags.join(' ')});
+  return { h1, blocks };
+}
+function renderBlogPub(){
+  const data=buildBlog();
+  const paper=document.getElementById('blogPaper');
+  if(!data){ paper.innerHTML='<p class="hint">선택한 조건에 해당하는 일기가 없어요.</p>'; return; }
+  const body=data.blocks.map(b=>{
+    if(b.type==='h2') return `<h2 style="font-size:20px;margin:26px 0 10px">${b.html}</h2>`;
+    if(b.type==='h3') return `<h3 style="font-size:16px;margin:10px 0;color:var(--slate)">${b.html}</h3>`;
+    if(b.type==='who') return `<p style="font-size:12px;font-weight:700;color:var(--dusk-coral);margin:10px 0 2px">${b.html}</p>`;
+    if(b.type==='img') return `<div class="brunch-fig"><img src="${b.html}">${b.cap?`<div style="font-size:12px;color:var(--text-light);margin-top:6px">${esc(b.cap)}</div>`:''}</div>`;
+    if(b.type==='tags') return `<p style="margin-top:24px;color:var(--london);font-size:14px">${b.html}</p>`;
+    return `<p>${b.html}</p>`;
+  }).join('');
+  paper.innerHTML=`<div class="brunch-h1" style="font-size:26px;text-align:left">${esc(data.h1)}</div><div class="brunch-rule" style="margin:14px 0 20px 0"></div><div class="brunch-body">${body}</div>`;
+}
+function copyBlogPub(){
+  const data=buildBlog(); if(!data){ toast('복사할 내용이 없어요'); return; }
+  const lines=[data.h1,''];
+  data.blocks.forEach(b=>{
+    if(b.type==='img'){ lines.push(b.cap?`[사진: ${b.cap}]`:'[사진]',''); return; }
+    if(b.type==='h2'){ lines.push('', strip(b.html), ''); return; }
+    if(b.type==='h3'){ lines.push('▶ '+strip(b.html)); return; }
+    if(b.type==='who'){ lines.push(strip(b.html)); return; }
+    if(b.type==='tags'){ lines.push('', strip(b.html)); return; }
+    lines.push(strip(b.html), '');
+  });
+  const text=lines.join('\n');
+  navigator.clipboard.writeText(text).then(()=>toast('블로그 글이 복사됐어요 📋'), ()=>{
+    const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); toast('복사됐어요 📋'); }catch(e){ toast('복사 실패'); } document.body.removeChild(ta);
+  });
+}
+
 /* ══════════════════ SETTINGS ══════════════════ */
 function openSettings(){
   document.getElementById('setTitle').value=settings.title||'';
@@ -1713,7 +1999,7 @@ function saveSettings(){
 function downloadBlob(blob, name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 800); }
 function stamp(){ const d=new Date(); const p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`; }
 function exportData(){
-  const payload={ app:'noleu-europe', version:1, exportedAt:new Date().toISOString(), addedActs, diary, settings, contacts, related };
+  const payload={ app:'noleu-europe', version:1, exportedAt:new Date().toISOString(), addedActs, diary, settings, contacts, related, checklist };
   downloadBlob(new Blob([JSON.stringify(payload,null,2)], {type:'application/json'}), `noleu-europe-backup-${stamp()}.json`);
   toast('백업 파일을 저장했어요 💾');
 }
@@ -1735,7 +2021,8 @@ function importData(ev){
       if('settings' in j){ settings=Object.assign({}, DEFAULT_SETTINGS, j.settings||{}); save(LS.settings, settings); }
       if('contacts' in j){ contacts=Object.assign({}, contacts, j.contacts||{}); save(LS.contacts, contacts); }
       if('related' in j && j.related){ related=Object.assign({videos:[],books:[],blogs:[]}, j.related); save(LS.related, related); }
-      refreshTimelines(); renderDiary(); renderContacts(); renderHotels(); renderRelated();
+      if('checklist' in j && j.checklist){ checklist=Object.assign({checked:{},custom:[]}, j.checklist); save(LS.checklist, checklist); }
+      refreshTimelines(); renderDiary(); renderContacts(); renderHotels(); renderRelated(); renderChecklist();
       toast('불러오기 완료 ✅');
     }catch(err){ toast('올바른 백업 파일이 아니에요'); }
     ev.target.value='';
@@ -1745,24 +2032,31 @@ function importData(ev){
 
 /* ══════════════════ E-BOOK ══════════════════ */
 function buildBook(voice){
-  let entries=diary.slice().sort((a,b)=>a.day-b.day || (a.who>b.who?1:-1));
+  let entries=diary.slice().sort((a,b)=> (entryKey(a)<entryKey(b)?-1:entryKey(a)>entryKey(b)?1:0) || (a.who>b.who?1:-1));
   if(voice && voice!=='both') entries=entries.filter(e=>e.who===voice);
   if(!entries.length) return null;
-  const cityOf = e => DAYS.find(d=>d.d===e.day).city;
+  const cityOf = e => { const d=entryDay(e); return d?d.city:null; };
   const usedCities = CITY_ORDER.filter(k=> entries.some(e=>cityOf(e)===k));
   const chapters = usedCities.map((k,idx)=>{
     const c=CITIES[k];
     const ce=entries.filter(e=>cityOf(e)===k);
-    const dayNums=[...new Set(ce.map(e=>e.day))].sort((a,b)=>a-b);
-    const days=dayNums.map(dn=>{ const d0=DAYS.find(d=>d.d===dn); return { day:dn, date:d0.date, wd:d0.wd, entries:ce.filter(e=>e.day===dn) }; });
+    const keys=[...new Set(ce.map(e=>entryKey(e)))].sort();
+    const days=keys.map(kk=>{ const d0=entryDay(ce.find(e=>entryKey(e)===kk)); return { date:d0?d0.date:isoLabel(kk), wd:d0?d0.wd:'', entries:ce.filter(e=>entryKey(e)===kk) }; });
     return { key:k, num:idx+1, title:`${idx+1}장 · ${c.name}`, city:c, days };
   });
-  const dts=entries.map(e=>e.date);
+  // 여행 일정 밖의 기록 → '기타' 챕터
+  const others=entries.filter(e=>!cityOf(e));
+  if(others.length){
+    const keys=[...new Set(others.map(e=>entryKey(e)))].sort();
+    const days=keys.map(kk=>({ date:isoLabel(kk), wd:'', entries:others.filter(e=>entryKey(e)===kk) }));
+    chapters.push({ key:'etc', num:chapters.length+1, title:`${chapters.length+1}장 · 그 밖의 기록`, city:{name:'그 밖의 기록', color:'#8B96A8'}, days });
+  }
+  const dts=entries.map(e=>{ const d=entryDay(e); return d?d.date:isoLabel(e.iso); });
   return {
     title: settings.title || '유럽 여행 일기',
     subtitle: settings.subtitle || usedCities.map(k=>CITIES[k].name).join(' · '),
     author: settings.author || '',
-    range: `${dts[0]}${dts.length>1?` – ${dts[dts.length-1]}`:''}`,
+    range: `${dts[0]||''}${dts.length>1?` – ${dts[dts.length-1]}`:''}`,
     cities: usedCities.map(k=>CITIES[k].name), chapters, voice
   };
 }
@@ -1785,7 +2079,7 @@ function ebookBody(book){
 }
 function openEbook(){
   if(!diary.length){ toast('일기를 먼저 작성해주세요'); return; }
-  closeBrunch();
+  closeBrunch(); closeBlogPub();
   document.getElementById('ebookOut').classList.add('open');
   renderEbook();
   document.getElementById('ebookOut').scrollIntoView({behavior:'smooth'});
@@ -1992,7 +2286,9 @@ function init(){
   renderCitySubtabs();
   renderHotels();
   renderTransport();
+  renderCost();
   renderCommunity();
+  renderChecklist();
   renderContacts();
   renderRelated();
   renderDiary();
