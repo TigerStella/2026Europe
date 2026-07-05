@@ -827,9 +827,11 @@
       <button class="btn btn-ghost" onclick="openEbook()">📖 전자책 만들기</button>
       <span style="flex:1"></span>
       <button class="btn btn-ghost" onclick="exportData()" title="일기·사진·추가일정 백업">💾 백업</button>
-      <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()" title="백업 파일 불러오기">📥 복원</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()" title="이 파일로 전체 교체(덮어쓰기)">📥 복원(덮어쓰기)</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('mergeFile').click()" title="다른 기기 백업을 합쳐서 누적">🔀 합치기(누적)</button>
       <button class="btn btn-ghost" onclick="openSettings()" title="브런치 문체·서명 설정">⚙️ 설정</button>
       <input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(event)">
+      <input type="file" id="mergeFile" accept="application/json,.json" style="display:none" onchange="importMerge(event)">
     </div>
 
     <div class="diary-cols">
@@ -2303,6 +2305,36 @@ function importData(ev){
       if('expenses' in j && Array.isArray(j.expenses)){ expenses=j.expenses; save(LS.expenses, expenses); }
       refreshTimelines(); renderDiary(); renderContacts(); renderHotels(); renderRelated(); renderChecklist(); renderExpenses();
       toast('불러오기 완료 ✅');
+    }catch(err){ toast('올바른 백업 파일이 아니에요'); }
+    ev.target.value='';
+  };
+  reader.readAsText(file);
+}
+function importMerge(ev){
+  const file=ev.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const j=JSON.parse(e.target.result);
+      if(!j || j.app!=='noleu-europe') throw 0;
+      if(!confirm('이 파일의 기록을 현재 데이터에 합칠까요?\n(중복은 제외하고 누적됩니다. 기존 기록은 지워지지 않아요)')){ ev.target.value=''; return; }
+      let added=0;
+      if(Array.isArray(j.diary)){
+        const ids=new Set(diary.map(x=>x.id));
+        j.diary.forEach(x=>{ if(!ids.has(x.id)){ x.photos=normPhotos(x.photos); if(!x.iso){ const dd=DAYS.find(d=>d.d===x.day); x.iso=dd?dd.iso:(x.date?mdToIso(x.date):''); } diary.push(x); ids.add(x.id); added++; } });
+        save(LS.diary, diary);
+      }
+      if(Array.isArray(j.expenses)){
+        const ids=new Set(expenses.map(x=>x.id));
+        j.expenses.forEach(x=>{ if(!ids.has(x.id)){ expenses.push(x); ids.add(x.id); added++; } });
+        save(LS.expenses, expenses);
+      }
+      if(j.addedActs){ Object.keys(j.addedActs).forEach(d=>{ addedActs[d]=addedActs[d]||[]; const seen=new Set(addedActs[d].map(a=>(a.time||'')+'|'+a.t)); (j.addedActs[d]||[]).forEach(a=>{ const k=(a.time||'')+'|'+a.t; if(!seen.has(k)){ addedActs[d].push(a); seen.add(k); added++; } }); }); save(LS.acts, addedActs); }
+      if(j.checklist){ checklist.checked=Object.assign({}, checklist.checked, j.checklist.checked||{}); checklist.hidden=Object.assign({}, checklist.hidden, j.checklist.hidden||{}); (j.checklist.custom||[]).forEach(t=>{ if(!checklist.custom.includes(t)) checklist.custom.push(t); }); save(LS.checklist, checklist); }
+      if(j.related){ const r=j.related; (r.videos||[]).forEach(v=>{ if(!related.videos.some(x=>x.id===v.id)){ related.videos.push(v); added++; } }); (r.books||[]).forEach(bk=>{ if(!related.books.some(x=>x.title===bk.title)){ related.books.push(bk); added++; } }); (r.blogs||[]).forEach(bl=>{ if(!related.blogs.some(x=>x.url===bl.url)){ related.blogs.push(bl); added++; } }); save(LS.related, related); }
+      if(j.contacts){ contacts=Object.assign({}, contacts, j.contacts); save(LS.contacts, contacts); }
+      refreshTimelines(); renderDiary(); renderContacts(); renderHotels(); renderRelated(); renderChecklist(); renderExpenses();
+      toast(`합쳤어요 · 새 항목 ${added}개 추가 ✅`);
     }catch(err){ toast('올바른 백업 파일이 아니에요'); }
     ev.target.value='';
   };
