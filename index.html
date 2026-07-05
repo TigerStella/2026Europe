@@ -57,53 +57,53 @@
 
   /* ── HEADER ── */
   .hero {
-    background: linear-gradient(135deg, var(--deep-navy) 0%, var(--slate) 60%, #3D5278 100%);
+    background: linear-gradient(168deg, #241830 0%, #3A2447 32%, #7A3F4E 62%, #C06B3C 86%, #E7A046 100%);
     color: white;
-    padding: 40px 24px 34px;
+    padding: 24px 20px 104px;
     text-align: center;
     position: relative;
     overflow: hidden;
   }
-  .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  .hero-art {
+    position: absolute; left: 0; right: 0; bottom: -1px;
+    width: 100%; height: 150px; z-index: 1; pointer-events: none; display: block;
   }
+  .hero-inner { position: relative; z-index: 2; }
   .hero-eyebrow {
-    font-size: 11px;
+    font-size: 10px;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: var(--sunset-gold);
-    margin-bottom: 12px;
-    opacity: 0.9;
+    color: #FFD8A0;
+    margin-bottom: 8px;
+    opacity: 0.95;
   }
   .hero-title {
     font-family: 'Playfair Display', serif;
     font-style: italic;
-    font-size: clamp(28px, 6vw, 48px);
+    font-size: clamp(26px, 6vw, 42px);
     font-weight: 400;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     letter-spacing: -0.5px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.25);
   }
   .hero-subtitle {
-    font-size: 13px;
-    color: rgba(255,255,255,0.6);
-    margin-bottom: 24px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.72);
+    margin-bottom: 14px;
   }
   .hero-stats {
     display: flex;
     justify-content: center;
-    gap: 32px;
+    gap: 22px;
     flex-wrap: wrap;
     position: relative;
   }
   .hero-stat { text-align: center; }
   .hero-stat-num {
     font-family: 'Playfair Display', serif;
-    font-size: 28px;
+    font-size: 22px;
     font-weight: 700;
-    color: var(--sunset-gold);
+    color: #FFD8A0;
     display: block;
     line-height: 1;
   }
@@ -115,8 +115,8 @@
     margin-top: 4px;
   }
   .hero-flights {
-    display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
-    margin: 0 auto 22px; position: relative;
+    display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;
+    margin: 0 auto 14px; position: relative;
   }
   .hero-flight {
     font-size: 12px; color: rgba(255,255,255,0.85);
@@ -329,6 +329,7 @@
   }
   .add-tile:hover { border-color: var(--sunset-gold); color: var(--dusk-coral); }
   .add-tile .plus { font-size: 26px; }
+  .rel-subhead { font-size: 12px; font-weight: 700; color: var(--text-mid); margin: 6px 2px 10px; display: flex; align-items: center; gap: 6px; }
   .rel-list { display: flex; flex-direction: column; gap: 8px; }
   .rel-row { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
   .rel-row a { color: var(--slate); font-weight: 700; font-size: 13px; text-decoration: none; flex: 1; word-break: break-all; }
@@ -419,6 +420,18 @@
   .cost-line:last-child { border-bottom: none; }
   .cost-line-name { font-size: 12px; color: var(--text-mid); flex: 1; }
   .cost-line-amt { font-size: 12px; font-weight: 700; color: var(--text-dark); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .cost-line-orig { font-size: 10px; color: var(--text-light); }
+  .cost-day-head { display: flex; justify-content: space-between; align-items: center; margin: 16px 4px 8px; }
+  .cost-day-date { font-size: 12px; font-weight: 700; color: var(--slate); }
+  .cost-day-sum { font-size: 12px; font-weight: 700; color: var(--dusk-coral); }
+  .cost-del { color: var(--text-light); cursor: pointer; font-size: 12px; margin-left: 8px; }
+  .cost-del:hover { color: var(--dusk-coral); }
+  .exp-cats { display: flex; flex-wrap: wrap; gap: 6px; }
+  .exp-cat { border: 1.5px solid var(--border); background: var(--ivory); border-radius: 18px; padding: 6px 11px; font-size: 12px; cursor: pointer; font-family: inherit; color: var(--text-mid); }
+  .exp-cat.on { background: var(--sunset-gold); border-color: var(--sunset-gold); color: white; font-weight: 700; }
+  .grand-total { background: linear-gradient(135deg, var(--dusk-coral), var(--sunset-gold)); color: white; border-radius: 12px; padding: 16px; display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+  .grand-total .lbl { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.9; }
+  .grand-total .amt { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
 
   /* ── TIPS / COMMUNITY CARDS ── */
   .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
@@ -526,8 +539,11 @@
     .diary-cols { grid-template-columns: 1fr; }
   }
   @media (max-width: 600px) {
-    .hero { padding: 30px 16px 26px; }
-    .hero-stats { gap: 20px; }
+    .hero { padding: 20px 16px 84px; }
+    .hero-art { height: 118px; }
+    .hero-stats { gap: 16px; }
+    .hero-stat-num { font-size: 19px; }
+    .hero-flight { font-size: 11px; padding: 4px 9px; }
     .container { padding: 16px 12px; }
     .hotels-grid { grid-template-columns: 1fr; }
     .tips-grid { grid-template-columns: 1fr; }
@@ -535,6 +551,7 @@
     .route-bar { padding: 12px 16px; }
     .fx-bar { gap: 14px; }
     .brunch-paper { padding: 28px 20px; }
+    .tiles { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 </head>
@@ -548,18 +565,57 @@
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-eyebrow">✈ 노을 &amp; 타이거의 단둘 여행</div>
-  <h1 class="hero-title">2026 유럽 여행</h1>
-  <div class="hero-subtitle">런던 · 파리 · 뮌헨 · 피렌체 · 로마</div>
-  <div class="hero-flights">
-    <span class="hero-flight">🛫 9/25 인천 <b>10:55</b> → 런던 17:20</span>
-    <span class="hero-flight">🛬 10/11 밀라노 <b>22:00</b> → 인천 10/12 16:40</span>
-  </div>
-  <div class="hero-stats">
-    <div class="hero-stat"><span class="hero-stat-num">18</span><span class="hero-stat-label">박 19일</span></div>
-    <div class="hero-stat"><span class="hero-stat-num">5</span><span class="hero-stat-label">개 도시</span></div>
-    <div class="hero-stat"><span class="hero-stat-num">9/25</span><span class="hero-stat-label">출발</span></div>
-    <div class="hero-stat"><span class="hero-stat-num">10/12</span><span class="hero-stat-label">귀국</span></div>
+  <svg class="hero-art" viewBox="0 0 800 200" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <defs>
+      <radialGradient id="hsun" cx="50%" cy="94%" r="60%">
+        <stop offset="0%" stop-color="#FFEAC4"/>
+        <stop offset="32%" stop-color="#F7BC64"/>
+        <stop offset="64%" stop-color="#EE9B4E" stop-opacity=".5"/>
+        <stop offset="100%" stop-color="#EE9B4E" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <circle cx="400" cy="198" r="170" fill="url(#hsun)"/>
+    <ellipse cx="155" cy="58" rx="48" ry="12" fill="#fff" opacity=".07"/>
+    <ellipse cx="655" cy="44" rx="62" ry="14" fill="#fff" opacity=".06"/>
+    <path d="M118 70 q7 -6 14 0 q7 -6 14 0" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M168 88 q5 -4 10 0 q5 -4 10 0" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="2" stroke-linecap="round"/>
+    <path d="M560 48 C620 38 662 32 714 18" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="2.2" stroke-dasharray="2 7" stroke-linecap="round"/>
+    <path d="M714 14 l15 5 -12 4 2 9 -9 -9 -13 3 9 -8z" fill="#fff" opacity=".8"/>
+    <path d="M0 176 Q400 150 800 176 L800 200 L0 200 Z" fill="#241830"/>
+    <g fill="#241830">
+      <!-- 아이(타이거) -->
+      <rect x="336" y="128" width="13" height="19" rx="6"/>
+      <circle cx="353" cy="120" r="11"/>
+      <path d="M345 131 q8 -5 16 0 l3 47 q-11 4 -22 0 z"/>
+      <path d="M361 139 q11 5 20 10" stroke="#241830" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <!-- 엄마(노을) -->
+      <path d="M392 101 q-11 8 -6 27 q7 -3 12 -13 z"/>
+      <circle cx="405" cy="104" r="13"/>
+      <path d="M389 117 q16 -9 32 0 l5 61 q-21 6 -42 0 z"/>
+      <path d="M391 131 q-14 6 -24 12" stroke="#241830" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <path d="M421 131 q17 4 31 12" stroke="#241830" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <!-- 캐리어 -->
+      <path d="M454 141 l0 -19" stroke="#241830" stroke-width="4" stroke-linecap="round"/>
+      <path d="M445 121 q9 -5 18 0" stroke="#241830" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <rect x="447" y="141" width="34" height="40" rx="6"/>
+      <circle cx="453" cy="183" r="3"/><circle cx="475" cy="183" r="3"/>
+    </g>
+    <rect x="447" y="153" width="34" height="3.5" fill="#3b2a4a"/>
+  </svg>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">✈ 노을 &amp; 타이거의 단둘 여행</div>
+    <h1 class="hero-title">2026 유럽 여행</h1>
+    <div class="hero-subtitle">런던 · 파리 · 뮌헨 · 피렌체 · 로마</div>
+    <div class="hero-flights">
+      <span class="hero-flight">🛫 9/25 인천 <b>10:55</b> → 런던 17:20</span>
+      <span class="hero-flight">🛬 10/11 밀라노 <b>22:00</b> → 인천 10/12 16:40</span>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><span class="hero-stat-num">18</span><span class="hero-stat-label">박 19일</span></div>
+      <div class="hero-stat"><span class="hero-stat-num">5</span><span class="hero-stat-label">개 도시</span></div>
+      <div class="hero-stat"><span class="hero-stat-num">9/25</span><span class="hero-stat-label">출발</span></div>
+      <div class="hero-stat"><span class="hero-stat-num">10/12</span><span class="hero-stat-label">귀국</span></div>
+    </div>
   </div>
 </div>
 
@@ -636,10 +692,13 @@
 <!-- ── TAB: 비용 ── -->
 <div id="cost" class="tab-section">
   <div class="container">
-    <div class="section-header"><span class="section-icon">💰</span><span class="section-title">예산 &amp; 비용 정리</span><span class="section-sub">사전 결제 확정분</span></div>
+    <div class="section-header"><span class="section-icon">💰</span><span class="section-title">예산 &amp; 비용 정리</span>
+      <button class="mini-refresh" onclick="openExpenseModal()" title="여행 경비 추가">＋ 비용 추가</button>
+    </div>
     <div id="costWrap"></div>
+    <div id="expenseWrap"></div>
     <div style="margin-top:12px; font-size:11px; color:var(--text-light); padding: 0 4px;">
-      ※ 위 금액은 <strong>사전 결제 확정분</strong>이에요. 현지 식비·교통카드·입장료·투어·쇼핑 등은 별도입니다.
+      ※ 사전 결제 확정분 + 직접 입력한 경비를 <strong>원화로 환산</strong>해 합산해요. 환율은 상단 실시간 환율 기준(오프라인 시 참고치).
     </div>
   </div>
 </div>
@@ -707,10 +766,12 @@
     <div class="section-header">
       <span class="section-icon">📺</span>
       <span class="section-title">유튜브 영상</span>
-      <span class="section-sub">여행 준비 영상 모음</span>
+      <span class="section-sub">+ 타일로 URL 추가</span>
     </div>
-    <p class="hint">+ 타일을 눌러 유튜브 URL을 붙여넣으면 영상이 추가돼요. 타일을 누르면 영상이 열립니다.</p>
-    <div class="tiles" id="videoTiles"></div>
+    <div class="rel-subhead">🗺 관광지 정보</div>
+    <div class="tiles" id="videoTiles-spot"></div>
+    <div class="rel-subhead" style="margin-top:18px">📜 역사 공부</div>
+    <div class="tiles" id="videoTiles-history"></div>
 
     <div class="section-header" style="margin-top:32px">
       <span class="section-icon">📚</span>
@@ -895,15 +956,46 @@
   </div>
 </div>
 
+<!-- EXPENSE ADD MODAL -->
+<div class="modal-back" id="expenseModal">
+  <div class="modal">
+    <h3 id="expenseModalTitle">💰 비용 추가</h3>
+    <div class="row">
+      <div class="field" style="flex:2"><label>지출 금액</label><input type="number" id="exAmount" inputmode="decimal" placeholder="0" oninput="updateExPreview()"></div>
+      <div class="field" style="flex:1"><label>통화</label>
+        <select id="exCcy" onchange="updateExPreview()"><option value="KRW">KRW ₩</option><option value="EUR">EUR €</option><option value="GBP">GBP £</option><option value="USD">USD $</option></select>
+      </div>
+    </div>
+    <div class="field" style="margin:2px 0 10px"><label>카테고리</label>
+      <div id="exCats" class="exp-cats"></div>
+    </div>
+    <div class="row">
+      <div class="field" style="flex:1"><label>날짜</label><input type="date" id="exDate"></div>
+      <div class="field" style="flex:1"><label>지불 방식</label>
+        <select id="exPay"><option>신용카드</option><option>체크/트래블카드</option><option>현금</option></select>
+      </div>
+    </div>
+    <div class="field" style="margin:10px 0"><label>메모 (지출 내역)</label><input id="exMemo" placeholder="예: 에펠탑 입장권, 점심 파스타"></div>
+    <div id="exPreview" class="hint" style="margin-bottom:12px"></div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveExpense()">저장</button>
+      <button class="btn btn-ghost" onclick="closeModal('expenseModal')">취소</button>
+    </div>
+  </div>
+</div>
+
 <!-- VIDEO ADD MODAL -->
 <div class="modal-back" id="videoModal">
   <div class="modal">
     <h3>📺 유튜브 영상 추가</h3>
     <div class="field" style="margin-bottom:10px"><label>유튜브 URL</label>
       <input id="vUrl" placeholder="https://youtu.be/... 또는 https://www.youtube.com/watch?v=..."></div>
-    <div class="field" style="margin-bottom:12px"><label>메모 (선택)</label>
-      <input id="vTitle" placeholder="예: 유럽 3주 코스 정리"></div>
-    <div class="form-actions">
+    <div class="row">
+      <div class="field" style="flex:2"><label>메모 (선택)</label><input id="vTitle" placeholder="예: 루브르 관람 순서"></div>
+      <div class="field" style="flex:1"><label>분류</label>
+        <select id="vCat"><option value="spot">🗺 관광지 정보</option><option value="history">📜 역사 공부</option></select></div>
+    </div>
+    <div class="form-actions" style="margin-top:12px">
       <button class="btn btn-primary" onclick="addVideo()">추가</button>
       <button class="btn btn-ghost" onclick="closeModal('videoModal')">취소</button>
     </div>
@@ -1137,6 +1229,7 @@ const LS = {
   contacts: 'noleu_contacts_v1',
   related: 'noleu_related_v1',
   checklist: 'noleu_checklist_v1',
+  expenses: 'noleu_expenses_v1',
 };
 function load(key, def){ try { const v=JSON.parse(localStorage.getItem(key)); return (v===null||v===undefined)?def:v; } catch(e){ return def; } }
 function save(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){ toast('저장 공간이 부족해요 (사진 용량 확인)'); } }
@@ -1161,8 +1254,9 @@ const CONTACT_SLOTS = [
 ];
 // 관련정보 (유튜브·도서·블로그) — localStorage 보관
 let related = load(LS.related, null);
-if(!related || typeof related!=='object'){ related = { videos:[{id:'6PC8FqfRi1E', url:'https://youtu.be/6PC8FqfRi1E', title:'유럽 여행 참고 영상'}], books:[], blogs:[] }; save(LS.related, related); }
+if(!related || typeof related!=='object'){ related = { videos:[{id:'6PC8FqfRi1E', url:'https://youtu.be/6PC8FqfRi1E', title:'유럽 여행 참고 영상', cat:'spot'}], books:[], blogs:[] }; save(LS.related, related); }
 related.videos = related.videos||[]; related.books = related.books||[]; related.blogs = related.blogs||[];
+related.videos.forEach(v=>{ if(!v.cat) v.cat='spot'; }); // 기존 영상은 관광지 정보로
 
 function pcVal(id){ return contacts[id] ? esc(contacts[id]) : '<span style="color:#b7b0a6">🔒 비공개</span>'; }
 function resolveContact(v){ return (typeof v==='string' && v[0]==='@') ? (contacts[v.slice(1)] ? esc(contacts[v.slice(1)]) : '<span style="color:#b7b0a6">🔒 비공개 (팁 탭)</span>') : esc(v); }
@@ -1404,8 +1498,74 @@ function renderCost(){
       ${cat.items.map(it=>`<div class="cost-line"><span class="cost-line-name">${esc(it[0])}</span><span class="cost-line-amt">${won(it[1])}원</span></div>`).join('')}
     </div>`;
   }).join('');
-  document.getElementById('costWrap').innerHTML = html +
+  document.getElementById('costWrap').innerHTML =
+    `<div class="section-header" style="margin-top:4px"><span class="section-icon">💳</span><span class="section-title" style="font-size:12px">사전 결제 확정분</span></div>` + html +
     `<div class="cost-total" style="margin-top:12px"><span class="cost-total-label">사전 결제 합계</span><span class="cost-total-amount">${won(grand)}원</span></div>`;
+  renderExpenses();
+}
+
+/* ── 여행 경비 (직접 입력, 원화 환산) ── */
+const FX = { KRW:1, USD:1380, GBP:1750, EUR:1490 }; // KRW per 1 unit (loadFx가 실시간 갱신)
+const EXP_CATS = [['🧾','기타비용'],['🍽','식비'],['🚕','교통비'],['🛍','쇼핑'],['🎫','티켓'],['🏨','숙박비'],['✈️','항공권'],['⛱','투어'],['🎉','유흥'],['🏃','액티비티'],['💵','팁'],['🎁','선물']];
+const CCY_SYM = { KRW:'₩', EUR:'€', GBP:'£', USD:'$' };
+let expenses = load(LS.expenses, []);
+let exCatSel = '기타비용';
+function toKrw(amount, ccy){ return Math.round((+amount||0) * (FX[ccy]||1)); }
+function costSum(){ let s=0; COSTS.forEach(c=>c.items.forEach(i=>s+=i[1])); return s; }
+function openExpenseModal(){
+  exCatSel='기타비용';
+  document.getElementById('exAmount').value='';
+  document.getElementById('exCcy').value='KRW';
+  document.getElementById('exMemo').value='';
+  document.getElementById('exDate').value = DAYS[0].iso;
+  document.getElementById('exPay').selectedIndex=0;
+  document.getElementById('exCats').innerHTML = EXP_CATS.map(c=>`<button type="button" class="exp-cat ${c[1]===exCatSel?'on':''}" onclick="pickExCat('${c[1]}')">${c[0]} ${c[1]}</button>`).join('');
+  updateExPreview();
+  document.getElementById('expenseModal').classList.add('open');
+}
+function pickExCat(name){ exCatSel=name; document.querySelectorAll('#exCats .exp-cat').forEach(b=>b.classList.toggle('on', b.textContent.trim().endsWith(name))); }
+function updateExPreview(){
+  const amt=+document.getElementById('exAmount').value||0;
+  const ccy=document.getElementById('exCcy').value;
+  const el=document.getElementById('exPreview');
+  el.innerHTML = (ccy==='KRW'||!amt) ? (amt?`= ${toKrw(amt,ccy).toLocaleString('ko-KR')}원`:'') : `${CCY_SYM[ccy]}${amt.toLocaleString()} ≈ <strong>${toKrw(amt,ccy).toLocaleString('ko-KR')}원</strong> (환율 ${Math.round(FX[ccy]).toLocaleString()})`;
+}
+function saveExpense(){
+  const amount=+document.getElementById('exAmount').value;
+  if(!amount||amount<=0){ toast('금액을 입력해주세요'); return; }
+  expenses.push({ id:'x'+Date.now()+Math.floor(performance.now()), amount, ccy:document.getElementById('exCcy').value,
+    cat:exCatSel, pay:document.getElementById('exPay').value, date:document.getElementById('exDate').value, memo:document.getElementById('exMemo').value.trim() });
+  save(LS.expenses, expenses);
+  closeModal('expenseModal'); renderExpenses();
+  toast('비용이 추가됐어요 💰');
+}
+function delExpense(id){ expenses=expenses.filter(x=>x.id!==id); save(LS.expenses, expenses); renderExpenses(); }
+function catIcon(name){ const c=EXP_CATS.find(x=>x[1]===name); return c?c[0]:'🧾'; }
+function renderExpenses(){
+  const wrap=document.getElementById('expenseWrap'); if(!wrap) return;
+  const won=n=>n.toLocaleString('ko-KR');
+  const pre=costSum();
+  let html=`<div class="section-header" style="margin-top:24px"><span class="section-icon">🧾</span><span class="section-title" style="font-size:12px">여행 중 경비 (일별)</span><span class="section-sub">원화 환산</span></div>`;
+  if(!expenses.length){
+    html+=`<p class="hint" style="padding:8px">아직 입력한 경비가 없어요. 상단 <strong>＋ 비용 추가</strong>로 식비·교통·입장료 등을 날짜별로 기록해보세요.</p>`;
+  } else {
+    const byDate={}; expenses.forEach(e=>{ (byDate[e.date||'미정']=byDate[e.date||'미정']||[]).push(e); });
+    const dates=Object.keys(byDate).sort();
+    let expTotal=0;
+    dates.forEach(dt=>{
+      const list=byDate[dt]; const daySum=list.reduce((a,e)=>a+toKrw(e.amount,e.ccy),0); expTotal+=daySum;
+      const dd=ISO2DAY[dt];
+      html+=`<div class="cost-day-head"><span class="cost-day-date">📅 ${dd?`${dd.date}(${dd.wd}) · ${CITIES[dd.city].name}`:(dt==='미정'?'날짜 미정':isoLabel(dt))}</span><span class="cost-day-sum">${won(daySum)}원</span></div><div class="cost-cat">`;
+      html+=list.map(e=>{
+        const krw=toKrw(e.amount,e.ccy);
+        const orig = e.ccy!=='KRW' ? `<span class="cost-line-orig"> (${CCY_SYM[e.ccy]}${(+e.amount).toLocaleString()})</span>` : '';
+        return `<div class="cost-line"><span class="cost-line-name">${catIcon(e.cat)} ${esc(e.memo||e.cat)}<span class="cost-line-orig"> · ${esc(e.pay||'')}</span></span><span class="cost-line-amt">${won(krw)}원${orig}<span class="cost-del" onclick="delExpense('${e.id}')" title="삭제">✕</span></span></div>`;
+      }).join('')+`</div>`;
+    });
+    html+=`<div class="cost-total" style="margin-top:12px"><span class="cost-total-label">경비 합계</span><span class="cost-total-amount">${won(expTotal)}원</span></div>`;
+    html+=`<div class="grand-total"><span class="lbl">총 합계 (사전+경비)</span><span class="amt">${won(pre+expTotal)}원</span></div>`;
+  }
+  wrap.innerHTML=html;
 }
 
 /* ══════════════════ CHECKLIST (준비물) ══════════════════ */
@@ -1569,31 +1729,36 @@ function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 
 function renderRelated(){ renderVideos(); renderBooks(); renderBlogs(); }
 
-function renderVideos(){
-  const el=document.getElementById('videoTiles'); if(!el) return;
-  const tiles = related.videos.map((v,i)=>`
-    <div class="tile">
-      <button class="tile-del" onclick="delVideo(${i})" title="삭제">✕</button>
+function videoTileHTML(v, gi){
+  return `<div class="tile">
+      <button class="tile-del" onclick="delVideo('${v.id}')" title="삭제">✕</button>
       <div class="tile-thumbwrap" onclick="window.open('https://youtu.be/${v.id}','_blank')">
         <img class="tile-thumb" src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg" alt="" loading="lazy"
              onerror="this.src='https://img.youtube.com/vi/${v.id}/0.jpg'">
         <span class="tile-play">▶</span>
       </div>
       <div class="tile-body"><div class="tile-title">${esc(v.title||'유튜브 영상')}</div></div>
-    </div>`).join('');
-  el.innerHTML = tiles + `<button class="add-tile" onclick="openModal('videoModal')"><span class="plus">＋</span>영상 추가</button>`;
+    </div>`;
 }
-function openModal(id){ const el=document.getElementById(id); el.classList.add('open'); }
+function renderVideos(){
+  [['spot','videoTiles-spot'],['history','videoTiles-history']].forEach(([cat,id])=>{
+    const el=document.getElementById(id); if(!el) return;
+    const tiles = related.videos.filter(v=>(v.cat||'spot')===cat).map(v=>videoTileHTML(v)).join('');
+    el.innerHTML = tiles + `<button class="add-tile" onclick="openVideoModal('${cat}')"><span class="plus">＋</span>영상 추가</button>`;
+  });
+}
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function openVideoModal(cat){ document.getElementById('vUrl').value=''; document.getElementById('vTitle').value=''; document.getElementById('vCat').value=cat||'spot'; openModal('videoModal'); }
 function addVideo(){
   const url=document.getElementById('vUrl').value.trim();
   const id=ytId(url);
   if(!id){ toast('유효한 유튜브 URL이 아니에요'); return; }
-  related.videos.push({ id, url, title:document.getElementById('vTitle').value.trim() });
+  related.videos.push({ id, url, title:document.getElementById('vTitle').value.trim(), cat:document.getElementById('vCat').value });
   saveRelated(); renderVideos();
   document.getElementById('vUrl').value=''; document.getElementById('vTitle').value='';
   closeModal('videoModal'); toast('영상이 추가됐어요 📺');
 }
-function delVideo(i){ related.videos.splice(i,1); saveRelated(); renderVideos(); }
+function delVideo(id){ related.videos=related.videos.filter(v=>v.id!==id); saveRelated(); renderVideos(); }
 
 function renderBooks(){
   const el=document.getElementById('bookTiles'); if(!el) return;
@@ -1999,7 +2164,7 @@ function saveSettings(){
 function downloadBlob(blob, name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 800); }
 function stamp(){ const d=new Date(); const p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`; }
 function exportData(){
-  const payload={ app:'noleu-europe', version:1, exportedAt:new Date().toISOString(), addedActs, diary, settings, contacts, related, checklist };
+  const payload={ app:'noleu-europe', version:1, exportedAt:new Date().toISOString(), addedActs, diary, settings, contacts, related, checklist, expenses };
   downloadBlob(new Blob([JSON.stringify(payload,null,2)], {type:'application/json'}), `noleu-europe-backup-${stamp()}.json`);
   toast('백업 파일을 저장했어요 💾');
 }
@@ -2022,7 +2187,8 @@ function importData(ev){
       if('contacts' in j){ contacts=Object.assign({}, contacts, j.contacts||{}); save(LS.contacts, contacts); }
       if('related' in j && j.related){ related=Object.assign({videos:[],books:[],blogs:[]}, j.related); save(LS.related, related); }
       if('checklist' in j && j.checklist){ checklist=Object.assign({checked:{},custom:[]}, j.checklist); save(LS.checklist, checklist); }
-      refreshTimelines(); renderDiary(); renderContacts(); renderHotels(); renderRelated(); renderChecklist();
+      if('expenses' in j && Array.isArray(j.expenses)){ expenses=j.expenses; save(LS.expenses, expenses); }
+      refreshTimelines(); renderDiary(); renderContacts(); renderHotels(); renderRelated(); renderChecklist(); renderExpenses();
       toast('불러오기 완료 ✅');
     }catch(err){ toast('올바른 백업 파일이 아니에요'); }
     ev.target.value='';
@@ -2235,7 +2401,10 @@ async function loadFx(){
   const fmt=n=>Math.round(n).toLocaleString('ko-KR');
   bar.innerHTML=`<span class="fx-meta">💱 환율 불러오는 중…</span>`;
   const render=(usd,gbp,eur,meta)=>{ bar.innerHTML=
-    `<span class="fx-meta">💱 실시간 환율 (원)</span>${fxRow('🇺🇸','USD',fmt(usd))}${fxRow('🇬🇧','GBP',fmt(gbp))}${fxRow('🇪🇺','EUR',fmt(eur))}<span class="fx-meta">${meta}</span><button class="fx-refresh" onclick="loadFx()" title="새로고침">🔄</button>`; };
+    `<span class="fx-meta">💱 실시간 환율 (원)</span>${fxRow('🇺🇸','USD',fmt(usd))}${fxRow('🇬🇧','GBP',fmt(gbp))}${fxRow('🇪🇺','EUR',fmt(eur))}<span class="fx-meta">${meta}</span><button class="fx-refresh" onclick="loadFx()" title="새로고침">🔄</button>`;
+    FX.USD=usd; FX.GBP=gbp; FX.EUR=eur;
+    if(document.getElementById('expenseWrap')) renderExpenses();
+  };
   // 1순위: open.er-api.com
   try{ const j=await fetchJSON('https://open.er-api.com/v6/latest/USD');
     if(j&&j.rates&&j.rates.KRW){ const {KRW,GBP,EUR}=j.rates; render(KRW, KRW/GBP, KRW/EUR, (j.time_last_update_utc?j.time_last_update_utc.slice(5,16):'')+' 기준'); return; }
