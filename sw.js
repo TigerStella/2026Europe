@@ -1,5 +1,5 @@
 /* 노을과 타이거의 유럽여행 — service worker (오프라인 지원) */
-const CACHE = 'noleu-europe-v3';
+const CACHE = 'noleu-europe-v4';
 const ASSETS = ['./', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
