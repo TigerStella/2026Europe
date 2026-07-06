@@ -1876,9 +1876,11 @@ function toggleRead(i){ related.books[i].read=!related.books[i].read; saveRelate
 function delBook(i){ related.books.splice(i,1); saveRelated(); renderBooks(); }
 function gbMap(j){ return (j.items||[]).map(it=>{const v=it.volumeInfo||{};return {title:v.title||'',authors:(v.authors||[]).join(', '),thumb:(v.imageLinks?(v.imageLinks.thumbnail||v.imageLinks.smallThumbnail||''):'').replace('http://','https://')};}); }
 async function bookLookup(q){
+  const gb='https://www.googleapis.com/books/v1/volumes?country=KR&maxResults=10&q='+encodeURIComponent(q);
   let list=[];
-  try{ list=gbMap(await fetchJSON('https://www.googleapis.com/books/v1/volumes?country=KR&langRestrict=ko&maxResults=10&q='+encodeURIComponent(q))); }catch(e){}
-  if(!list.length){ try{ list=gbMap(await fetchJSON('https://www.googleapis.com/books/v1/volumes?country=KR&maxResults=10&q='+encodeURIComponent(q))); }catch(e){} }
+  try{ list=gbMap(await fetchJSON(gb)); }catch(e){}
+  if(!list.length){ try{ list=gbMap(await fetchJSON('https://api.allorigins.win/raw?url='+encodeURIComponent(gb),12000)); }catch(e){} }
+  if(!list.length){ try{ list=gbMap(await fetchJSON('https://corsproxy.io/?url='+encodeURIComponent(gb),12000)); }catch(e){} }
   if(!list.length){ try{ const j=await fetchJSON('https://openlibrary.org/search.json?limit=10&q='+encodeURIComponent(q));
     list=(j.docs||[]).map(d=>({title:d.title||'',authors:(d.author_name||[]).join(', '),thumb:d.cover_i?('https://covers.openlibrary.org/b/id/'+d.cover_i+'-M.jpg'):''})); }catch(e){} }
   return list;
@@ -1951,10 +1953,13 @@ function fontCss(id){ const f=DIARY_FONTS.find(x=>x.id===id); return f?f.css:DIA
 function fillFontSelect(sel){ sel.innerHTML=DIARY_FONTS.map(f=>`<option value="${f.id}" style="font-family:${f.css}">${f.name}</option>`).join(''); }
 function applyDiaryFont(){ const css=fontCss(document.getElementById('dFont').value); document.getElementById('dBody').style.fontFamily=css; document.getElementById('dTitle').style.fontFamily=css; }
 
-function tripDday(){
-  const start=new Date(2026,8,25), end=new Date(2026,9,12), t=new Date(); t.setHours(0,0,0,0);
+function tripDday(refIso){
+  const start=new Date(2026,8,25), end=new Date(2026,9,12);
+  let t; if(refIso){ const p=refIso.split('-').map(Number); t=new Date(p[0],p[1]-1,p[2]); } else { t=new Date(); }
+  t.setHours(0,0,0,0);
   const day=86400000, ds=Math.round((start-t)/day);
   if(ds>0) return `여행 시작 D-${ds}`;
+  if(ds===0) return `여행 첫날 · D-DAY`;
   if(t<=end) return `여행 ${Math.round((t-start)/day)+1}일차`;
   return `여행 종료 D+${Math.round((t-end)/day)}`;
 }
@@ -1963,6 +1968,7 @@ function updateDDayHint(){
   const day=ISO2DAY[iso];
   const el=document.getElementById('dDayHint');
   el.innerHTML = day ? `📍 <strong>D${day.d} · ${CITIES[day.city].name}</strong> (${day.date} ${day.wd}요일)` : (iso?`여행 일정 밖의 날짜예요 (${isoLabel(iso)})`:'');
+  const bd=document.getElementById('ddayBadge'); if(bd) bd.textContent='✈ '+tripDday(iso||null);
 }
 function openDiaryModal(who){
   editingId=null; pendingPhotos=[];
@@ -1973,7 +1979,7 @@ function openDiaryModal(who){
   document.getElementById('photoPreview').innerHTML=''; document.getElementById('dPhotos').value='';
   fillFontSelect(document.getElementById('dFont')); document.getElementById('dFont').value=lastDiaryFont; applyDiaryFont();
   updateDDayHint();
-  document.getElementById('ddayBadge').textContent='✈ '+tripDday();
+  document.getElementById('ddayBadge').textContent='✈ '+tripDday(document.getElementById('dDate').value);
   document.getElementById('diaryModal').classList.add('open');
 }
 function editDiary(id){
@@ -1986,7 +1992,7 @@ function editDiary(id){
   document.getElementById('dBody').value=e.body;
   fillFontSelect(document.getElementById('dFont')); document.getElementById('dFont').value=e.font||''; applyDiaryFont();
   renderPhotoPreview(); updateDDayHint();
-  document.getElementById('ddayBadge').textContent='✈ '+tripDday();
+  document.getElementById('ddayBadge').textContent='✈ '+tripDday(document.getElementById('dDate').value);
   document.getElementById('diaryModal').classList.add('open');
 }
 function closeDiaryModal(){ document.getElementById('diaryModal').classList.remove('open'); }
@@ -2602,6 +2608,8 @@ function fxDelta(cur, prev){
   const t=a.toFixed(2)+'%';
   return pct>0 ? `<span class="fx-up">▲ +${t}</span>` : `<span class="fx-down">▼ -${t}</span>`;
 }
+function fxSaveSnap(usd,gbp,eur){ try{ const today=fxDateBack(0); const raw=localStorage.getItem('noleu_fx_hist_v1'); const h=raw?JSON.parse(raw):null; if(!h||h.date!==today) localStorage.setItem('noleu_fx_hist_v1',JSON.stringify({date:today,usd,gbp,eur})); }catch(e){} }
+function fxHistDelta(usd,gbp,eur){ let du='',dg='',de=''; try{ const raw=localStorage.getItem('noleu_fx_hist_v1'); const h=raw?JSON.parse(raw):null; const today=fxDateBack(0); if(h&&h.date&&h.date!==today&&h.usd){ du=fxDelta(usd,h.usd); dg=fxDelta(gbp,h.gbp); de=fxDelta(eur,h.eur); } }catch(e){} fxSaveSnap(usd,gbp,eur); return [du,dg,de]; }
 async function loadFx(){
   const bar=document.getElementById('fxBar');
   const fmt=n=>Math.round(n).toLocaleString('ko-KR');
@@ -2611,22 +2619,33 @@ async function loadFx(){
     FX.USD=usd; FX.GBP=gbp; FX.EUR=eur;
     if(document.getElementById('expenseWrap')) renderExpenses();
   };
-  try{
-    const j=await fetchJSON(`https://api.frankfurter.app/${fxDateBack(12)}..?from=USD&to=KRW,GBP,EUR`);
-    if(j&&j.rates){
-      const ds=Object.keys(j.rates).sort();
-      if(ds.length>=1){
-        const c=j.rates[ds[ds.length-1]], pv=ds.length>=2?j.rates[ds[ds.length-2]]:null;
-        const uK=c.KRW, gK=c.KRW/c.GBP, eK=c.KRW/c.EUR;
-        let du='',dg='',de='';
-        if(pv){ du=fxDelta(uK,pv.KRW); dg=fxDelta(gK,pv.KRW/pv.GBP); de=fxDelta(eK,pv.KRW/pv.EUR); }
-        render(uK,gK,eK, ds[ds.length-1]+' ECB · 전일비', du,dg,de);
-        return;
+  // 1) frankfurter 시계열 (전일비 정확) — .dev 우선, .app 백업
+  const fkHosts=[
+    {u:'https://api.frankfurter.dev/v1', q:'base=USD&symbols=KRW,GBP,EUR'},
+    {u:'https://api.frankfurter.app', q:'from=USD&to=KRW,GBP,EUR'}
+  ];
+  for(const f of fkHosts){
+    try{
+      const j=await fetchJSON(`${f.u}/${fxDateBack(12)}..?${f.q}`);
+      if(j&&j.rates){
+        const ds=Object.keys(j.rates).sort();
+        if(ds.length>=1){
+          const c=j.rates[ds[ds.length-1]], pv=ds.length>=2?j.rates[ds[ds.length-2]]:null;
+          const uK=c.KRW, gK=c.KRW/c.GBP, eK=c.KRW/c.EUR;
+          let du='',dg='',de='';
+          if(pv){ du=fxDelta(uK,pv.KRW); dg=fxDelta(gK,pv.KRW/pv.GBP); de=fxDelta(eK,pv.KRW/pv.EUR); }
+          fxSaveSnap(uK,gK,eK);
+          render(uK,gK,eK, ds[ds.length-1]+' ECB · 전일비', du,dg,de);
+          return;
+        }
       }
-    }
-  }catch(e){}
+    }catch(e){}
+  }
+  // 2) open.er-api 현재값 + localStorage 전일 대비
   try{ const j=await fetchJSON('https://open.er-api.com/v6/latest/USD');
-    if(j&&j.rates&&j.rates.KRW){ const {KRW,GBP,EUR}=j.rates; render(KRW, KRW/GBP, KRW/EUR, (j.time_last_update_utc?j.time_last_update_utc.slice(5,16):'')+' 기준','','',''); return; }
+    if(j&&j.rates&&j.rates.KRW){ const {KRW,GBP,EUR}=j.rates; const uK=KRW,gK=KRW/GBP,eK=KRW/EUR;
+      const [du,dg,de]=fxHistDelta(uK,gK,eK);
+      render(uK,gK,eK,(j.time_last_update_utc?j.time_last_update_utc.slice(5,16):'')+' · 전일비', du,dg,de); return; }
   }catch(e){}
   bar.innerHTML=`<span class="fx-meta">💱 환율(참고치)</span>${fxRow('🇺🇸','USD','~1,380')}${fxRow('🇬🇧','GBP','~1,750')}${fxRow('🇪🇺','EUR','~1,490')}<button class="fx-refresh" onclick="loadFx()">다시 시도</button>`;
 }
@@ -2685,6 +2704,6 @@ init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-05c</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-05d</div>
 </body>
 </html>
