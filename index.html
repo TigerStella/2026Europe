@@ -601,6 +601,8 @@
   .fx-up{color:#FF5D5D;font-size:11px;font-weight:800;margin-left:4px;}
   .fx-down{color:#5C93F0;font-size:11px;font-weight:800;margin-left:4px;}
   .fx-flat{color:rgba(255,255,255,0.4);font-size:10px;margin-left:3px;}
+  .hero-dday{display:inline-block;margin:12px 0 4px;padding:6px 16px;border-radius:22px;background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.4);color:#fff;font-weight:800;font-size:15px;letter-spacing:.3px;box-shadow:0 2px 10px rgba(0,0,0,0.15);}
+  .postit-dday{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:10px;background:rgba(181,131,42,0.14);color:#B5832A;font-size:11px;font-weight:700;vertical-align:middle;}
   .dday-badge{display:inline-block;background:linear-gradient(135deg,var(--sunset-gold),var(--dusk-coral));color:#fff;font-size:12px;font-weight:700;padding:4px 12px;border-radius:16px;margin:-4px 0 12px;}
 </style>
 </head>
@@ -622,6 +624,7 @@
     <div class="hero-title-sub">Tiger, ready?</div>
     <h1 class="hero-title">Let's go, Europe! <span class="hero-year">✈ 2026</span></h1>
     <div class="hero-subtitle">London · Paris · Munich · Florence · Rome &nbsp;·&nbsp; 18 nights</div>
+    <div class="hero-dday" id="heroDday"></div>
     <div class="hero-flights">
       <span class="hero-flight">🛫 9/25 Seoul <b>10:55</b> → London 17:20</span>
       <span class="hero-flight">🛬 10/11 Milan <b>22:00</b> → Seoul 10/12 16:40</span>
@@ -1889,8 +1892,11 @@ async function findCover(i){
   const b=related.books[i]; if(!b) return; toast('표지 찾는 중…');
   const list=await bookLookup(b.title);
   const hit=list.find(x=>x.thumb);
-  if(hit){ b.thumb=hit.thumb; if(!b.authors&&hit.authors) b.authors=hit.authors; saveRelated(); renderBooks(); toast('표지를 찾았어요 📚'); }
-  else toast('표지를 못 찾았어요 · 직접 입력해보세요');
+  if(hit){ b.thumb=hit.thumb; if(!b.authors&&hit.authors) b.authors=hit.authors; saveRelated(); renderBooks(); toast('표지를 찾았어요 📚'); return; }
+  const url=prompt('자동 검색이 안 됐어요.\n표지 이미지 주소(URL)를 붙여넣으면 바로 등록돼요.\n(네이버/구글 이미지 검색 → 이미지 주소 복사)','');
+  if(url&&/^https?:\/\//.test(url.trim())){ b.thumb=url.trim(); saveRelated(); renderBooks(); toast('표지를 등록했어요 📚'); }
+  else if(url) toast('올바른 이미지 주소가 아니에요 (http…)');
+  else toast('표지를 못 찾았어요');
 }
 function openBookModal(){ document.getElementById('bQuery').value=''; document.getElementById('bookResults').innerHTML=''; openModal('bookModal'); setTimeout(()=>document.getElementById('bQuery').focus(),50); }
 async function searchBooks(){
@@ -1963,6 +1969,7 @@ function tripDday(refIso){
   if(t<=end) return `여행 ${Math.round((t-start)/day)+1}일차`;
   return `여행 종료 D+${Math.round((t-end)/day)}`;
 }
+function updateHeroDday(){ const el=document.getElementById('heroDday'); if(el) el.textContent='✈ '+tripDday(); }
 function updateDDayHint(){
   const iso=document.getElementById('dDate').value;
   const day=ISO2DAY[iso];
@@ -2063,7 +2070,7 @@ function renderDiary(){
       <div class="postit ${who}">
         <span class="pin">📌</span>
         <div class="postit-actions"><button onclick="editDiary('${e.id}')" title="수정">✎</button><button onclick="delDiary('${e.id}')" title="삭제">🗑</button></div>
-        <div class="postit-date">${esc(entryLabel(e))}</div>
+        <div class="postit-date">${esc(entryLabel(e))}${entryKey(e)!=='9999'?` <span class="postit-dday">${esc(tripDday(entryKey(e)))}</span>`:''}</div>
         ${e.title?`<div class="postit-title" style="font-family:${fontCss(e.font)}">${esc(e.title)}</div>`:''}
         <div class="postit-body" style="font-family:${fontCss(e.font)}">${esc(e.body)}</div>
         ${e.photos&&e.photos.length?`<div class="postit-photos">${e.photos.map(p=>`<img src="${p.src}" title="${esc(p.cap)}" onclick="viewImage(this.src)">`).join('')}</div>`:''}
@@ -2685,6 +2692,7 @@ function injectMaruFace(){ const s=document.createElement('style'); s.textConten
 function init(){
   injectMaruFace();
   renderRoute();
+  updateHeroDday();
   renderCityChips();
   renderHscroll();
   renderCitySubtabs();
@@ -2704,6 +2712,6 @@ init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-05d</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-05e</div>
 </body>
 </html>

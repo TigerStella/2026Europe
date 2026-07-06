@@ -1,5 +1,5 @@
 /* 노을과 타이거의 유럽여행 — service worker (오프라인 지원) */
-const CACHE = 'noleu-europe-v6';
+const CACHE = 'noleu-europe-v7';
 const ASSETS = ['./', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -50,6 +50,6 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // 외부(환율·날씨·도서 API·폰트·썸네일): 네트워크 → 실패 시 캐시
-  e.respondWith(fetch(req).catch(() => caches.match(req)));
+  // 외부(환율·날씨·도서 API·썸네일): SW가 개입하지 않고 브라우저가 직접 처리
+  // (서비스워커 재요청이 일부 CORS 요청을 깨뜨리는 문제 방지)
 });
