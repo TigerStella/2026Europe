@@ -603,6 +603,8 @@
   .fx-flat{color:rgba(255,255,255,0.4);font-size:10px;margin-left:3px;}
   .hero-dday{display:inline-block;margin:12px 0 4px;padding:6px 16px;border-radius:22px;background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.4);color:#fff;font-weight:800;font-size:15px;letter-spacing:.3px;box-shadow:0 2px 10px rgba(0,0,0,0.15);}
   .postit-dday{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:10px;background:rgba(181,131,42,0.14);color:#B5832A;font-size:11px;font-weight:700;vertical-align:middle;}
+  .day-foot{margin-top:10px;padding:9px 12px;border-radius:10px;background:rgba(181,131,42,0.10);border:1px dashed rgba(181,131,42,0.45);font-size:12.5px;line-height:1.5;color:var(--text-dark);}
+  .day-foot a{color:#B5832A;font-weight:800;text-decoration:underline;word-break:break-all;}
   .dday-badge{display:inline-block;background:linear-gradient(135deg,var(--sunset-gold),var(--dusk-coral));color:#fff;font-size:12px;font-weight:700;padding:4px 12px;border-radius:16px;margin:-4px 0 12px;}
 </style>
 </head>
@@ -1132,7 +1134,26 @@ const DAYS = [
   { d:3, date:'9/27', wd:'일', city:'london', badges:['런던'],
     title:'영국박물관 · 내셔널갤러리 · 뮤지컬', acts:[] },
   { d:4, date:'9/28', wd:'월', city:'london', badges:['런던'],
-    title:'해리포터 투어 · 타워브릿지', acts:[] },
+    title:'해리포터 투어 · 타워브릿지',
+    foot:'🎫 티켓 예약 공식 사이트 : <a href="https://www.wbstudiotour.co.uk/tickets/?hl=ko-KR" target="_blank" rel="noopener">wbstudiotour.co.uk/tickets</a>',
+    acts:[
+      {ic:'🍳', t:'조식·준비', time:'08:30', endTime:'09:10'},
+      {ic:'🚶', t:'숙소 출발 → 킹스크로스·유스턴 도보 12분 · 지하철 불필요', time:'09:15'},
+      {ic:'🎫', t:'유스턴 도착 · M&S 간식/물, 아동 오프피크 왕복권 발권', time:'09:30'},
+      {ic:'📋', t:'전광판 확인 → 급행 승강장 이동 · ⚠️ Overground 아닌 WMT/LNR 확인', time:'09:40'},
+      {ic:'🚂', t:'급행 탑승 (이 시간대 열차) · 소요 14~18분', time:'09:45', endTime:'09:55'},
+      {ic:'🚉', t:'왓포드 정션 도착 · 역 나와 좌측 셔틀 정류장', time:'10:05', endTime:'10:15'},
+      {ic:'🚌', t:'셔틀 (15분) · 20~30분 간격, 09:20 첫차', time:'10:20'},
+      {ic:'🏰', t:'스튜디오 도착 · 보안검색·락커 (슬롯 20분 전)', time:'10:40'},
+      {ic:'🎟️', t:'입장', time:'11:00'},
+      {ic:'🧙', t:'관람 6시간 15분 (점심·버터비어 13:00~14:00 포함) · 폐관 20:00까지 여유', time:'11:00', endTime:'17:15'},
+      {ic:'🚌', t:'셔틀 → 왓포드', time:'17:20'},
+      {ic:'🚂', t:'급행 탑승 · ⚠️ 17시대는 퇴근 피크 — 완행 주의', time:'17:45', endTime:'17:55'},
+      {ic:'🚉', t:'유스턴 도착', time:'18:10', endTime:'18:15'},
+      {ic:'🚇', t:'Northern선 → 런던브릿지 (약 25분)', time:'18:20'},
+      {ic:'🌉', t:'타워브릿지 — 일몰 직후 매직아워·야경', time:'18:45'},
+      {ic:'🍽️', t:'강변 저녁 → 숙소', time:'19:30'}
+    ] },
   { d:5, date:'9/29', wd:'화', city:'paris', badges:['런던','→','파리'],
     title:'런던 출발 → 파리 이동 (유로스타)',
     transport:{ icon:'🚂', time:'12:31', text:'<strong>유로스타</strong> 12:31 런던 출발 → 15:59 파리 북역 · <strong>10:30까지 역 도착</strong>' },
@@ -1478,6 +1499,7 @@ function renderCityTimeline(k){
         <div class="day-meta"><span class="day-weekday">${day.wd}</span><span class="city-badge ${c.cls}">${c.name}</span></div>
         <div class="day-title">${esc(day.title)}</div>
         ${rows?`<div class="tl-list">${rows}</div>`:''}
+        ${day.foot?`<div class="day-foot">${day.foot}</div>`:''}
       </div>
     </div>`;
   }).join('');
@@ -2712,6 +2734,6 @@ init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-09b</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-09c</div>
 </body>
 </html>
