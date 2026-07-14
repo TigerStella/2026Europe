@@ -1169,7 +1169,18 @@ const DAYS = [
       {ic:'🍟', t:'저녁 (피시앤칩스 등) · 숙소 복귀', time:'19:45'}
     ] },
   { d:4, date:'9/28', wd:'월', city:'london', badges:['런던'],
-    title:'영국박물관 · 내셔널 갤러리', acts:[] },
+    title:'사우스켄싱턴 뮤지엄 데이',
+    acts:[
+      {ic:'🚇', t:'숙소 출발 → 피카딜리선 (러셀스퀘어→사우스켄싱턴, 20분)', time:'09:20'},
+      {ic:'🦕', t:'자연사박물관 오픈런 · 무료 시간지정권 사전예약 필수', time:'10:00'},
+      {ic:'🦖', t:'공룡관(T-Rex) → 힌츠홀(블루웨일) → 지구관', time:'10:00', endTime:'12:30'},
+      {ic:'🍽️', t:'점심', time:'12:30', endTime:'13:30'},
+      {ic:'🔬', t:'과학박물관 (도보 3분) · Wonderlab 체험관(유료 ~£10) 강력추천', time:'13:30', endTime:'16:30'},
+      {ic:'🌳', t:'하이드파크 산책 (도보 10분) · 날씨 좋으면, 아니면 생략', time:'16:30', endTime:'17:30'},
+      {ic:'🔀', t:'갈림길 — 아이 컨디션에 따라 선택 ⬇️', time:'17:30'},
+      {ic:'🅰️', t:'A안(무리 없음) · 숙소 복귀 → 저녁 → 여유롭게 짐 정리 · 유로스타 전날 권장 ⭐', time:'18:00'},
+      {ic:'🅱️', t:'B안(체력 되면) · 타워브릿지 야경(~19:30) → 저녁 → 복귀', time:'18:00'}
+    ] },
   { d:5, date:'9/29', wd:'화', city:'paris', badges:['런던','→','파리'],
     title:'런던 출발 → 파리 이동 (유로스타)',
     transport:{ icon:'🚂', time:'12:31', text:'<strong>유로스타</strong> 12:31 런던 출발 → 15:59 파리 북역 · <strong>10:30까지 역 도착</strong>' },
@@ -2750,6 +2761,6 @@ init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-09e</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-09f</div>
 </body>
 </html>
