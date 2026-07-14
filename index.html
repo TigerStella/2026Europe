@@ -605,6 +605,10 @@
   .postit-dday{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:10px;background:rgba(181,131,42,0.14);color:#B5832A;font-size:11px;font-weight:700;vertical-align:middle;}
   .day-foot{margin-top:10px;padding:9px 12px;border-radius:10px;background:rgba(181,131,42,0.10);border:1px dashed rgba(181,131,42,0.45);font-size:12.5px;line-height:1.5;color:var(--text-dark);}
   .day-foot a{color:#B5832A;font-weight:800;text-decoration:underline;word-break:break-all;}
+  .prep-todo{display:flex;align-items:flex-start;gap:8px;padding:6px 4px;font-size:13px;line-height:1.5;cursor:pointer;border-bottom:1px dashed rgba(0,0,0,0.06);}
+  .prep-todo input{margin-top:3px;width:16px;height:16px;flex:0 0 auto;accent-color:#B5832A;cursor:pointer;}
+  .prep-todo input:checked + span{text-decoration:line-through;opacity:.5;}
+  .prep-todo strong{font-weight:800;}
   .dday-badge{display:inline-block;background:linear-gradient(135deg,var(--sunset-gold),var(--dusk-coral));color:#fff;font-size:12px;font-weight:700;padding:4px 12px;border-radius:16px;margin:-4px 0 12px;}
 </style>
 </head>
@@ -1245,6 +1249,16 @@ const PREP = {
     tip:['로마패스 검토','트레비·스페인계단 소매치기 주의','성당 방문 시 어깨·무릎 가리기'] },
 };
 
+const PREP_TODO = {
+  london:[
+    {t:'자연사박물관 무료 티켓', a:'9/28(월) 10:00 슬롯 예약'},
+    {t:'뮤지컬', a:'9/26(토) 19:30 이브닝 예매'},
+    {t:'과학박물관 Wonderlab', a:'사전 예약 확인 (인기 슬롯)'},
+    {t:'피카딜리선 운행', a:'9월 중순 TfL 재확인'},
+    {t:'해리포터 귀로 기차', a:'당일 소요 20분 이하 열차만'},
+  ],
+};
+
 const HOTELS = [
   { city:'london', label:'🏙 런던 (1박)', name:'Premier Inn Heathrow Ai 트리플룸', dates:'9/25 IN 16:00 → 9/26 OUT 12:00',
     rows:[['📍','Terminal 4, Sheffield Road, 히스로, 런던 TW6 3FH'],['📞','@london_premier'],['🍴','조식 포함 확인'],['🔖','예약: 아고다']], cost:'137,087원' },
@@ -1326,10 +1340,12 @@ const LS = {
   related: 'noleu_related_v1',
   checklist: 'noleu_checklist_v1',
   expenses: 'noleu_expenses_v1',
+  reserve: 'noleu_reserve_v1',
 };
 function load(key, def){ try { const v=JSON.parse(localStorage.getItem(key)); return (v===null||v===undefined)?def:v; } catch(e){ return def; } }
 function save(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){ toast('저장 공간이 부족해요 (사진 용량 확인)'); } scheduleGdPush(); }
 let addedActs = load(LS.acts, {});   // { dayNum: [ {ic,t,type,time} ] }
+let reserveState = load(LS.reserve, {}); // { 'london:0': true }
 let diary = load(LS.diary, []);       // [ {id, who, day, date, title, body, photos:[{src,cap}] } ]
 let settings = load(LS.settings, {}); // {title, subtitle, author, tone, momName, sonName}
 const DEFAULT_SETTINGS = { title:'노을과 타이거, 유럽', subtitle:'둘이서 걸은 열여덟 밤', author:'글 · 노을', tone:'noeul', momName:'노을', sonName:'타이거' };
@@ -1489,10 +1505,13 @@ function renderCityPanel(k, active){
         ${prep.must.map(m=>`<div class="prep-item"><span class="ic">✔️</span><span>${m}</span></div>`).join('')}
         <div class="prep-sub">💡 현지 팁</div>
         ${prep.tip.map(m=>`<div class="prep-item"><span class="ic">•</span><span>${m}</span></div>`).join('')}
+        ${(PREP_TODO[k]&&PREP_TODO[k].length)?`<div class="prep-sub">✅ 지금 예약/확인 체크리스트</div>
+        ${PREP_TODO[k].map((r,i)=>`<label class="prep-todo"><input type="checkbox" ${reserveState[k+':'+i]?'checked':''} onchange="toggleReserve('${k}',${i})"><span><strong>${esc(r.t)}</strong> — ${esc(r.a)}</span></label>`).join('')}`:''}
       </div>
     </div>
   </div>`;
 }
+function toggleReserve(city,i){ const key=city+':'+i; reserveState[key]=!reserveState[key]; save(LS.reserve, reserveState); }
 function timeKey(t){ const m=/^\s*(\d{1,2}):(\d{2})/.exec(t||''); return m ? (+m[1])*60+(+m[2]) : 9999; }
 // 하루의 일정을 시간순으로 자동 배치 (숙소 체크인·기차/비행 시간·추가 일정)
 function dayTimedItems(day){
@@ -2761,6 +2780,6 @@ init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-09f</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-09g</div>
 </body>
 </html>
