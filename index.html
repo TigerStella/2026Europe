@@ -1132,28 +1132,34 @@ const DAYS = [
     hotel:{ time:'17:00', text:'히드로 OUT → <strong>파크 런던 (시내)</strong> 체크인 17:00' },
     acts:[ {ic:'🍱', t:'식사: 한인 밥집 아침/저녁 제공 (연락처는 팁 탭 › 긴급 연락처)'} ] },
   { d:3, date:'9/27', wd:'일', city:'london', badges:['런던'],
-    title:'영국박물관 · 내셔널갤러리 · 뮤지컬', acts:[] },
-  { d:4, date:'9/28', wd:'월', city:'london', badges:['런던'],
-    title:'해리포터 투어 · 타워브릿지',
-    foot:'🎫 티켓 예약 공식 사이트 : <a href="https://www.wbstudiotour.co.uk/tickets/?hl=ko-KR" target="_blank" rel="noopener">wbstudiotour.co.uk/tickets</a>',
+    title:'해리포터 스튜디오 투어',
+    foot:'🎫 티켓 예약 공식 사이트 : <a href="https://www.wbstudiotour.co.uk/tickets/?hl=ko-KR" target="_blank" rel="noopener">wbstudiotour.co.uk/tickets</a><br>🚂 기타 예매 사이트 : <a href="https://www.nationalrail.co.uk/journey-planner/?type=return&amp;origin=EUS&amp;destination=WFJ&amp;leavingType=departing&amp;leavingDate=270926&amp;leavingHour=09&amp;leavingMin=30&amp;returnType=departing&amp;returnDate=270926&amp;returnHour=16&amp;returnMin=30&amp;adults=1&amp;children=1&amp;extraTime=0#I" target="_blank" rel="noopener">National Rail (Euston↔Watford)</a>',
     acts:[
-      {ic:'🍳', t:'조식·준비', time:'08:30', endTime:'09:10'},
-      {ic:'🚶', t:'숙소 출발 → 킹스크로스·유스턴 도보 12분 · 지하철 불필요', time:'09:15'},
-      {ic:'🎫', t:'유스턴 도착 · M&S 간식/물, 아동 오프피크 왕복권 발권', time:'09:30'},
-      {ic:'📋', t:'전광판 확인 → 급행 승강장 이동 · ⚠️ Overground 아닌 WMT/LNR 확인', time:'09:40'},
-      {ic:'🚂', t:'급행 탑승 (이 시간대 열차) · 소요 14~18분', time:'09:45', endTime:'09:55'},
-      {ic:'🚉', t:'왓포드 정션 도착 · 역 나와 좌측 셔틀 정류장', time:'10:05', endTime:'10:15'},
-      {ic:'🚌', t:'셔틀 (15분) · 20~30분 간격, 09:20 첫차', time:'10:20'},
-      {ic:'🏰', t:'스튜디오 도착 · 보안검색·락커 (슬롯 20분 전)', time:'10:40'},
-      {ic:'🎟️', t:'입장', time:'11:00'},
-      {ic:'🧙', t:'관람 6시간 15분 (점심·버터비어 13:00~14:00 포함) · 폐관 20:00까지 여유', time:'11:00', endTime:'17:15'},
-      {ic:'🚌', t:'셔틀 → 왓포드', time:'17:20'},
-      {ic:'🚂', t:'급행 탑승 · ⚠️ 17시대는 퇴근 피크 — 완행 주의', time:'17:45', endTime:'17:55'},
-      {ic:'🚉', t:'유스턴 도착', time:'18:10', endTime:'18:15'},
-      {ic:'🚇', t:'Northern선 → 런던브릿지 (약 25분)', time:'18:20'},
-      {ic:'🌉', t:'타워브릿지 — 일몰 직후 매직아워·야경', time:'18:45'},
-      {ic:'🍽️', t:'강변 저녁 → 숙소', time:'19:30'}
+      {ic:'🍳', t:'한인민박 조식 · 여유롭게 준비 · 아침 넉넉 ✅', time:'08:30', endTime:'09:45'},
+      {ic:'🚶', t:'숙소 출발 · 킹스크로스 → 유스턴 도보 12분', time:'10:20'},
+      {ic:'🎫', t:'유스턴역 도착 · M&S 물/간식, 아동표 발권, 화장실', time:'10:35'},
+      {ic:'📋', t:'Platform 15 이동 · ⚠️ 소요 20분 이하 열차 확인 (완행 아님)', time:'10:45'},
+      {ic:'🚂', t:'Euston 출발 (P15) · 18분, Direct', time:'10:54'},
+      {ic:'🚉', t:'Watford Junction 도착 (P6) · 역 나와 좌측 셔틀 정류장 직행', time:'11:12'},
+      {ic:'🚌', t:'해리포터 셔틀 (15분) · 바우처 제시', time:'11:20'},
+      {ic:'🏰', t:'스튜디오 도착 · 보안검색·락커', time:'11:35', endTime:'11:40'},
+      {ic:'⭐', t:'로비 대기 (20분, 적정) · 액티비티 패스포트 수령 + 완드 컴뱃 세션 시간 확인', time:'11:40', endTime:'12:00'},
+      {ic:'🪄', t:'입장!', time:'12:00'},
+      {ic:'🏛️', t:'그레이트홀(떠다니는 호박 100개) → 다이애건 앨리 · 입장 직후 몰림 — 5분 여유 두고 진입', time:'12:00', endTime:'13:00'},
+      {ic:'📸', t:'⭐ 그린스크린 빗자루 + 9¾ 승강장 포토 · 혼잡 회피 핵심 — 다들 점심 갈 때 줄 최소', time:'13:00', endTime:'14:00'},
+      {ic:'🍽️', t:'점심 + 버터비어 (백롯 카페) · 피크 지난 뒤 = 자리 여유', time:'14:00', endTime:'15:00'},
+      {ic:'🧹', t:'금지된 숲(디멘터) → 호그와트 익스프레스 → 크리처 이펙트 · 데스이터 행진 마주치면 관람', time:'15:00', endTime:'16:30'},
+      {ic:'🏰', t:'호그와트 성 미니어처(하이라이트) → 지팡이의 방', time:'16:30', endTime:'17:30'},
+      {ic:'🛍️', t:'기념품 숍 · 30~45분', time:'17:30', endTime:'18:15'},
+      {ic:'✨', t:'관람 종료 = 6시간 15분 · 폐관 22:00 — 더 있어도 OK', time:'18:15'},
+      {ic:'🚌', t:'셔틀 → 왓포드 정션', time:'18:20', endTime:'18:30'},
+      {ic:'🚂', t:'Watford Junction 출발 · ⚠️ 50분짜리 완행 피하기', time:'18:45', endTime:'19:00'},
+      {ic:'🚉', t:'London Euston 도착', time:'19:05', endTime:'19:20'},
+      {ic:'🚶', t:'도보 → 킹스크로스', time:'19:35'},
+      {ic:'🍟', t:'저녁 (피시앤칩스 등) · 숙소 복귀', time:'19:45'}
     ] },
+  { d:4, date:'9/28', wd:'월', city:'london', badges:['런던'],
+    title:'영국박물관 · 내셔널 갤러리', acts:[] },
   { d:5, date:'9/29', wd:'화', city:'paris', badges:['런던','→','파리'],
     title:'런던 출발 → 파리 이동 (유로스타)',
     transport:{ icon:'🚂', time:'12:31', text:'<strong>유로스타</strong> 12:31 런던 출발 → 15:59 파리 북역 · <strong>10:30까지 역 도착</strong>' },
@@ -2734,6 +2740,6 @@ init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-09c</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-09d</div>
 </body>
 </html>
