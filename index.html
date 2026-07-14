@@ -946,7 +946,7 @@
       <input id="dTitle" placeholder="예: 에펠탑 아래에서">
     </div>
     <div class="field" style="margin-bottom:10px"><label>오늘의 느낌</label>
-      <textarea id="dBody" rows="6" placeholder="지금 이 순간의 느낌을 적어보세요…"></textarea>
+      <textarea id="dBody" rows="6" spellcheck="true" lang="ko" placeholder="지금 이 순간의 느낌을 적어보세요…"></textarea>
     </div>
     <div class="field" style="margin-bottom:10px"><label>사진 업로드</label>
       <input type="file" id="dPhotos" accept="image/*" multiple onchange="handlePhotoPick(event)">
@@ -2217,9 +2217,10 @@ function buildBrunch(){
         if(qIdx<0 && paras[0] && paras[0].length<60) qIdx=0;
       }
       paras.forEach((para,i)=>{
-        if(e.who==='son') blocks.push({type:'quote', html:esc(para), hand:true});
-        else if(i===qIdx) blocks.push({type:'quote', html:esc(para)});
-        else blocks.push({type:'p', html:esc(para)});
+        if(e.who==='son'){ blocks.push({type:'quote', html:esc(para), hand:true}); return; }
+        const t=tidyKorean(para);
+        if(i===qIdx) blocks.push({type:'quote', html:esc(t)});
+        else blocks.push({type:'p', html:esc(t)});
       });
       (e.photos||[]).forEach(p=> blocks.push({type:'img', html:p.src, cap:p.cap}));
     });
@@ -2278,6 +2279,15 @@ const WRITE_HINTS=[
   "'좋았다' 대신 — 무엇을 보고, 만지고, 먹었는지. 명사로 적으면 장면이 됩니다.",
   '오늘을 사진 한 장으로 남긴다면 어떤 장면인가요? 그 장면을 글로 먼저 찍어 두세요.',
 ];
+const SPELL_FIX={'됬':'됐','몇일':'며칠','오랫만':'오랜만','오랜동안':'오랫동안','역활':'역할','일일히':'일일이','틈틈히':'틈틈이','곰곰히':'곰곰이','희안':'희한','왠만':'웬만','웬지':'왠지','설겆이':'설거지','어의없':'어이없','단언컨데':'단언컨대'};
+function tidyKorean(s){
+  if(!s) return s;
+  let t=s;
+  for(const k in SPELL_FIX) t=t.split(k).join(SPELL_FIX[k]);
+  t=t.replace(/[ \t]{2,}/g,' ');          // 중복 공백 → 하나
+  t=t.replace(/ +([,.!?…])/g,'$1');        // 문장부호 앞 공백 제거
+  return t.trim();
+}
 function splitParas(txt){ return (txt||'').split(/\n\s*\n|\n/).map(s=>s.trim()).filter(Boolean); }
 
 function renderBrunch(){
@@ -2392,7 +2402,7 @@ function buildBlog(){
     byKey[kk].forEach(e=>{
       blocks.push({type:'who', html:`${e.who==='mom'?'👩 '+momName:'🧑 '+sonName}`});
       if(e.title) blocks.push({type:'h3', html:esc(e.title)});
-      splitParas(e.body).forEach(p=> blocks.push({type:'p', html:esc(p)}));
+      splitParas(e.body).forEach(p=> blocks.push({type:'p', html:esc(e.who==='mom'?tidyKorean(p):p)}));
       (e.photos||[]).forEach(p=> blocks.push({type:'img', html:p.src, cap:p.cap}));
     });
   });
@@ -2866,6 +2876,6 @@ init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-10b</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-10c</div>
 </body>
 </html>
