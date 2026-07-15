@@ -1450,6 +1450,7 @@ const LS = {
   checklist: 'noleu_checklist_v1',
   expenses: 'noleu_expenses_v1',
   reserve: 'noleu_reserve_v1',
+  actedit: 'noleu_actedit_v1',
 };
 function load(key, def){ try { const v=JSON.parse(localStorage.getItem(key)); return (v===null||v===undefined)?def:v; } catch(e){ return def; } }
 function save(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){ toast('저장 공간이 부족해요 (사진 용량 확인)'); } scheduleGdPush(); }
@@ -1623,16 +1624,37 @@ function renderCityPanel(k, active){
 function toggleReserve(city,i){ const key=city+':'+i; reserveState[key]=!reserveState[key]; save(LS.reserve, reserveState); }
 function timeKey(t){ const m=/^\s*(\d{1,2}):(\d{2})/.exec(t||''); return m ? (+m[1])*60+(+m[2]) : 9999; }
 // 하루의 일정을 시간순으로 자동 배치 (숙소 체크인·기차/비행 시간·추가 일정)
+function fixedList(day){
+  const f=[];
+  if(day.transport) f.push({kind:'move', icon:day.transport.icon||'🚆', rawHtml:day.transport.text, title:strip(day.transport.text), time:day.transport.time||'', end:''});
+  if(day.hotel) f.push({kind:'hotel', icon:'🏨', rawHtml:day.hotel.text, title:strip(day.hotel.text), time:day.hotel.time||'', end:''});
+  (day.acts||[]).forEach(a=> f.push({kind:'act', icon:a.ic||'•', rawHtml:esc(a.t), title:a.t, time:a.time||'', end:a.endTime||''}));
+  return f;
+}
+function fixedItemData(dayNum, fkey){
+  const ov=actEdits.overrides[fkey];
+  if(ov) return {t:ov.t, time:ov.time||'', endTime:ov.endTime||'', place:ov.place||'', memo:ov.memo||''};
+  const day=DAYS.find(d=>d.d===dayNum); if(!day) return null;
+  const f=fixedList(day)[+String(fkey).split(':')[1]]; if(!f) return null;
+  return {t:f.title, time:f.time, endTime:f.end, place:'', memo:''};
+}
+function addMeta(place,memo){ return (place?` <span class="tg-place">📍${esc(place)}</span>`:'')+(memo?`<small class="tg-memo">${esc(memo)}</small>`:''); }
 function dayTimedItems(day){
   const items=[];
-  if(day.transport) items.push({time:day.transport.time||'', icon:day.transport.icon, html:day.transport.text, kind:'move'});
-  if(day.hotel) items.push({time:day.hotel.time||'', icon:'🏨', html:day.hotel.text, kind:'hotel'});
-  (day.acts||[]).forEach(a=> items.push({time:a.time||'', end:a.endTime||'', icon:a.ic||'•', html:esc(a.t), kind:'act'}));
-  (addedActs[day.d]||[]).forEach((a,ai)=> items.push({time:a.time||'', end:a.endTime||'', icon:a.ic||'📌', html:esc(a.t)+(a.place?` <span class="tg-place">📍${esc(a.place)}</span>`:'')+(a.memo?`<small class="tg-memo">${esc(a.memo)}</small>`:''), kind:'added', dayNum:day.d, idx:ai}));
+  fixedList(day).forEach((f,fi)=>{
+    const key=day.d+':'+fi;
+    if(actEdits.hidden[key]) return;
+    const o=actEdits.overrides[key];
+    if(o){ items.push({time:o.time||'', end:o.endTime||'', icon:f.icon, html:esc(o.t)+addMeta(o.place,o.memo), kind:f.kind, src:'fixed', fkey:key}); }
+    else { items.push({time:f.time, end:f.end, icon:f.icon, html:f.rawHtml, kind:f.kind, src:'fixed', fkey:key}); }
+  });
+  (addedActs[day.d]||[]).forEach((a,ai)=> items.push({time:a.time||'', end:a.endTime||'', icon:a.ic||'📌', html:esc(a.t)+addMeta(a.place,a.memo), kind:'added', src:'added', dayNum:day.d, idx:ai}));
   return items.map((it,i)=>({...it, _i:i})).sort((a,b)=> (timeKey(a.time)-timeKey(b.time)) || (a._i-b._i));
 }
 function fmtHM(m){ const h=Math.floor(m/60), mm=m%60; return (h<10?'0'+h:''+h)+':'+(mm<10?'0'+mm:mm); }
 let expandedDays = new Set();
+let actEdits = load(LS.actedit, {overrides:{}, hidden:{}});
+if(!actEdits.overrides) actEdits.overrides={}; if(!actEdits.hidden) actEdits.hidden={};
 function toggleDayExpand(d){ if(expandedDays.has(d)) expandedDays.delete(d); else expandedDays.add(d); refreshTimelines(); }
 function addActivityInline(d,k){
   const g=id=>(document.getElementById(id)||{}).value||'';
@@ -1645,64 +1667,83 @@ function addActivityInline(d,k){
   toast('일정이 추가됐어요 ✨');
 }
 let gridDrag=null;
-function gridPointerDown(e, day, city, gridStart, pxmin){
-  if(e.target.closest('.tg-block')) return;   // 기존 블록은 무시
+function gridDragStart(e, day, city, gridStart, pxmin){
+  const isTouch = e.type==='touchstart';
+  const pt = isTouch ? e.touches[0] : e; if(!pt) return;
+  const tgt = document.elementFromPoint(pt.clientX, pt.clientY);
+  if(tgt && tgt.closest('.tg-block')) return;   // 블록 탭은 각 블록의 편집(onclick)이 처리
+  if(!isTouch && e.button!==0) return;
   const blocks=e.currentTarget; const rect=blocks.getBoundingClientRect();
-  const y0=Math.max(0, e.clientY-rect.top);
-  gridDrag={day, city, gridStart, pxmin, blocks, rect, y0, moved:false};
-  const sel=document.createElement('div'); sel.className='tg-select'; sel.style.top=y0+'px'; sel.style.height='4px';
+  const y0=Math.max(0, pt.clientY-rect.top);
+  gridDrag={day, city, gridStart, pxmin, rect, y0};
+  const sel=document.createElement('div'); sel.className='tg-select'; sel.style.top=y0+'px'; sel.style.height='6px';
   blocks.appendChild(sel); gridDrag.sel=sel;
-  try{ blocks.setPointerCapture(e.pointerId); }catch(_){}
-  document.addEventListener('pointermove', gridPointerMove);
-  document.addEventListener('pointerup', gridPointerUp);
+  if(isTouch){ document.addEventListener('touchmove', gridDragMove, {passive:false}); document.addEventListener('touchend', gridDragEnd); document.addEventListener('touchcancel', gridDragEnd); }
+  else { document.addEventListener('mousemove', gridDragMove); document.addEventListener('mouseup', gridDragEnd); }
   e.preventDefault();
 }
-function gridPointerMove(e){
-  if(!gridDrag) return; gridDrag.moved=true;
-  const y=Math.max(0, e.clientY-gridDrag.rect.top);
+function gridDragMove(e){
+  if(!gridDrag) return;
+  const pt = e.touches ? e.touches[0] : e; if(!pt) return;
+  const y=Math.max(0, pt.clientY-gridDrag.rect.top);
   const top=Math.min(y, gridDrag.y0), h=Math.abs(y-gridDrag.y0);
-  gridDrag.sel.style.top=top+'px'; gridDrag.sel.style.height=Math.max(4,h)+'px';
-  const a=gridDrag.gridStart+Math.round(((top/gridDrag.pxmin))/15)*15;
-  const b=gridDrag.gridStart+Math.round((((top+h)/gridDrag.pxmin))/15)*15;
+  gridDrag.sel.style.top=top+'px'; gridDrag.sel.style.height=Math.max(6,h)+'px';
+  const a=gridDrag.gridStart+Math.round((top/gridDrag.pxmin)/15)*15;
+  const b=gridDrag.gridStart+Math.round(((top+h)/gridDrag.pxmin)/15)*15;
   gridDrag.sel.textContent=fmtHM(a)+' ~ '+fmtHM(Math.max(b,a+15));
+  if(e.cancelable) e.preventDefault();
 }
-function gridPointerUp(e){
-  document.removeEventListener('pointermove', gridPointerMove);
-  document.removeEventListener('pointerup', gridPointerUp);
+function gridDragEnd(e){
+  document.removeEventListener('touchmove', gridDragMove);
+  document.removeEventListener('touchend', gridDragEnd);
+  document.removeEventListener('touchcancel', gridDragEnd);
+  document.removeEventListener('mousemove', gridDragMove);
+  document.removeEventListener('mouseup', gridDragEnd);
   if(!gridDrag) return; const g=gridDrag; gridDrag=null;
-  const y=Math.max(0, (e.clientY!=null?e.clientY:g.rect.top+g.y0)-g.rect.top);
+  const pt = (e.changedTouches&&e.changedTouches[0]) || e;
+  const y = (pt&&pt.clientY!=null) ? Math.max(0, pt.clientY-g.rect.top) : g.y0;
   let topPx=Math.min(y,g.y0), botPx=Math.max(y,g.y0);
   let a=Math.round((g.gridStart+topPx/g.pxmin)/15)*15;
   let b=Math.round((g.gridStart+botPx/g.pxmin)/15)*15;
-  if(b-a<15) b=a+60;   // 탭만 하면 1시간 기본
+  if(b-a<15) b=a+60;
   if(g.sel&&g.sel.parentNode) g.sel.parentNode.removeChild(g.sel);
-  openSchedModal(g.day, g.city, fmtHM(a), fmtHM(b));
+  openSchedNew(g.day, g.city, fmtHM(a), fmtHM(b));
 }
-let schedDay=null, schedEditIdx=null;
-function openSchedModal(day, city, startHM, endHM, idx){
-  schedDay=day; schedEditIdx=(idx!=null?idx:null);
-  const cur=(idx!=null && addedActs[day])?addedActs[day][idx]:null;
-  document.getElementById('schModalTitle').textContent = cur?'✏️ 일정 수정':'📅 새 일정';
-  document.getElementById('schWhen').textContent = (ISO2DAY_BYNUM(day)||'')+'';
-  document.getElementById('schTitle').value = cur?(cur.t||''):'';
-  document.getElementById('schStart').value = cur?(cur.time||startHM||''):(startHM||'');
-  document.getElementById('schEnd').value = cur?(cur.endTime||endHM||''):(endHM||'');
-  document.getElementById('schPlace').value = cur?(cur.place||''):'';
-  document.getElementById('schMemo').value = cur?(cur.memo||''):'';
-  document.getElementById('schDelBtn').style.display = cur?'':'none';
+let schedTarget=null;
+function ISO2DAY_BYNUM(d){ const dd=DAYS.find(x=>x.d===d); return dd?`D${dd.d} · ${dd.date}(${dd.wd}) · ${CITIES[dd.city].name}`:''; }
+function fillSchedModal(cur, isEdit){
+  document.getElementById('schModalTitle').textContent = isEdit?'✏️ 일정 수정':'📅 새 일정';
+  document.getElementById('schWhen').textContent = ISO2DAY_BYNUM(schedTarget.day)||'';
+  document.getElementById('schTitle').value = cur.t||'';
+  document.getElementById('schStart').value = cur.time||'';
+  document.getElementById('schEnd').value = cur.endTime||'';
+  document.getElementById('schPlace').value = cur.place||'';
+  document.getElementById('schMemo').value = cur.memo||'';
+  document.getElementById('schDelBtn').style.display = isEdit?'':'none';
   document.getElementById('schedModal').classList.add('open');
   setTimeout(()=>document.getElementById('schTitle').focus(), 60);
 }
-function ISO2DAY_BYNUM(d){ const dd=DAYS.find(x=>x.d===d); return dd?`D${dd.d} · ${dd.date}(${dd.wd}) · ${CITIES[dd.city].name}`:''; }
+function openSchedNew(day, city, s, e){ schedTarget={src:'new', day, city}; fillSchedModal({time:s, endTime:e}, false); }
+function openSchedEdit(day, city, src, ref){
+  let cur;
+  if(src==='added'){ cur=(addedActs[day]||[])[ref]; schedTarget={src:'added', day, city, idx:ref}; }
+  else { cur=fixedItemData(day, ref); schedTarget={src:'fixed', day, city, fkey:ref}; }
+  if(!cur) return; fillSchedModal(cur, true);
+}
 function saveSched(){
   const t=document.getElementById('schTitle').value.trim(); if(!t){ toast('일정 제목을 입력해주세요'); return; }
   const rec={ ic:'📌', t, time:document.getElementById('schStart').value, endTime:document.getElementById('schEnd').value, place:document.getElementById('schPlace').value.trim(), memo:document.getElementById('schMemo').value.trim() };
-  if(!addedActs[schedDay]) addedActs[schedDay]=[];
-  if(schedEditIdx!=null) addedActs[schedDay][schedEditIdx]=rec; else addedActs[schedDay].push(rec);
-  save(LS.acts, addedActs); expandedDays.add(schedDay);
-  closeModal('schedModal'); refreshTimelines(); toast('일정이 저장됐어요 ✨');
+  const T=schedTarget||{src:'new'};
+  if(T.src==='fixed'){ actEdits.overrides[T.fkey]={t:rec.t, time:rec.time, endTime:rec.endTime, place:rec.place, memo:rec.memo}; save(LS.actedit, actEdits); }
+  else { if(!addedActs[T.day]) addedActs[T.day]=[]; if(T.src==='added' && T.idx!=null) addedActs[T.day][T.idx]=rec; else addedActs[T.day].push(rec); save(LS.acts, addedActs); }
+  expandedDays.add(T.day); closeModal('schedModal'); refreshTimelines(); toast('일정이 저장됐어요 ✨');
 }
-function deleteSched(){ if(schedEditIdx!=null && addedActs[schedDay]){ delActivity(schedDay, schedEditIdx); } closeModal('schedModal'); toast('삭제됐어요'); }
+function deleteSched(){
+  const T=schedTarget; if(!T){ closeModal('schedModal'); return; }
+  if(T.src==='fixed'){ actEdits.hidden[T.fkey]=true; delete actEdits.overrides[T.fkey]; save(LS.actedit, actEdits); refreshTimelines(); }
+  else if(T.src==='added' && T.idx!=null){ delActivity(T.day, T.idx); }
+  closeModal('schedModal'); toast('삭제됐어요');
+}
 function dayGridHTML(day, c){
   const items=dayTimedItems(day);
   const timed=items.filter(it=>timeKey(it.time)!==9999);
@@ -1727,19 +1768,20 @@ function dayGridHTML(day, c){
     const top=(sl.start-gridStart)*PXMIN;
     const isPoint = sl.end==null;
     const h = isPoint ? 28 : Math.max(30,(sl.end-sl.start)*PXMIN)-3;
-    const kind=sl.items[0].kind;
-    const added=sl.items.find(it=>it.kind==='added');
-    const clickAttr = added ? `onclick="event.stopPropagation();openSchedModal(${day.d},'${day.city}','${fmtHM(sl.start)}','${sl.end!=null?fmtHM(sl.end):fmtHM(sl.start+60)}',${added.idx})"` : '';
+    const it0=sl.items[0]; const kind=it0.kind;
+    const clickAttr = it0.src==='added'
+      ? `onclick="event.stopPropagation();openSchedEdit(${day.d},'${day.city}','added',${it0.idx})"`
+      : `onclick="event.stopPropagation();openSchedEdit(${day.d},'${day.city}','fixed','${it0.fkey}')"`;
     const body=sl.items.map(it=>{
       const rng = it.end?`<small class="tg-rng">~${esc(it.end)}</small>`:'';
       return `<div class="tg-item"><span class="tg-ic">${it.icon}</span><span class="tg-text">${it.html}${rng}</span></div>`;
     }).join('');
-    blocks+=`<div class="tg-block ${kind}${isPoint?' point':''}${added?' editable':''}" ${clickAttr} style="top:${top}px;height:${h}px;border-left-color:${c.color}"><span class="tg-start">${fmtHM(sl.start)}</span><div class="tg-body">${body}</div></div>`;
+    blocks+=`<div class="tg-block ${kind}${isPoint?' point':''} editable" ${clickAttr} style="top:${top}px;height:${h}px;border-left-color:${c.color}"><span class="tg-start">${fmtHM(sl.start)}</span><div class="tg-body">${body}</div></div>`;
   });
   const gl=`repeating-linear-gradient(to bottom, transparent 0, transparent ${30*PXMIN-1}px, rgba(0,0,0,0.06) ${30*PXMIN-1}px, rgba(0,0,0,0.06) ${30*PXMIN}px)`;
-  grid=`<div class="tg-hint">👆 빈 시간대를 <b>드래그</b>하면 새 일정이 추가돼요</div>
+  grid=`<div class="tg-hint">👆 빈 시간대를 <b>드래그</b>하면 새 일정 · 블록을 <b>탭</b>하면 시간·내용 수정</div>
     <div class="tg" style="height:${H}px"><div class="tg-axis">${ruler}</div>
-      <div class="tg-blocks" style="background-image:${gl}" onpointerdown="gridPointerDown(event,${day.d},'${day.city}',${gridStart},${PXMIN})">${blocks}</div>
+      <div class="tg-blocks" style="background-image:${gl}" ontouchstart="gridDragStart(event,${day.d},'${day.city}',${gridStart},${PXMIN})" onmousedown="gridDragStart(event,${day.d},'${day.city}',${gridStart},${PXMIN})">${blocks}</div>
     </div>`;
   const untimedHTML = untimed.length? `<div class="tg-untimed">${untimed.map(it=>{
     const del = it.kind==='added'?`<span class="tl-del" onclick="delActivity(${it.dayNum},${it.idx})" title="삭제">✕</span>`:'';
@@ -2824,7 +2866,7 @@ function saveSettings(){
 /* ══════════════════ BACKUP / RESTORE ══════════════════ */
 function downloadBlob(blob, name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 800); }
 function stamp(){ const d=new Date(); const p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`; }
-function buildPayload(){ return { app:'noleu-europe', version:1, exportedAt:new Date().toISOString(), addedActs, diary, settings, contacts, related, checklist, expenses }; }
+function buildPayload(){ return { app:'noleu-europe', version:1, exportedAt:new Date().toISOString(), addedActs, diary, settings, contacts, related, checklist, expenses, reserve:reserveState, actEdits }; }
 function exportData(){
   downloadBlob(new Blob([JSON.stringify(buildPayload(),null,2)], {type:'application/json'}), `noleu-europe-backup-${stamp()}.json`);
   toast('백업 파일을 저장했어요 💾');
@@ -2873,6 +2915,8 @@ function mergeData(j){
   if(j.checklist){ checklist.checked=Object.assign({}, checklist.checked, j.checklist.checked||{}); checklist.hidden=Object.assign({}, checklist.hidden, j.checklist.hidden||{}); (j.checklist.custom||[]).forEach(t=>{ if(!checklist.custom.includes(t)) checklist.custom.push(t); }); save(LS.checklist, checklist); }
   if(j.related){ const r=j.related; (r.videos||[]).forEach(v=>{ if(!related.videos.some(x=>x.id===v.id)){ related.videos.push(v); added++; } }); (r.books||[]).forEach(bk=>{ if(!related.books.some(x=>x.title===bk.title)){ related.books.push(bk); added++; } }); (r.blogs||[]).forEach(bl=>{ if(!related.blogs.some(x=>x.url===bl.url)){ related.blogs.push(bl); added++; } }); save(LS.related, related); }
   if(j.contacts){ contacts=Object.assign({}, contacts, j.contacts); save(LS.contacts, contacts); }
+  if(j.reserve){ Object.assign(reserveState, j.reserve); save(LS.reserve, reserveState); }
+  if(j.actEdits){ actEdits.overrides=Object.assign(actEdits.overrides||{}, j.actEdits.overrides||{}); actEdits.hidden=Object.assign(actEdits.hidden||{}, j.actEdits.hidden||{}); save(LS.actedit, actEdits); }
   return added;
 }
 function rerenderAll(){ refreshTimelines(); renderDiary(); renderContacts(); renderHotels(); renderRelated(); renderChecklist(); renderExpenses(); }
@@ -3222,6 +3266,6 @@ init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11e</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11f</div>
 </body>
 </html>
