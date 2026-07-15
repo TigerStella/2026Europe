@@ -950,27 +950,7 @@
       </div>
     </div>
 
-    <!-- SCHEDULE (구글 캘린더식) MODAL -->
-<div class="modal-back" id="schedModal">
-  <div class="modal">
-    <h3 id="schModalTitle">📅 새 일정</h3>
-    <div class="hint" id="schWhen" style="margin:-4px 0 10px"></div>
-    <div class="field" style="margin-bottom:8px"><input type="text" id="schTitle" placeholder="제목 추가" style="font-size:17px;font-weight:700"></div>
-    <div class="row">
-      <div class="field" style="flex:1"><label>시작</label><input type="time" id="schStart"></div>
-      <div class="field" style="flex:1"><label>종료</label><input type="time" id="schEnd"></div>
-    </div>
-    <div class="field" style="margin:8px 0"><label>📍 장소 (선택)</label><input type="text" id="schPlace" placeholder="예: 오르세 미술관, 7구"></div>
-    <div class="field" style="margin-bottom:10px"><label>🗒️ 메모 (선택)</label><input type="text" id="schMemo" placeholder="예: 인상파 · 사전예약"></div>
-    <div class="form-actions">
-      <button class="btn btn-primary" onclick="saveSched()">저장</button>
-      <button class="btn btn-ghost" onclick="closeModal('schedModal')">취소</button>
-      <button class="btn btn-ghost" id="schDelBtn" style="display:none;color:#E0607A" onclick="deleteSched()">🗑 삭제</button>
-    </div>
-  </div>
-</div>
-
-<!-- BRUNCH OUTPUT -->
+    <!-- BRUNCH OUTPUT -->
     <div class="brunch-out" id="brunchOut">
       <div class="section-header"><span class="section-icon">✍️</span><span class="section-title">브런치 발행 미리보기</span></div>
       <div class="brunch-tools">
@@ -3266,6 +3246,26 @@ init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11f</div>
+<!-- SCHEDULE (구글 캘린더식) MODAL -->
+<div class="modal-back" id="schedModal">
+  <div class="modal">
+    <h3 id="schModalTitle">📅 새 일정</h3>
+    <div class="hint" id="schWhen" style="margin:-4px 0 10px"></div>
+    <div class="field" style="margin-bottom:8px"><input type="text" id="schTitle" placeholder="제목 추가" style="font-size:17px;font-weight:700"></div>
+    <div class="row">
+      <div class="field" style="flex:1"><label>시작</label><input type="time" id="schStart"></div>
+      <div class="field" style="flex:1"><label>종료</label><input type="time" id="schEnd"></div>
+    </div>
+    <div class="field" style="margin:8px 0"><label>📍 장소 (선택)</label><input type="text" id="schPlace" placeholder="예: 오르세 미술관, 7구"></div>
+    <div class="field" style="margin-bottom:10px"><label>🗒️ 메모 (선택)</label><input type="text" id="schMemo" placeholder="예: 인상파 · 사전예약"></div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveSched()">저장</button>
+      <button class="btn btn-ghost" onclick="closeModal('schedModal')">취소</button>
+      <button class="btn btn-ghost" id="schDelBtn" style="display:none;color:#E0607A" onclick="deleteSched()">🗑 삭제</button>
+    </div>
+  </div>
+</div>
+
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11g</div>
 </body>
 </html>
