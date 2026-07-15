@@ -610,6 +610,17 @@
   .prep-todo input:checked + span{text-decoration:line-through;opacity:.5;}
   .prep-todo strong{font-weight:800;}
   .mg-line{margin:0 0 6px !important;}
+  .exp-filter{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 4px;}
+  .exp-fbtn{flex:1;min-width:96px;padding:8px 6px;border-radius:10px;border:1.5px solid rgba(0,0,0,0.08);background:#fff;font-size:12px;font-weight:600;cursor:pointer;line-height:1.4;}
+  .exp-fbtn b{display:block;font-size:13px;font-weight:800;margin-top:2px;}
+  .exp-fbtn.on{border-color:var(--dusk-coral);background:rgba(255,158,134,0.10);}
+  .exp-fbtn.pre.on{border-color:#C9922E;background:rgba(201,146,46,0.10);}
+  .exp-fbtn.loc.on{border-color:#5B9B6E;background:rgba(91,155,110,0.10);}
+  .exp-group-head{display:flex;justify-content:space-between;align-items:baseline;margin:16px 0 4px;padding:6px 10px;border-radius:8px;font-weight:800;font-size:13px;}
+  .exp-group-head.pre{background:rgba(201,146,46,0.12);color:#8A6420;}
+  .exp-group-head.local{background:rgba(91,155,110,0.12);color:#3E6E4F;}
+  .exp-group-sub{font-size:11px;font-weight:600;opacity:.85;}
+  .cost-line{cursor:pointer;}
   .emph-guide{margin-top:22px;padding:12px 14px;border-radius:10px;background:rgba(255,182,64,0.10);border:1px solid rgba(181,131,42,0.35);font-size:13px;line-height:1.7;}
   .emph-guide b{color:#B5832A;}
   .emph-line{margin-top:4px;}
@@ -1024,6 +1035,7 @@
     <div class="form-actions">
       <button class="btn btn-primary" onclick="saveExpense()">저장</button>
       <button class="btn btn-ghost" onclick="closeModal('expenseModal')">취소</button>
+      <button class="btn btn-ghost" id="exDelBtn" style="display:none;color:#E0607A" onclick="deleteEditingExpense()">🗑 삭제</button>
     </div>
   </div>
 </div>
@@ -1663,7 +1675,11 @@ let expenses = load(LS.expenses, []);
 let exCatSel = '기타비용';
 function toKrw(amount, ccy){ return Math.round((+amount||0) * (FX[ccy]||1)); }
 function costSum(){ let s=0; COSTS.forEach(c=>c.items.forEach(i=>s+=i[1])); return s; }
+let editingExpId=null;
 function openExpenseModal(){
+  editingExpId=null;
+  document.getElementById('expenseModalTitle').textContent='💰 비용 추가';
+  document.getElementById('exDelBtn').style.display='none';
   exCatSel='기타비용';
   document.getElementById('exAmount').value='';
   document.getElementById('exCcy').value='KRW';
@@ -1681,17 +1697,41 @@ function updateExPreview(){
   const el=document.getElementById('exPreview');
   el.innerHTML = (ccy==='KRW'||!amt) ? (amt?`= ${toKrw(amt,ccy).toLocaleString('ko-KR')}원`:'') : `${CCY_SYM[ccy]}${amt.toLocaleString()} ≈ <strong>${toKrw(amt,ccy).toLocaleString('ko-KR')}원</strong> (환율 ${Math.round(FX[ccy]).toLocaleString()})`;
 }
+function editExpense(id){
+  const e=expenses.find(x=>x.id===id); if(!e) return;
+  editingExpId=id;
+  document.getElementById('expenseModalTitle').textContent='✏️ 비용 수정';
+  exCatSel=e.cat||'기타비용';
+  document.getElementById('exAmount').value=e.amount;
+  document.getElementById('exCcy').value=e.ccy||'KRW';
+  document.getElementById('exMemo').value=e.memo||'';
+  document.getElementById('exDate').value=e.date||DAYS[0].iso;
+  const payS=document.getElementById('exPay'); [...payS.options].forEach((o,i)=>{ if(o.value===e.pay) payS.selectedIndex=i; });
+  document.getElementById('exCats').innerHTML = EXP_CATS.map(c=>`<button type="button" class="exp-cat ${c[1]===exCatSel?'on':''}" onclick="pickExCat('${c[1]}')">${c[0]} ${c[1]}</button>`).join('');
+  document.getElementById('exDelBtn').style.display='';
+  updateExPreview();
+  document.getElementById('expenseModal').classList.add('open');
+}
+function deleteEditingExpense(){ if(editingExpId){ delExpense(editingExpId); editingExpId=null; closeModal('expenseModal'); toast('삭제됐어요'); } }
 function saveExpense(){
   const amount=+document.getElementById('exAmount').value;
   if(!amount||amount<=0){ toast('금액을 입력해주세요'); return; }
-  expenses.push({ id:'x'+Date.now()+Math.floor(performance.now()), amount, ccy:document.getElementById('exCcy').value,
-    cat:exCatSel, pay:document.getElementById('exPay').value, date:document.getElementById('exDate').value, memo:document.getElementById('exMemo').value.trim() });
+  const fields={ amount, ccy:document.getElementById('exCcy').value, cat:exCatSel, pay:document.getElementById('exPay').value, date:document.getElementById('exDate').value, memo:document.getElementById('exMemo').value.trim() };
+  if(editingExpId){
+    const e=expenses.find(x=>x.id===editingExpId); if(e) Object.assign(e, fields);
+    editingExpId=null;
+  } else {
+    expenses.push(Object.assign({ id:'x'+Date.now()+Math.floor(performance.now()) }, fields));
+  }
   save(LS.expenses, expenses);
   closeModal('expenseModal'); renderExpenses();
-  toast('비용이 추가됐어요 💰');
+  toast(editingExpId?'수정됐어요 ✏️':'비용이 추가됐어요 💰');
 }
 function delExpense(id){ expenses=expenses.filter(x=>x.id!==id); save(LS.expenses, expenses); renderExpenses(); }
 function catIcon(name){ const c=EXP_CATS.find(x=>x[1]===name); return c?c[0]:'🧾'; }
+function expClass(e){ return (e.date && e.date < '2026-09-25') ? 'pre' : 'local'; }
+let expFilter='all';
+function setExpFilter(f){ expFilter=f; renderExpenses(); }
 function renderExpenses(){
   const wrap=document.getElementById('expenseWrap'); if(!wrap) return;
   const won=n=>n.toLocaleString('ko-KR');
@@ -1699,23 +1739,38 @@ function renderExpenses(){
   let html=`<div class="section-header" style="margin-top:24px"><span class="section-icon">🧾</span><span class="section-title" style="font-size:12px">여행 중 경비 (일별)</span><span class="section-sub">원화 환산</span></div>`;
   if(!expenses.length){
     html+=`<p class="hint" style="padding:8px">아직 입력한 경비가 없어요. 상단 <strong>＋ 비용 추가</strong>로 식비·교통·입장료 등을 날짜별로 기록해보세요.</p>`;
-  } else {
-    const byDate={}; expenses.forEach(e=>{ (byDate[e.date||'미정']=byDate[e.date||'미정']||[]).push(e); });
-    const dates=Object.keys(byDate).sort();
-    let expTotal=0;
-    dates.forEach(dt=>{
-      const list=byDate[dt]; const daySum=list.reduce((a,e)=>a+toKrw(e.amount,e.ccy),0); expTotal+=daySum;
+    wrap.innerHTML=html; return;
+  }
+  // 분류별 소계
+  const preSum=expenses.filter(e=>expClass(e)==='pre').reduce((a,e)=>a+toKrw(e.amount,e.ccy),0);
+  const locSum=expenses.filter(e=>expClass(e)==='local').reduce((a,e)=>a+toKrw(e.amount,e.ccy),0);
+  const expTotal=preSum+locSum;
+  // 필터 바
+  html+=`<div class="exp-filter">
+    <button class="exp-fbtn ${expFilter==='all'?'on':''}" onclick="setExpFilter('all')">전체 <b>${won(expTotal)}</b></button>
+    <button class="exp-fbtn pre ${expFilter==='pre'?'on':''}" onclick="setExpFilter('pre')">🧾 사전결재 <b>${won(preSum)}</b></button>
+    <button class="exp-fbtn loc ${expFilter==='local'?'on':''}" onclick="setExpFilter('local')">🧳 현지경비 <b>${won(locSum)}</b></button>
+  </div>`;
+  const groups=[['pre','🧾 사전결재','기준일 9/25 이전',preSum],['local','🧳 현지경비','기준일 9/25 이후',locSum]];
+  groups.forEach(([cls,label,desc,subSum])=>{
+    const inThis=expenses.filter(e=>expClass(e)===cls);
+    if(!inThis.length) return;
+    if(expFilter!=='all' && expFilter!==cls) return;
+    html+=`<div class="exp-group-head ${cls}"><span>${label}</span><span class="exp-group-sub">${desc} · <b>${won(subSum)}원</b></span></div>`;
+    const byDate={}; inThis.forEach(e=>{ (byDate[e.date||'미정']=byDate[e.date||'미정']||[]).push(e); });
+    Object.keys(byDate).sort().forEach(dt=>{
+      const list=byDate[dt]; const daySum=list.reduce((a,e)=>a+toKrw(e.amount,e.ccy),0);
       const dd=ISO2DAY[dt];
       html+=`<div class="cost-day-head"><span class="cost-day-date">📅 ${dd?`${dd.date}(${dd.wd}) · ${CITIES[dd.city].name}`:(dt==='미정'?'날짜 미정':isoLabel(dt))}</span><span class="cost-day-sum">${won(daySum)}원</span></div><div class="cost-cat">`;
       html+=list.map(e=>{
         const krw=toKrw(e.amount,e.ccy);
         const orig = e.ccy!=='KRW' ? `<span class="cost-line-orig"> (${CCY_SYM[e.ccy]}${(+e.amount).toLocaleString()})</span>` : '';
-        return `<div class="cost-line"><span class="cost-line-name">${catIcon(e.cat)} ${esc(e.memo||e.cat)}<span class="cost-line-orig"> · ${esc(e.pay||'')}</span></span><span class="cost-line-amt">${won(krw)}원${orig}<span class="cost-del" onclick="delExpense('${e.id}')" title="삭제">✕</span></span></div>`;
+        return `<div class="cost-line" onclick="editExpense('${e.id}')" title="탭하면 수정"><span class="cost-line-name">${catIcon(e.cat)} ${esc(e.memo||e.cat)}<span class="cost-line-orig"> · ${esc(e.pay||'')}</span></span><span class="cost-line-amt">${won(krw)}원${orig}<span class="cost-del" onclick="event.stopPropagation();delExpense('${e.id}')" title="삭제">✕</span></span></div>`;
       }).join('')+`</div>`;
     });
-    html+=`<div class="cost-total" style="margin-top:12px"><span class="cost-total-label">경비 합계</span><span class="cost-total-amount">${won(expTotal)}원</span></div>`;
-    html+=`<div class="grand-total"><span class="lbl">총 합계 (사전+경비)</span><span class="amt">${won(pre+expTotal)}원</span></div>`;
-  }
+  });
+  html+=`<div class="cost-total" style="margin-top:12px"><span class="cost-total-label">경비 합계</span><span class="cost-total-amount">${won(expTotal)}원</span></div>`;
+  html+=`<div class="grand-total"><span class="lbl">총 합계 (예상 사전비용 + 경비)</span><span class="amt">${won(pre+expTotal)}원</span></div>`;
   wrap.innerHTML=html;
 }
 
@@ -2913,6 +2968,6 @@ init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-10e</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11a</div>
 </body>
 </html>
