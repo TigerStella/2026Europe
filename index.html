@@ -609,6 +609,7 @@
   .prep-todo input{margin-top:3px;width:16px;height:16px;flex:0 0 auto;accent-color:#B5832A;cursor:pointer;}
   .prep-todo input:checked + span{text-decoration:line-through;opacity:.5;}
   .prep-todo strong{font-weight:800;}
+  .mg-line{margin:0 0 6px !important;}
   .emph-guide{margin-top:22px;padding:12px 14px;border-radius:10px;background:rgba(255,182,64,0.10);border:1px solid rgba(181,131,42,0.35);font-size:13px;line-height:1.7;}
   .emph-guide b{color:#B5832A;}
   .emph-line{margin-top:4px;}
@@ -2212,19 +2213,22 @@ function buildBrunch(){
       if(e.title && scope!=='all') blocks.push({type:'h2', html:esc(e.title)});
       // 노을(엄마)의 글은 본문 서술로 흐르게 두고, 타이거(아들)의 기록만 짚어준다
       if(voice==='both' && e.who==='son') blocks.push({type:'label', html:`— ${esc(sonName)}의 기록`});
-      const paras=splitParas(e.body);
-      // 가장 생생한 문단(대화·물음·감탄, 90자 이하)을 인용으로 — 없으면 짧은 첫 문단
-      let qIdx=-1;
-      if(e.who!=='son'){
-        qIdx=paras.findIndex(p=>p.length<=90 && /["“”'']|[?!]\s*$/.test(p));
+      if(e.who==='son'){
+        splitParas(e.body).forEach(para=> blocks.push({type:'quote', html:esc(para), hand:true}));
+      } else if(tone==='noeul'){
+        moglowBlocks(mgSentences(tidyKorean(e.body))).forEach(b=>{
+          blocks.push({type:(b.t==='quote'?'quote':b.t==='line'?'line':'p'), html:esc(b.s)});
+        });
+      } else {
+        const paras=splitParas(e.body);
+        let qIdx=paras.findIndex(p=>p.length<=90 && /["“”'']|[?!]\s*$/.test(p));
         if(qIdx<0 && paras[0] && paras[0].length<60) qIdx=0;
+        paras.forEach((para,i)=>{
+          const t=tidyKorean(para);
+          if(i===qIdx) blocks.push({type:'quote', html:esc(t)});
+          else blocks.push({type:'p', html:esc(t)});
+        });
       }
-      paras.forEach((para,i)=>{
-        if(e.who==='son'){ blocks.push({type:'quote', html:esc(para), hand:true}); return; }
-        const t=tidyKorean(para);
-        if(i===qIdx) blocks.push({type:'quote', html:esc(t)});
-        else blocks.push({type:'p', html:esc(t)});
-      });
       (e.photos||[]).forEach(p=> blocks.push({type:'img', html:p.src, cap:p.cap}));
     });
   });
@@ -2289,6 +2293,30 @@ function tidyKorean(s){
   return t.trim();
 }
 function splitParas(txt){ return (txt||'').split(/\n\s*\n|\n/).map(s=>s.trim()).filter(Boolean); }
+function mgSentences(text){
+  const out=[];
+  (text||'').split(/\n+/).forEach(seg=>{
+    seg=seg.trim(); if(!seg) return;
+    const parts=seg.match(/[^.?!…]+[.?!…]+[”"'']?|[^.?!…]+$/g) || [seg];
+    parts.forEach(p=>{ p=p.trim(); if(p) out.push(p); });
+  });
+  return out;
+}
+// 노을 문체: 짧은 행 + 긴 문단의 혼합 리듬(5단 낙차)으로 재배치 — 문장은 그대로, 배치만 스킬대로
+function moglowBlocks(sents){
+  const blocks=[]; if(!sents.length) return blocks;
+  const isDlg=s=> /["“”'']/.test(s) || /[?!]\s*$/.test(s);
+  blocks.push({t:'line', s:sents[0]});
+  let buf=[]; const flush=()=>{ if(buf.length){ blocks.push({t:'p', s:buf.join(' ')}); buf=[]; } };
+  for(let i=1;i<sents.length;i++){
+    const s=sents[i];
+    if(isDlg(s)){ flush(); blocks.push({t:'quote', s}); }
+    else if(s.length<=22){ flush(); blocks.push({t:'line', s}); }
+    else { buf.push(s); if(buf.length>=4) flush(); }
+  }
+  flush();
+  return blocks;
+}
 function pickEmph(blocks){ const a=[]; blocks.forEach(b=>{ if(b.type==='quote' && !b.hand) a.push(strip(b.html)); }); const cl=blocks.filter(b=>b.type==='close').pop(); if(cl) a.push(strip(cl.html)); return [...new Set(a.map(x=>x.trim()).filter(Boolean))].slice(0,5); }
 function pickEmphBlog(blocks){ const ps=blocks.filter(b=>b.type==='p').map(b=>strip(b.html)).filter(t=>t && !t.startsWith('안녕하세요')); if(!ps.length) return []; const out=[]; const last=ps[ps.length-1]; if(last&&last.length<=90) out.push(last); ps.forEach(t=>{ if(t.length<=42) out.push(t); }); if(!out.length&&last) out.push(last); return [...new Set(out)].slice(0,5); }
 function emphHTML(arr){ return arr.length?`<div class="emph-guide"><b>✍️ 강조할 문장</b> — 붙여넣기 후 아래 문장을 에디터에서 찾아 <b>굵게 + 글자크기 18</b>로 지정하세요 (한 편에 3~5곳).${arr.map((e,i)=>`<div class="emph-line">${i+1}. \u201c${esc(e)}\u201d</div>`).join('')}</div>`:''; }
@@ -2303,6 +2331,7 @@ function renderBrunch(){
     if(b.type==='h2') return `<h2>${b.html}</h2>`;
     if(b.type==='quote') return `<blockquote class="${b.hand?'hand':''}">${b.html}</blockquote>`;
     if(b.type==='label') return `<p style="font-size:12px;color:var(--text-light);font-weight:700;margin-bottom:6px">${b.html}</p>`;
+    if(b.type==='line') return `<p class="mg-line">${b.html}</p>`;
     if(b.type==='img') return `<div class="brunch-fig"><img src="${b.html}">${b.cap?`<div class="brunch-cap">${esc(b.cap)}</div>`:''}</div>`;
     if(b.type==='close') return `<div class="brunch-close">${b.html}</div>`;
     return `<p>${b.html}</p>`;
@@ -2357,6 +2386,7 @@ function brunchText(){
   data.blocks.forEach(b=>{
     if(b.type==='img') { lines.push(b.cap?`[사진: ${b.cap}]`:'[사진]'); return; }
     if(b.type==='h2') { lines.push('', '■ '+strip(b.html), ''); return; }
+    if(b.type==='line') { lines.push(strip(b.html)); return; }
     if(b.type==='quote') { lines.push('“'+strip(b.html)+'”'); return; }
     if(b.type==='label') { lines.push(strip(b.html)+' —'); return; }
     if(b.type==='close') { lines.push('', strip(b.html)); return; }
@@ -2883,6 +2913,6 @@ init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-10d</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-10e</div>
 </body>
 </html>
