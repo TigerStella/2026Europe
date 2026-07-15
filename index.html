@@ -669,6 +669,23 @@
   .day-add-t{width:96px;padding:5px;border:1px solid rgba(0,0,0,0.12);border-radius:7px;font-size:12px;}
   .day-add-x{flex:1;min-width:140px;padding:6px 8px;border:1px solid rgba(0,0,0,0.12);border-radius:7px;font-size:13px;}
   .day-add-btn{padding:6px 12px;border:none;border-radius:7px;background:var(--sunset-gold);color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;}
+  .gcal-add{margin-top:10px;padding:10px 12px;border-radius:12px;background:#fff;border:1px solid rgba(0,0,0,0.08);box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+  .gcal-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(0,0,0,0.05);}
+  .gcal-row:last-of-type{border-bottom:none;}
+  .gcal-ic{flex:0 0 20px;text-align:center;font-size:14px;opacity:.8;}
+  .gcal-title{flex:1;border:none;outline:none;font-size:15px;font-weight:700;color:var(--text-dark);background:transparent;}
+  .gcal-time{border:1px solid rgba(0,0,0,0.12);border-radius:7px;padding:5px 6px;font-size:13px;}
+  .gcal-dash{color:var(--text-light);}
+  .gcal-hint{font-size:10px;color:var(--text-light);}
+  .gcal-sub{flex:1;border:none;outline:none;font-size:13px;color:var(--text-dark);background:transparent;}
+  .gcal-btn{margin-top:8px;width:100%;padding:9px;font-size:13.5px;}
+  .tg-place{color:var(--slate);font-size:11px;}
+  .tg-memo{display:block;color:var(--text-light);font-size:11px;margin-top:1px;}
+  .cal-month{flex:0 0 auto;align-self:center;font-size:11px;font-weight:800;color:var(--dusk-coral);padding:0 6px;writing-mode:horizontal-tb;}
+  .cal-cell.today{outline:2px solid var(--sunset-gold);outline-offset:1px;}
+  .cal-cell.sun .cal-dnum{color:#E5484D;} .cal-cell.sat .cal-dnum{color:#4C7DE0;}
+  .postit.flash{animation:flashHi 1.6s ease;}
+  @keyframes flashHi{0%,100%{box-shadow:0 0 0 0 rgba(255,214,102,0);}30%{box-shadow:0 0 0 3px rgba(255,190,60,0.85);}}
   .emph-guide{margin-top:22px;padding:12px 14px;border-radius:10px;background:rgba(255,182,64,0.10);border:1px solid rgba(181,131,42,0.35);font-size:13px;line-height:1.7;}
   .emph-guide b{color:#B5832A;}
   .emph-line{margin-top:4px;}
@@ -1587,18 +1604,17 @@ function dayTimedItems(day){
   if(day.transport) items.push({time:day.transport.time||'', icon:day.transport.icon, html:day.transport.text, kind:'move'});
   if(day.hotel) items.push({time:day.hotel.time||'', icon:'🏨', html:day.hotel.text, kind:'hotel'});
   (day.acts||[]).forEach(a=> items.push({time:a.time||'', end:a.endTime||'', icon:a.ic||'•', html:esc(a.t), kind:'act'}));
-  (addedActs[day.d]||[]).forEach((a,ai)=> items.push({time:a.time||'', end:a.endTime||'', icon:a.ic||'📌', html:esc(a.t), kind:'added', dayNum:day.d, idx:ai}));
+  (addedActs[day.d]||[]).forEach((a,ai)=> items.push({time:a.time||'', end:a.endTime||'', icon:a.ic||'📌', html:esc(a.t)+(a.place?` <span class="tg-place">📍${esc(a.place)}</span>`:'')+(a.memo?`<small class="tg-memo">${esc(a.memo)}</small>`:''), kind:'added', dayNum:day.d, idx:ai}));
   return items.map((it,i)=>({...it, _i:i})).sort((a,b)=> (timeKey(a.time)-timeKey(b.time)) || (a._i-b._i));
 }
 function fmtHM(m){ const h=Math.floor(m/60), mm=m%60; return (h<10?'0'+h:''+h)+':'+(mm<10?'0'+mm:mm); }
 let expandedDays = new Set();
 function toggleDayExpand(d){ if(expandedDays.has(d)) expandedDays.delete(d); else expandedDays.add(d); refreshTimelines(); }
 function addActivityInline(d,k){
-  const t=(document.getElementById('af2-text-'+d)||{}).value; if(!t||!t.trim()){ toast('내용을 입력해주세요'); return; }
-  const time=(document.getElementById('af2-time-'+d)||{}).value||'';
-  const endTime=(document.getElementById('af2-end-'+d)||{}).value||'';
+  const g=id=>(document.getElementById(id)||{}).value||'';
+  const t=g('af2-text-'+d).trim(); if(!t){ toast('일정 제목을 입력해주세요'); return; }
   if(!addedActs[d]) addedActs[d]=[];
-  addedActs[d].push({ ic:'📌', t:t.trim(), time:time.trim(), endTime:endTime.trim() });
+  addedActs[d].push({ ic:'📌', t, time:g('af2-time-'+d).trim(), endTime:g('af2-end-'+d).trim(), place:g('af2-place-'+d).trim(), memo:g('af2-memo-'+d).trim() });
   save(LS.acts, addedActs);
   expandedDays.add(d);
   refreshTimelines();
@@ -1641,10 +1657,13 @@ function dayGridHTML(day, c){
     const del = it.kind==='added'?`<span class="tl-del" onclick="delActivity(${it.dayNum},${it.idx})" title="삭제">✕</span>`:'';
     return `<div class="tg-uitem"><span class="tg-ic">${it.icon}</span><span>${it.html}</span>${del}</div>`; }).join('')}</div>`:'';
   // 인라인 입력 (날짜별 본문)
-  const addForm=`<div class="day-add">
-    <div class="day-add-row"><input type="time" id="af2-time-${day.d}" class="day-add-t"><span>~</span><input type="time" id="af2-end-${day.d}" class="day-add-t"></div>
-    <input type="text" id="af2-text-${day.d}" class="day-add-x" placeholder="이 날 일정 추가 (예: 오르세 미술관 14:00)">
-    <button class="day-add-btn" onclick="addActivityInline(${day.d},'${day.city}')">＋ 추가</button>
+  const addForm=`<div class="gcal-add">
+    <div class="gcal-row"><span class="gcal-ic">📝</span><input type="text" id="af2-text-${day.d}" class="gcal-title" placeholder="일정 제목 (예: 오르세 미술관)"></div>
+    <div class="gcal-row"><span class="gcal-ic">🕐</span>
+      <input type="time" id="af2-time-${day.d}" class="gcal-time"><span class="gcal-dash">~</span><input type="time" id="af2-end-${day.d}" class="gcal-time"><span class="gcal-hint">(종료 시각 → 블록 높이)</span></div>
+    <div class="gcal-row"><span class="gcal-ic">📍</span><input type="text" id="af2-place-${day.d}" class="gcal-sub" placeholder="장소 (선택)"></div>
+    <div class="gcal-row"><span class="gcal-ic">🗒️</span><input type="text" id="af2-memo-${day.d}" class="gcal-sub" placeholder="메모 (선택)"></div>
+    <button class="day-add-btn gcal-btn" onclick="addActivityInline(${day.d},'${day.city}')">＋ 일정 추가</button>
   </div>`;
   return grid + untimedHTML + addForm;
 }
@@ -1793,7 +1812,7 @@ function openExpenseModal(){
   document.getElementById('exAmount').value='';
   document.getElementById('exCcy').value='KRW';
   document.getElementById('exMemo').value='';
-  document.getElementById('exDate').value = DAYS[0].iso;
+  document.getElementById('exDate').value = fxDateBack(0);
   document.getElementById('exPay').selectedIndex=0;
   document.getElementById('exCats').innerHTML = EXP_CATS.map(c=>`<button type="button" class="exp-cat ${c[1]===exCatSel?'on':''}" onclick="pickExCat('${c[1]}')">${c[0]} ${c[1]}</button>`).join('');
   updateExPreview();
@@ -2299,15 +2318,35 @@ function delDiary(id){
 }
 function renderDiaryCal(){
   const el=document.getElementById('diaryCal'); if(!el) return;
-  // 기록한 날짜별 작성자 집합
-  const marks={}; diary.forEach(e=>{ const k=e.iso||(entryDay(e)?entryDay(e).iso:''); if(!k) return; (marks[k]=marks[k]||{}).__=(marks[k].__||0); marks[k][e.who]=true; });
+  const marks={}; diary.forEach(e=>{ const k=e.iso||(entryDay(e)?entryDay(e).iso:''); if(!k) return; (marks[k]=marks[k]||{})[e.who]=true; });
+  const WD=['일','월','화','수','목','금','토'];
+  const todayIso=fxDateBack(0);
+  const months=[[2026,7],[2026,8],[2026,9],[2026,10]];  // 7월부터 여행 종료(10월)까지
+  let strip='';
+  months.forEach(([y,m])=>{
+    const dim=new Date(y,m,0).getDate();
+    strip+=`<div class="cal-month">${m}월</div>`;
+    for(let d=1; d<=dim; d++){
+      const iso=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const wd=WD[new Date(y,m-1,d).getDay()];
+      const mk=marks[iso]||{}; const mom=mk.mom, son=mk.son;
+      let mark=''; if(mom&&son) mark='<span class="cal-mk star">★</span>'; else if(mom) mark='<span class="cal-mk mom"></span>'; else if(son) mark='<span class="cal-mk son"></span>';
+      const cls=[mom||son?'has':'', iso===todayIso?'today':'', (wd==='일'?'sun':wd==='토'?'sat':'')].filter(Boolean).join(' ');
+      strip+=`<div class="cal-cell ${cls}" id="cal-${iso}" onclick="diaryCalClick('${iso}')" title="${m}/${d} (${wd})">
+        <div class="cal-wd">${wd}</div><div class="cal-dnum">${d}</div>${mark}</div>`;
+    }
+  });
   el.innerHTML = `<div class="cal-title">📅 기록 달력 <span class="cal-legend"><i class="c-mom"></i>엄마 <i class="c-son"></i>아들 <b>★</b>둘다</span></div>
-    <div class="cal-strip">${DAYS.map(d=>{
-      const m=marks[d.iso]||{}; const mom=m.mom, son=m.son;
-      let mk=''; if(mom&&son) mk='<span class="cal-mk star">★</span>'; else if(mom) mk='<span class="cal-mk mom"></span>'; else if(son) mk='<span class="cal-mk son"></span>';
-      return `<div class="cal-cell ${mom||son?'has':''}" onclick="openDiaryModalOn('${d.iso}')" title="${d.date} 일기 쓰기">
-        <div class="cal-wd">${d.wd}</div><div class="cal-dnum">${d.date.split('/')[1]}</div>${mk}</div>`;
-    }).join('')}</div>`;
+    <div class="cal-strip" id="calStrip">${strip}</div>`;
+  // 오늘 위치로 살짝 스크롤
+  const t=document.getElementById('cal-'+todayIso); if(t) t.scrollIntoView({inline:'start',block:'nearest'});
+}
+function diaryCalClick(iso){
+  const hit=diary.find(e=>(e.iso||(entryDay(e)?entryDay(e).iso:''))===iso);
+  if(hit){
+    const el=document.getElementById('pit-'+hit.id);
+    if(el){ el.classList.add('open','flash'); el.scrollIntoView({behavior:'smooth', block:'center'}); setTimeout(()=>el.classList.remove('flash'),1600); }
+  } else { openDiaryModalOn(iso); }
 }
 function openDiaryModalOn(iso){ openDiaryModal('mom'); const el=document.getElementById('dDate'); if(el){ el.value=iso; updateDDayHint(); } }
 function togglePostit(id){ const el=document.getElementById('pit-'+id); if(el) el.classList.toggle('open'); }
@@ -3096,6 +3135,6 @@ init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11c</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11d</div>
 </body>
 </html>
