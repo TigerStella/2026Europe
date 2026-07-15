@@ -621,6 +621,27 @@
   .exp-group-head.local{background:rgba(91,155,110,0.12);color:#3E6E4F;}
   .exp-group-sub{font-size:11px;font-weight:600;opacity:.85;}
   .cost-line{cursor:pointer;}
+  .diary-cal{margin:4px 0 16px;padding:10px 12px;border-radius:12px;background:#fff;border:1px solid rgba(0,0,0,0.06);}
+  .cal-title{font-size:13px;font-weight:800;color:var(--text-dark);display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+  .cal-legend{font-size:10px;font-weight:600;color:var(--text-light);display:inline-flex;align-items:center;gap:5px;}
+  .cal-legend i{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:middle;}
+  .cal-legend .c-mom{border:2px solid #E5484D;} .cal-legend .c-son{border:2px solid #3E9B57;} .cal-legend b{color:#E5484D;}
+  .cal-strip{display:flex;gap:6px;overflow-x:auto;padding:10px 2px 4px;-webkit-overflow-scrolling:touch;}
+  .cal-cell{position:relative;flex:0 0 auto;width:42px;height:52px;border-radius:9px;background:var(--ivory);border:1px solid rgba(0,0,0,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;}
+  .cal-cell.has{background:#fff;}
+  .cal-wd{font-size:10px;color:var(--text-light);}
+  .cal-dnum{font-size:15px;font-weight:800;color:var(--text-dark);line-height:1.1;}
+  .cal-mk{position:absolute;width:34px;height:34px;top:9px;left:4px;pointer-events:none;}
+  .cal-mk.mom{border:2.5px solid #E5484D;border-radius:50%;transform:rotate(-8deg);}
+  .cal-mk.son{border:2.5px solid #3E9B57;border-radius:50%;transform:rotate(6deg);}
+  .cal-mk.star{border:none;color:#E5484D;font-size:30px;line-height:34px;text-align:center;top:6px;left:5px;text-shadow:0 0 2px #fff;}
+  .postit-head{display:flex;align-items:center;gap:8px;cursor:pointer;}
+  .postit-titleline{flex:1;font-weight:800;font-size:15px;color:var(--text-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .postit-titleline i{font-weight:500;color:var(--text-light);}
+  .postit-caret{transition:transform .2s;color:var(--text-light);font-size:12px;}
+  .postit.open .postit-caret{transform:rotate(180deg);}
+  .postit-detail{display:none;margin-top:8px;}
+  .postit.open .postit-detail{display:block;}
   .emph-guide{margin-top:22px;padding:12px 14px;border-radius:10px;background:rgba(255,182,64,0.10);border:1px solid rgba(181,131,42,0.35);font-size:13px;line-height:1.7;}
   .emph-guide b{color:#B5832A;}
   .emph-line{margin-top:4px;}
@@ -861,6 +882,7 @@
       <input type="file" id="mergeFile" accept="application/json,.json" style="display:none" onchange="importMerge(event)">
     </div>
 
+    <div class="diary-cal" id="diaryCal"></div>
     <div class="diary-cols">
       <div>
         <div class="diary-col-head">
@@ -2188,23 +2210,42 @@ function saveDiary(){
 function delDiary(id){
   diary=diary.filter(x=>x.id!==id); save(LS.diary, diary); renderDiary();
 }
+function renderDiaryCal(){
+  const el=document.getElementById('diaryCal'); if(!el) return;
+  // 기록한 날짜별 작성자 집합
+  const marks={}; diary.forEach(e=>{ const k=e.iso||(entryDay(e)?entryDay(e).iso:''); if(!k) return; (marks[k]=marks[k]||{}).__=(marks[k].__||0); marks[k][e.who]=true; });
+  el.innerHTML = `<div class="cal-title">📅 기록 달력 <span class="cal-legend"><i class="c-mom"></i>엄마 <i class="c-son"></i>아들 <b>★</b>둘다</span></div>
+    <div class="cal-strip">${DAYS.map(d=>{
+      const m=marks[d.iso]||{}; const mom=m.mom, son=m.son;
+      let mk=''; if(mom&&son) mk='<span class="cal-mk star">★</span>'; else if(mom) mk='<span class="cal-mk mom"></span>'; else if(son) mk='<span class="cal-mk son"></span>';
+      return `<div class="cal-cell ${mom||son?'has':''}" onclick="openDiaryModalOn('${d.iso}')" title="${d.date} 일기 쓰기">
+        <div class="cal-wd">${d.wd}</div><div class="cal-dnum">${d.date.split('/')[1]}</div>${mk}</div>`;
+    }).join('')}</div>`;
+}
+function openDiaryModalOn(iso){ openDiaryModal('mom'); const el=document.getElementById('dDate'); if(el){ el.value=iso; updateDDayHint(); } }
+function togglePostit(id){ const el=document.getElementById('pit-'+id); if(el) el.classList.toggle('open'); }
 function renderDiary(){
   const mw=document.getElementById('momWho'); if(mw) mw.textContent = `엄마 · ${settings.momName||'노을'}`;
   const _dd=document.getElementById('diaryDday'); if(_dd) _dd.textContent='✈ '+tripDday();
   const sw=document.getElementById('sonWho'); if(sw) sw.textContent = `아들 · ${settings.sonName||'타이거'}`;
+  renderDiaryCal();
   ['mom','son'].forEach(who=>{
     const entries=diary.filter(e=>e.who===who).sort((a,b)=>entryKey(a)<entryKey(b)?-1:1);
     document.getElementById(who+'Cnt').textContent = entries.length? `${entries.length}편` : '';
     const wrap=document.getElementById(who+'Wrap');
     if(!entries.length){ wrap.innerHTML=`<div class="diary-empty">아직 기록이 없어요.<br>매일의 순간을 남겨보세요 🌿</div>`; return; }
     wrap.innerHTML = entries.map(e=>`
-      <div class="postit ${who}">
-        <span class="pin">📌</span>
-        <div class="postit-actions"><button onclick="editDiary('${e.id}')" title="수정">✎</button><button onclick="delDiary('${e.id}')" title="삭제">🗑</button></div>
-        <div class="postit-date">${esc(entryLabel(e))}${entryKey(e)!=='9999'?` <span class="postit-dday">${esc(tripDday(entryKey(e)))}</span>`:''}</div>
-        ${e.title?`<div class="postit-title" style="font-family:${fontCss(e.font)}">${esc(e.title)}</div>`:''}
-        <div class="postit-body" style="font-family:${fontCss(e.font)}">${esc(e.body)}</div>
-        ${e.photos&&e.photos.length?`<div class="postit-photos">${e.photos.map(p=>`<img src="${p.src}" title="${esc(p.cap)}" onclick="viewImage(this.src)">`).join('')}</div>`:''}
+      <div class="postit ${who}" id="pit-${e.id}">
+        <div class="postit-head" onclick="togglePostit('${e.id}')">
+          <span class="postit-date">${esc(entryLabel(e))}${entryKey(e)!=='9999'?` <span class="postit-dday">${esc(tripDday(entryKey(e)))}</span>`:''}</span>
+          <span class="postit-titleline" style="font-family:${fontCss(e.font)}">${e.title?esc(e.title):'<i>무제</i>'}</span>
+          <span class="postit-caret">▾</span>
+        </div>
+        <div class="postit-detail">
+          <div class="postit-actions"><button onclick="event.stopPropagation();editDiary('${e.id}')" title="수정">✎</button><button onclick="event.stopPropagation();delDiary('${e.id}')" title="삭제">🗑</button></div>
+          <div class="postit-body" style="font-family:${fontCss(e.font)}">${esc(e.body)}</div>
+          ${e.photos&&e.photos.length?`<div class="postit-photos">${e.photos.map(p=>`<img src="${p.src}" title="${esc(p.cap)}" onclick="event.stopPropagation();viewImage(this.src)">`).join('')}</div>`:''}
+        </div>
       </div>`).join('');
   });
 }
@@ -2968,6 +3009,6 @@ init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11a</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11b</div>
 </body>
 </html>
