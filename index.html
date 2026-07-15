@@ -652,7 +652,11 @@
   .tg{position:relative;margin:8px 0 4px;padding-left:52px;}
   .tg-axis{position:absolute;left:0;top:0;width:48px;height:100%;}
   .tg-tick{position:absolute;left:0;font-size:10px;color:rgba(0,0,0,0.38);font-variant-numeric:tabular-nums;transform:translateY(-6px);border-top:1px solid rgba(0,0,0,0.06);width:48px;padding-top:1px;}
-  .tg-blocks{position:relative;height:100%;border-left:1px solid rgba(0,0,0,0.08);}
+  .tg-blocks{position:relative;height:100%;border-left:1px solid rgba(0,0,0,0.08);touch-action:none;cursor:crosshair;}
+  .tg-hint{font-size:11px;color:var(--text-light);margin:6px 0 2px;text-align:center;}
+  .tg-block.point{padding:3px 8px;}
+  .tg-block.editable{cursor:pointer;}
+  .tg-select{position:absolute;left:8px;right:2px;background:rgba(122,138,255,0.18);border:1.5px solid #7A8AFF;border-radius:8px;font-size:11px;font-weight:800;color:#4A57C8;padding:2px 6px;pointer-events:none;z-index:5;overflow:hidden;}
   .tg-block{position:absolute;left:8px;right:0;background:#fff;border:1px solid rgba(0,0,0,0.07);border-left:3px solid var(--slate);border-radius:8px;padding:5px 8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
   .tg-block.move{background:rgba(143,184,236,0.14);} .tg-block.hotel{background:rgba(255,158,134,0.13);} .tg-block.added{background:rgba(181,131,42,0.10);border-left-style:dashed;}
   .tg-start{font-size:10px;font-weight:800;color:var(--slate);font-variant-numeric:tabular-nums;}
@@ -946,7 +950,27 @@
       </div>
     </div>
 
-    <!-- BRUNCH OUTPUT -->
+    <!-- SCHEDULE (구글 캘린더식) MODAL -->
+<div class="modal-back" id="schedModal">
+  <div class="modal">
+    <h3 id="schModalTitle">📅 새 일정</h3>
+    <div class="hint" id="schWhen" style="margin:-4px 0 10px"></div>
+    <div class="field" style="margin-bottom:8px"><input type="text" id="schTitle" placeholder="제목 추가" style="font-size:17px;font-weight:700"></div>
+    <div class="row">
+      <div class="field" style="flex:1"><label>시작</label><input type="time" id="schStart"></div>
+      <div class="field" style="flex:1"><label>종료</label><input type="time" id="schEnd"></div>
+    </div>
+    <div class="field" style="margin:8px 0"><label>📍 장소 (선택)</label><input type="text" id="schPlace" placeholder="예: 오르세 미술관, 7구"></div>
+    <div class="field" style="margin-bottom:10px"><label>🗒️ 메모 (선택)</label><input type="text" id="schMemo" placeholder="예: 인상파 · 사전예약"></div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveSched()">저장</button>
+      <button class="btn btn-ghost" onclick="closeModal('schedModal')">취소</button>
+      <button class="btn btn-ghost" id="schDelBtn" style="display:none;color:#E0607A" onclick="deleteSched()">🗑 삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- BRUNCH OUTPUT -->
     <div class="brunch-out" id="brunchOut">
       <div class="section-header"><span class="section-icon">✍️</span><span class="section-title">브런치 발행 미리보기</span></div>
       <div class="brunch-tools">
@@ -1620,51 +1644,114 @@ function addActivityInline(d,k){
   refreshTimelines();
   toast('일정이 추가됐어요 ✨');
 }
+let gridDrag=null;
+function gridPointerDown(e, day, city, gridStart, pxmin){
+  if(e.target.closest('.tg-block')) return;   // 기존 블록은 무시
+  const blocks=e.currentTarget; const rect=blocks.getBoundingClientRect();
+  const y0=Math.max(0, e.clientY-rect.top);
+  gridDrag={day, city, gridStart, pxmin, blocks, rect, y0, moved:false};
+  const sel=document.createElement('div'); sel.className='tg-select'; sel.style.top=y0+'px'; sel.style.height='4px';
+  blocks.appendChild(sel); gridDrag.sel=sel;
+  try{ blocks.setPointerCapture(e.pointerId); }catch(_){}
+  document.addEventListener('pointermove', gridPointerMove);
+  document.addEventListener('pointerup', gridPointerUp);
+  e.preventDefault();
+}
+function gridPointerMove(e){
+  if(!gridDrag) return; gridDrag.moved=true;
+  const y=Math.max(0, e.clientY-gridDrag.rect.top);
+  const top=Math.min(y, gridDrag.y0), h=Math.abs(y-gridDrag.y0);
+  gridDrag.sel.style.top=top+'px'; gridDrag.sel.style.height=Math.max(4,h)+'px';
+  const a=gridDrag.gridStart+Math.round(((top/gridDrag.pxmin))/15)*15;
+  const b=gridDrag.gridStart+Math.round((((top+h)/gridDrag.pxmin))/15)*15;
+  gridDrag.sel.textContent=fmtHM(a)+' ~ '+fmtHM(Math.max(b,a+15));
+}
+function gridPointerUp(e){
+  document.removeEventListener('pointermove', gridPointerMove);
+  document.removeEventListener('pointerup', gridPointerUp);
+  if(!gridDrag) return; const g=gridDrag; gridDrag=null;
+  const y=Math.max(0, (e.clientY!=null?e.clientY:g.rect.top+g.y0)-g.rect.top);
+  let topPx=Math.min(y,g.y0), botPx=Math.max(y,g.y0);
+  let a=Math.round((g.gridStart+topPx/g.pxmin)/15)*15;
+  let b=Math.round((g.gridStart+botPx/g.pxmin)/15)*15;
+  if(b-a<15) b=a+60;   // 탭만 하면 1시간 기본
+  if(g.sel&&g.sel.parentNode) g.sel.parentNode.removeChild(g.sel);
+  openSchedModal(g.day, g.city, fmtHM(a), fmtHM(b));
+}
+let schedDay=null, schedEditIdx=null;
+function openSchedModal(day, city, startHM, endHM, idx){
+  schedDay=day; schedEditIdx=(idx!=null?idx:null);
+  const cur=(idx!=null && addedActs[day])?addedActs[day][idx]:null;
+  document.getElementById('schModalTitle').textContent = cur?'✏️ 일정 수정':'📅 새 일정';
+  document.getElementById('schWhen').textContent = (ISO2DAY_BYNUM(day)||'')+'';
+  document.getElementById('schTitle').value = cur?(cur.t||''):'';
+  document.getElementById('schStart').value = cur?(cur.time||startHM||''):(startHM||'');
+  document.getElementById('schEnd').value = cur?(cur.endTime||endHM||''):(endHM||'');
+  document.getElementById('schPlace').value = cur?(cur.place||''):'';
+  document.getElementById('schMemo').value = cur?(cur.memo||''):'';
+  document.getElementById('schDelBtn').style.display = cur?'':'none';
+  document.getElementById('schedModal').classList.add('open');
+  setTimeout(()=>document.getElementById('schTitle').focus(), 60);
+}
+function ISO2DAY_BYNUM(d){ const dd=DAYS.find(x=>x.d===d); return dd?`D${dd.d} · ${dd.date}(${dd.wd}) · ${CITIES[dd.city].name}`:''; }
+function saveSched(){
+  const t=document.getElementById('schTitle').value.trim(); if(!t){ toast('일정 제목을 입력해주세요'); return; }
+  const rec={ ic:'📌', t, time:document.getElementById('schStart').value, endTime:document.getElementById('schEnd').value, place:document.getElementById('schPlace').value.trim(), memo:document.getElementById('schMemo').value.trim() };
+  if(!addedActs[schedDay]) addedActs[schedDay]=[];
+  if(schedEditIdx!=null) addedActs[schedDay][schedEditIdx]=rec; else addedActs[schedDay].push(rec);
+  save(LS.acts, addedActs); expandedDays.add(schedDay);
+  closeModal('schedModal'); refreshTimelines(); toast('일정이 저장됐어요 ✨');
+}
+function deleteSched(){ if(schedEditIdx!=null && addedActs[schedDay]){ delActivity(schedDay, schedEditIdx); } closeModal('schedModal'); toast('삭제됐어요'); }
 function dayGridHTML(day, c){
   const items=dayTimedItems(day);
   const timed=items.filter(it=>timeKey(it.time)!==9999);
   const untimed=items.filter(it=>timeKey(it.time)===9999);
+  const PXMIN=1.5;
   let grid='';
+  // 시작~종료 범위 (일정 없으면 09~18 기본)
+  let gridStart, gridEnd;
+  const slots=[];
   if(timed.length){
-    // 같은 시작시각끼리 한 슬롯으로 묶기
-    const slots=[];
     timed.forEach(it=>{ const st=timeKey(it.time); const last=slots[slots.length-1]; if(last&&last.start===st) last.items.push(it); else slots.push({start:st, items:[it]}); });
-    const PXMIN=1.5, MINH=36;
-    const gridStart=Math.floor(slots[0].start/30)*30;
-    let lastEnd=slots[slots.length-1].start;
-    slots[slots.length-1].items.forEach(it=>{ if(it.end) lastEnd=Math.max(lastEnd, timeKey(it.end)); });
-    if(lastEnd<=slots[slots.length-1].start) lastEnd=slots[slots.length-1].start+60;
-    const gridEnd=Math.ceil(lastEnd/30)*30;
-    slots.forEach((sl,i)=>{ sl.end = (i<slots.length-1)?slots[i+1].start:lastEnd; });
-    const totalMin=gridEnd-gridStart, H=totalMin*PXMIN;
-    let ruler='';
-    for(let t=gridStart;t<=gridEnd;t+=30){ ruler+=`<div class="tg-tick" style="top:${(t-gridStart)*PXMIN}px">${fmtHM(t)}</div>`; }
-    let blocks='';
-    slots.forEach(sl=>{
-      const top=(sl.start-gridStart)*PXMIN;
-      const h=Math.max(MINH,(sl.end-sl.start)*PXMIN)-4;
-      const kind=sl.items[0].kind;
-      const body=sl.items.map(it=>{
-        const del = it.kind==='added'?`<span class="tl-del" onclick="event.stopPropagation();delActivity(${it.dayNum},${it.idx})" title="삭제">✕</span>`:'';
-        const rng = it.end?`<small class="tg-rng">~${esc(it.end)}</small>`:'';
-        return `<div class="tg-item"><span class="tg-ic">${it.icon}</span><span class="tg-text">${it.html}${rng}</span>${del}</div>`;
-      }).join('');
-      blocks+=`<div class="tg-block ${kind}" style="top:${top}px;height:${h}px;border-left-color:${c.color}"><span class="tg-start">${fmtHM(sl.start)}</span><div class="tg-body">${body}</div></div>`;
-    });
-    grid=`<div class="tg" style="height:${H}px"><div class="tg-axis">${ruler}</div><div class="tg-blocks">${blocks}</div></div>`;
-  }
+    slots.forEach(sl=>{ let end=null; sl.items.forEach(it=>{ if(it.end){ const te=timeKey(it.end); if(end==null||te>end) end=te; } }); sl.end=end; });
+    gridStart=Math.floor(slots[0].start/30)*30;
+    let maxEnd=gridStart; slots.forEach(sl=>{ maxEnd=Math.max(maxEnd, sl.end!=null?sl.end:sl.start+30); });
+    gridEnd=Math.ceil(maxEnd/30)*30;
+  } else { gridStart=9*60; gridEnd=18*60; }
+  const totalMin=gridEnd-gridStart, H=totalMin*PXMIN;
+  let ruler='';
+  for(let t=gridStart;t<=gridEnd;t+=30){ ruler+=`<div class="tg-tick" style="top:${(t-gridStart)*PXMIN}px">${fmtHM(t)}</div>`; }
+  let blocks='';
+  slots.forEach(sl=>{
+    const top=(sl.start-gridStart)*PXMIN;
+    const isPoint = sl.end==null;
+    const h = isPoint ? 28 : Math.max(30,(sl.end-sl.start)*PXMIN)-3;
+    const kind=sl.items[0].kind;
+    const added=sl.items.find(it=>it.kind==='added');
+    const clickAttr = added ? `onclick="event.stopPropagation();openSchedModal(${day.d},'${day.city}','${fmtHM(sl.start)}','${sl.end!=null?fmtHM(sl.end):fmtHM(sl.start+60)}',${added.idx})"` : '';
+    const body=sl.items.map(it=>{
+      const rng = it.end?`<small class="tg-rng">~${esc(it.end)}</small>`:'';
+      return `<div class="tg-item"><span class="tg-ic">${it.icon}</span><span class="tg-text">${it.html}${rng}</span></div>`;
+    }).join('');
+    blocks+=`<div class="tg-block ${kind}${isPoint?' point':''}${added?' editable':''}" ${clickAttr} style="top:${top}px;height:${h}px;border-left-color:${c.color}"><span class="tg-start">${fmtHM(sl.start)}</span><div class="tg-body">${body}</div></div>`;
+  });
+  const gl=`repeating-linear-gradient(to bottom, transparent 0, transparent ${30*PXMIN-1}px, rgba(0,0,0,0.06) ${30*PXMIN-1}px, rgba(0,0,0,0.06) ${30*PXMIN}px)`;
+  grid=`<div class="tg-hint">👆 빈 시간대를 <b>드래그</b>하면 새 일정이 추가돼요</div>
+    <div class="tg" style="height:${H}px"><div class="tg-axis">${ruler}</div>
+      <div class="tg-blocks" style="background-image:${gl}" onpointerdown="gridPointerDown(event,${day.d},'${day.city}',${gridStart},${PXMIN})">${blocks}</div>
+    </div>`;
   const untimedHTML = untimed.length? `<div class="tg-untimed">${untimed.map(it=>{
     const del = it.kind==='added'?`<span class="tl-del" onclick="delActivity(${it.dayNum},${it.idx})" title="삭제">✕</span>`:'';
     return `<div class="tg-uitem"><span class="tg-ic">${it.icon}</span><span>${it.html}</span>${del}</div>`; }).join('')}</div>`:'';
-  // 인라인 입력 (날짜별 본문)
-  const addForm=`<div class="gcal-add">
+  const addForm=`<details class="gcal-details"><summary>⌨️ 시간 직접 입력</summary>
+    <div class="gcal-add">
     <div class="gcal-row"><span class="gcal-ic">📝</span><input type="text" id="af2-text-${day.d}" class="gcal-title" placeholder="일정 제목 (예: 오르세 미술관)"></div>
-    <div class="gcal-row"><span class="gcal-ic">🕐</span>
-      <input type="time" id="af2-time-${day.d}" class="gcal-time"><span class="gcal-dash">~</span><input type="time" id="af2-end-${day.d}" class="gcal-time"><span class="gcal-hint">(종료 시각 → 블록 높이)</span></div>
+    <div class="gcal-row"><span class="gcal-ic">🕐</span><input type="time" id="af2-time-${day.d}" class="gcal-time"><span class="gcal-dash">~</span><input type="time" id="af2-end-${day.d}" class="gcal-time"></div>
     <div class="gcal-row"><span class="gcal-ic">📍</span><input type="text" id="af2-place-${day.d}" class="gcal-sub" placeholder="장소 (선택)"></div>
     <div class="gcal-row"><span class="gcal-ic">🗒️</span><input type="text" id="af2-memo-${day.d}" class="gcal-sub" placeholder="메모 (선택)"></div>
     <button class="day-add-btn gcal-btn" onclick="addActivityInline(${day.d},'${day.city}')">＋ 일정 추가</button>
-  </div>`;
+  </div></details>`;
   return grid + untimedHTML + addForm;
 }
 function daySummaryHTML(day){
@@ -3135,6 +3222,6 @@ init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11d</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11e</div>
 </body>
 </html>
