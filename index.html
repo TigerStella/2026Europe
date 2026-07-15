@@ -642,6 +642,33 @@
   .postit.open .postit-caret{transform:rotate(180deg);}
   .postit-detail{display:none;margin-top:8px;}
   .postit.open .postit-detail{display:block;}
+  /* 일정 타임테이블 그리드 (30분 고정축 + 소요시간 비례 블록) */
+  .day-summary{margin-top:4px;}
+  .ds-row{display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px dashed rgba(0,0,0,0.05);font-size:13.5px;}
+  .ds-time{flex:0 0 84px;font-weight:700;color:var(--slate);font-variant-numeric:tabular-nums;font-size:12px;}
+  .ds-time.none{color:rgba(0,0,0,0.25);}
+  .ds-ic{flex:0 0 auto;}
+  .ds-text{flex:1;line-height:1.5;}
+  .tg{position:relative;margin:8px 0 4px;padding-left:52px;}
+  .tg-axis{position:absolute;left:0;top:0;width:48px;height:100%;}
+  .tg-tick{position:absolute;left:0;font-size:10px;color:rgba(0,0,0,0.38);font-variant-numeric:tabular-nums;transform:translateY(-6px);border-top:1px solid rgba(0,0,0,0.06);width:48px;padding-top:1px;}
+  .tg-blocks{position:relative;height:100%;border-left:1px solid rgba(0,0,0,0.08);}
+  .tg-block{position:absolute;left:8px;right:0;background:#fff;border:1px solid rgba(0,0,0,0.07);border-left:3px solid var(--slate);border-radius:8px;padding:5px 8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
+  .tg-block.move{background:rgba(143,184,236,0.14);} .tg-block.hotel{background:rgba(255,158,134,0.13);} .tg-block.added{background:rgba(181,131,42,0.10);border-left-style:dashed;}
+  .tg-start{font-size:10px;font-weight:800;color:var(--slate);font-variant-numeric:tabular-nums;}
+  .tg-body{margin-top:1px;}
+  .tg-item{display:flex;align-items:flex-start;gap:5px;font-size:12.5px;line-height:1.4;}
+  .tg-ic{flex:0 0 auto;}
+  .tg-text{flex:1;}
+  .tg-rng{color:var(--text-light);margin-left:4px;font-size:11px;}
+  .tg-untimed{margin:6px 0;display:flex;flex-direction:column;gap:4px;}
+  .tg-uitem{display:flex;gap:6px;font-size:13px;color:var(--text-dark);padding:4px 8px;background:rgba(0,0,0,0.03);border-radius:8px;}
+  .day-expand{margin-top:8px;width:100%;padding:7px;border:1px dashed rgba(0,0,0,0.14);background:rgba(0,0,0,0.02);border-radius:9px;font-size:12.5px;font-weight:700;color:var(--slate);cursor:pointer;}
+  .day-add{margin-top:8px;padding:8px;border-radius:10px;background:rgba(0,0,0,0.03);display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+  .day-add-row{display:flex;align-items:center;gap:4px;}
+  .day-add-t{width:96px;padding:5px;border:1px solid rgba(0,0,0,0.12);border-radius:7px;font-size:12px;}
+  .day-add-x{flex:1;min-width:140px;padding:6px 8px;border:1px solid rgba(0,0,0,0.12);border-radius:7px;font-size:13px;}
+  .day-add-btn{padding:6px 12px;border:none;border-radius:7px;background:var(--sunset-gold);color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;}
   .emph-guide{margin-top:22px;padding:12px 14px;border-radius:10px;background:rgba(255,182,64,0.10);border:1px solid rgba(181,131,42,0.35);font-size:13px;line-height:1.7;}
   .emph-guide b{color:#B5832A;}
   .emph-line{margin-top:4px;}
@@ -1563,29 +1590,89 @@ function dayTimedItems(day){
   (addedActs[day.d]||[]).forEach((a,ai)=> items.push({time:a.time||'', end:a.endTime||'', icon:a.ic||'📌', html:esc(a.t), kind:'added', dayNum:day.d, idx:ai}));
   return items.map((it,i)=>({...it, _i:i})).sort((a,b)=> (timeKey(a.time)-timeKey(b.time)) || (a._i-b._i));
 }
+function fmtHM(m){ const h=Math.floor(m/60), mm=m%60; return (h<10?'0'+h:''+h)+':'+(mm<10?'0'+mm:mm); }
+let expandedDays = new Set();
+function toggleDayExpand(d){ if(expandedDays.has(d)) expandedDays.delete(d); else expandedDays.add(d); refreshTimelines(); }
+function addActivityInline(d,k){
+  const t=(document.getElementById('af2-text-'+d)||{}).value; if(!t||!t.trim()){ toast('내용을 입력해주세요'); return; }
+  const time=(document.getElementById('af2-time-'+d)||{}).value||'';
+  const endTime=(document.getElementById('af2-end-'+d)||{}).value||'';
+  if(!addedActs[d]) addedActs[d]=[];
+  addedActs[d].push({ ic:'📌', t:t.trim(), time:time.trim(), endTime:endTime.trim() });
+  save(LS.acts, addedActs);
+  expandedDays.add(d);
+  refreshTimelines();
+  toast('일정이 추가됐어요 ✨');
+}
+function dayGridHTML(day, c){
+  const items=dayTimedItems(day);
+  const timed=items.filter(it=>timeKey(it.time)!==9999);
+  const untimed=items.filter(it=>timeKey(it.time)===9999);
+  let grid='';
+  if(timed.length){
+    // 같은 시작시각끼리 한 슬롯으로 묶기
+    const slots=[];
+    timed.forEach(it=>{ const st=timeKey(it.time); const last=slots[slots.length-1]; if(last&&last.start===st) last.items.push(it); else slots.push({start:st, items:[it]}); });
+    const PXMIN=1.5, MINH=36;
+    const gridStart=Math.floor(slots[0].start/30)*30;
+    let lastEnd=slots[slots.length-1].start;
+    slots[slots.length-1].items.forEach(it=>{ if(it.end) lastEnd=Math.max(lastEnd, timeKey(it.end)); });
+    if(lastEnd<=slots[slots.length-1].start) lastEnd=slots[slots.length-1].start+60;
+    const gridEnd=Math.ceil(lastEnd/30)*30;
+    slots.forEach((sl,i)=>{ sl.end = (i<slots.length-1)?slots[i+1].start:lastEnd; });
+    const totalMin=gridEnd-gridStart, H=totalMin*PXMIN;
+    let ruler='';
+    for(let t=gridStart;t<=gridEnd;t+=30){ ruler+=`<div class="tg-tick" style="top:${(t-gridStart)*PXMIN}px">${fmtHM(t)}</div>`; }
+    let blocks='';
+    slots.forEach(sl=>{
+      const top=(sl.start-gridStart)*PXMIN;
+      const h=Math.max(MINH,(sl.end-sl.start)*PXMIN)-4;
+      const kind=sl.items[0].kind;
+      const body=sl.items.map(it=>{
+        const del = it.kind==='added'?`<span class="tl-del" onclick="event.stopPropagation();delActivity(${it.dayNum},${it.idx})" title="삭제">✕</span>`:'';
+        const rng = it.end?`<small class="tg-rng">~${esc(it.end)}</small>`:'';
+        return `<div class="tg-item"><span class="tg-ic">${it.icon}</span><span class="tg-text">${it.html}${rng}</span>${del}</div>`;
+      }).join('');
+      blocks+=`<div class="tg-block ${kind}" style="top:${top}px;height:${h}px;border-left-color:${c.color}"><span class="tg-start">${fmtHM(sl.start)}</span><div class="tg-body">${body}</div></div>`;
+    });
+    grid=`<div class="tg" style="height:${H}px"><div class="tg-axis">${ruler}</div><div class="tg-blocks">${blocks}</div></div>`;
+  }
+  const untimedHTML = untimed.length? `<div class="tg-untimed">${untimed.map(it=>{
+    const del = it.kind==='added'?`<span class="tl-del" onclick="delActivity(${it.dayNum},${it.idx})" title="삭제">✕</span>`:'';
+    return `<div class="tg-uitem"><span class="tg-ic">${it.icon}</span><span>${it.html}</span>${del}</div>`; }).join('')}</div>`:'';
+  // 인라인 입력 (날짜별 본문)
+  const addForm=`<div class="day-add">
+    <div class="day-add-row"><input type="time" id="af2-time-${day.d}" class="day-add-t"><span>~</span><input type="time" id="af2-end-${day.d}" class="day-add-t"></div>
+    <input type="text" id="af2-text-${day.d}" class="day-add-x" placeholder="이 날 일정 추가 (예: 오르세 미술관 14:00)">
+    <button class="day-add-btn" onclick="addActivityInline(${day.d},'${day.city}')">＋ 추가</button>
+  </div>`;
+  return grid + untimedHTML + addForm;
+}
+function daySummaryHTML(day){
+  const items=dayTimedItems(day);
+  const majors=items.filter(it=> it.kind==='move'||it.kind==='hotel'|| it.end );
+  const show=(majors.length?majors:items).slice(0,5);
+  if(!show.length) return '<p class="hint" style="padding:4px 0">아직 세부 일정이 없어요. 펼쳐서 추가해보세요.</p>';
+  return `<div class="day-summary">${show.map(it=>{
+    const t = timeKey(it.time)!==9999 ? `<span class="ds-time">${esc(it.time)}${it.end?'~'+esc(it.end):''}</span>` : '<span class="ds-time none">·</span>';
+    return `<div class="ds-row">${t}<span class="ds-ic">${it.icon}</span><span class="ds-text">${it.html}</span></div>`;
+  }).join('')}</div>`;
+}
 function renderCityTimeline(k){
   const days = DAYS.filter(d=>d.city===k);
   if(!days.length) return '<p class="hint">일정이 없어요.</p>';
   return days.map((day,idx)=>{
     const c=CITIES[k]; const last = idx===days.length-1;
-    const items=dayTimedItems(day);
-    const rows=items.map(it=>{
-      const timed = timeKey(it.time)!==9999;
-      const badge = it.kind==='move' ? '<span class="tl-kind move">이동</span>' : (it.kind==='hotel' ? '<span class="tl-kind hotel">숙소</span>' : '');
-      const del = it.kind==='added' ? `<span class="tl-del" onclick="delActivity(${it.dayNum},${it.idx})" title="삭제">✕</span>` : '';
-      const timeCell = timed ? `${esc(it.time)}${it.end?`<small>~${esc(it.end)}</small>`:''}` : '·';
-      return `<div class="tl-row ${it.kind==='added'?'added':''}">
-        <span class="tl-time ${timed?'':'none'}">${timeCell}</span>
-        <span class="tl-axis"><span class="tl-dot" style="background:${c.color}"></span></span>
-        <span class="tl-main"><span class="tl-ic">${it.icon}</span><span class="tl-text">${it.html}${badge}</span>${del}</span>
-      </div>`;
-    }).join('');
+    const open=expandedDays.has(day.d);
+    const total=dayTimedItems(day).length;
+    const mid = open ? dayGridHTML(day,c) : daySummaryHTML(day);
     return `<div class="day-block">
       <div class="day-left"><div class="day-circle ${c.cls}"><span class="day-num">D${day.d}</span><span class="day-date">${day.date}</span></div>${last?'':`<div class="day-line ${c.cls}-line"></div>`}</div>
       <div class="day-right ${c.cls}-border">
         <div class="day-meta"><span class="day-weekday">${day.wd}</span><span class="city-badge ${c.cls}">${c.name}</span></div>
         <div class="day-title">${esc(day.title)}</div>
-        ${rows?`<div class="tl-list">${rows}</div>`:''}
+        ${mid}
+        <button class="day-expand" onclick="toggleDayExpand(${day.d})">${open?'▲ 접기':`▼ 전체 일정 펼치기 (${total})`}</button>
         ${day.foot?`<div class="day-foot">${day.foot}</div>`:''}
       </div>
     </div>`;
@@ -3009,6 +3096,6 @@ init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11b</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11c</div>
 </body>
 </html>
