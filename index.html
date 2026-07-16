@@ -657,6 +657,11 @@
   .tg-block.point{padding:3px 8px;}
   .tg-block.editable{cursor:pointer;}
   .tg-block.dragging{opacity:.9;box-shadow:0 6px 18px rgba(0,0,0,0.25);z-index:20;cursor:grabbing;}
+  .story-btn{display:inline-flex;align-items:center;gap:4px;margin:0 0 8px;padding:6px 13px;border:none;border-radius:16px;background:linear-gradient(135deg,#7C6EFF,#FF6ECF);color:#fff;font-size:12.5px;font-weight:800;cursor:pointer;box-shadow:0 2px 8px rgba(124,110,255,0.3);}
+  .story-modal{position:relative;max-width:520px;}
+  .story-x{position:absolute;top:10px;right:12px;border:none;background:transparent;font-size:20px;color:var(--text-light);cursor:pointer;line-height:1;}
+  .story-body{font-family:'MaruBuri','Noto Sans KR',serif;font-size:15px;line-height:1.8;color:var(--text-dark);margin-top:8px;}
+  .story-body b{color:#6B4FE0;}
   .tg-select{position:absolute;left:8px;right:2px;background:rgba(122,138,255,0.18);border:1.5px solid #7A8AFF;border-radius:8px;font-size:11px;font-weight:800;color:#4A57C8;padding:2px 6px;pointer-events:none;z-index:5;overflow:hidden;}
   .tg-block{position:absolute;left:8px;right:0;background:#fff;border:1px solid rgba(0,0,0,0.07);border-left:3px solid var(--slate);border-radius:8px;padding:5px 8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
   .tg-block.move{background:rgba(143,184,236,0.14);} .tg-block.hotel{background:rgba(255,158,134,0.13);} .tg-block.added{background:rgba(181,131,42,0.10);border-left-style:dashed;}
@@ -880,6 +885,14 @@
 <div id="related" class="tab-section">
   <div class="container">
     <div class="section-header">
+      <span class="section-icon">📚</span>
+      <span class="section-title">도서 리스트</span>
+      <span class="section-sub">Google Books 검색</span>
+    </div>
+    <p class="hint">+ 타일 → 책 제목으로 검색해 표지와 함께 추가. 다 읽으면 <strong>읽음</strong> 버튼을 눌러 체크하세요.</p>
+    <div class="tiles" id="bookTiles"></div>
+
+    <div class="section-header" style="margin-top:32px">
       <span class="section-icon">📺</span>
       <span class="section-title">유튜브 영상</span>
       <span class="section-sub">+ 타일로 URL 추가</span>
@@ -888,14 +901,6 @@
     <div class="tiles" id="videoTiles-spot"></div>
     <div class="rel-subhead" style="margin-top:18px">📜 역사 공부</div>
     <div class="tiles" id="videoTiles-history"></div>
-
-    <div class="section-header" style="margin-top:32px">
-      <span class="section-icon">📚</span>
-      <span class="section-title">도서 리스트</span>
-      <span class="section-sub">Google Books 검색</span>
-    </div>
-    <p class="hint">+ 타일 → 책 제목으로 검색해 표지와 함께 추가. 다 읽으면 <strong>읽음</strong> 버튼을 눌러 체크하세요.</p>
-    <div class="tiles" id="bookTiles"></div>
 
     <div class="section-header" style="margin-top:32px">
       <span class="section-icon">✍️</span>
@@ -1223,6 +1228,7 @@ const DAYS = [
     acts:[ {ic:'🚇', t:'히드로 공항 → 숙소 이동 (히드로 익스프레스 or 지하철)'} ] },
   { d:2, date:'9/26', wd:'토', city:'london', badges:['런던'],
     title:'영국박물관 · 코벤트가든 · 뮤지컬',
+    story:'영국박물관에서 꼭 찾아야 할 건 <b>로제타석</b>이야. 시커먼 돌에 같은 내용이 <b>세 가지 문자(이집트 그림문자·이집트 흘림문자·그리스어)</b>로 적혀 있는데, 이 돌 덕분에 학자들이 <b>아무도 못 읽던 이집트 상형문자를 해독</b>했지 — 고대 이집트의 비밀을 푸는 열쇠였어! 미라관에선 3천 년 전 사람도 만날 수 있단다.',
     hotel:{ time:'17:00', text:'<strong>파크 런던 (시내)</strong> 체크인 — 샤워·짐 정리' },
     acts:[
       {ic:'🚇', t:'T4 체크아웃 → 피카딜리선 (T4 종점 탑승) · ⚠️ 출발 2주 전 TfL 운행 확인', time:'08:20'},
@@ -1237,6 +1243,7 @@ const DAYS = [
     ] },
   { d:3, date:'9/27', wd:'일', city:'london', badges:['런던'],
     title:'해리포터 스튜디오 투어',
+    story:'여기는 <b>진짜 해리포터 영화를 찍은 스튜디오</b>야. 그레이트홀, 다이애건 앨리, 호그와트 급행열차가 다 실제로 세운 세트란다. 배우들이 하늘 나는 장면은 <b>초록 천(그린스크린)</b> 앞에서 빗자루에 앉아 찍고 배경만 나중에 바꾼 거야. 마지막의 거대한 호그와트 성은 사실 <b>손바닥만 한 미니어처 모형</b>인데 영화에선 엄청 커 보이지!',
     foot:'🎫 티켓 예약 공식 사이트 : <a href="https://www.wbstudiotour.co.uk/tickets/?hl=ko-KR" target="_blank" rel="noopener">wbstudiotour.co.uk/tickets</a><br>🚂 기타 예매 사이트 : <a href="https://www.nationalrail.co.uk/journey-planner/?type=return&amp;origin=EUS&amp;destination=WFJ&amp;leavingType=departing&amp;leavingDate=270926&amp;leavingHour=09&amp;leavingMin=30&amp;returnType=departing&amp;returnDate=270926&amp;returnHour=16&amp;returnMin=30&amp;adults=1&amp;children=1&amp;extraTime=0#I" target="_blank" rel="noopener">National Rail (Euston↔Watford)</a>',
     acts:[
       {ic:'🍳', t:'한인민박 조식 · 여유롭게 준비 · 아침 넉넉 ✅', time:'08:30', endTime:'09:45'},
@@ -1264,6 +1271,7 @@ const DAYS = [
     ] },
   { d:4, date:'9/28', wd:'월', city:'london', badges:['런던'],
     title:'사우스켄싱턴 뮤지엄 데이',
+    story:'런던 자연사박물관엔 거대한 <b>공룡 뼈</b>가 가득해. 특히 힌츠홀 천장엔 <b>진짜 대왕고래(블루웨일) 뼈</b>가 매달려 있는데, 지구에서 <b>가장 큰 동물</b>이라 심장만 해도 자동차만 하대! 옆 과학박물관 원더랩에선 번개·우주·힘을 직접 만져보며 실험할 수 있어.',
     acts:[
       {ic:'🚇', t:'숙소 출발 → 피카딜리선 (러셀스퀘어→사우스켄싱턴, 20분)', time:'09:20'},
       {ic:'🦕', t:'자연사박물관 오픈런 · 무료 시간지정권 사전예약 필수', time:'10:00'},
@@ -1277,6 +1285,7 @@ const DAYS = [
     ] },
   { d:5, date:'9/29', wd:'화', city:'paris', badges:['런던','→','파리'],
     title:'런던 출발 → 파리 · 에펠 저녁 산책',
+    story:'<b>에펠탑</b>은 1889년 파리 만국박람회 때 세운 철탑이야. 처음엔 파리 사람들이 "흉측하다!"며 싫어해서 <b>20년 뒤 철거될 뻔</b>했대. 그런데 꼭대기가 <b>라디오·전파 안테나</b>로 쓸모가 커서 살아남았고, 지금은 세계가 사랑하는 탑이 됐지. 밤마다 정시엔 5분간 반짝반짝 빛나!',
     transport:{ icon:'🚂', time:'12:31', text:'<strong>유로스타</strong> 12:31 런던 출발 → 15:59 파리 북역 · <strong>10:30까지 역 도착</strong>' },
     hotel:{ time:'16:30', text:'루프라라 1호점 (파리시내 한인민박) 체크인 · 짐 정리 (택시) · 짐보관 가능' },
     foot:'✅ <b>오늘 할 일</b><br>☐ 노트르담 앱 계정 미리 생성 (예약은 방문 2~3일 전에만 열림)<br>☐ 유심/이심 개통 확인 · 숙소 와이파이 연결',
@@ -1289,6 +1298,7 @@ const DAYS = [
     ] },
   { d:6, date:'9/30', wd:'수', city:'paris', badges:['파리'],
     title:'루브르 · 오르세 미술관',
+    story:'루브르는 원래 <b>성(요새)이자 왕이 살던 궁전</b>이었어 — 그래서 이렇게 어마어마하게 크지! 가장 유명한 그림 다빈치의 <b>모나리자</b>는 1911년에 <b>도둑맞은 사건</b> 덕분에 전 세계에 더 유명해졌대. 2년 뒤 되찾았고, 지금은 방탄유리 안에서 은은하게 웃고 있단다.',
     foot:'🎟️ <b>예약</b> · 루브르 <a href="https://www.ticket.louvre.fr" target="_blank" rel="noopener">ticket.louvre.fr</a> (90일 전 오픈·지금 예약 가능 · 비EEA 성인 €32 · <b>18세 미만 무료</b> · 오전 9시 슬롯 먼저 매진 → 오후가 여유) · 오르세 <a href="https://billetterie.musee-orsay.fr" target="_blank" rel="noopener">billetterie.musee-orsay.fr</a> (권장 · 아동 무료)<br>✅ <b>오늘 할 일</b> ☐ 루브르 예약 재확인 ☐ 오르세 예약 ☐ 노트르담 슬롯 오픈 재확인(자정 파리시간) ☐ 아이에게 "루브르 2시간 = 핵심 3작품" 설명',
     acts:[
       {ic:'🖼️', t:'루브르 (1호선, ⭐예약 필수) — 모나리자·비너스 하이라이트 약 2시간', time:'10:00', endTime:'12:00'},
@@ -1298,6 +1308,7 @@ const DAYS = [
     ] },
   { d:7, date:'10/1', wd:'목', city:'munich', badges:['파리','→','뮌헨'],
     title:'노트르담 → 파리 출발 · 뮌헨행 (TGV)',
+    story:'<b>노트르담 대성당</b>은 약 850년 전에 짓기 시작한 거대한 성당이야. 소설 "노트르담의 꼽추"에서 종지기 콰지모도가 살던 곳이지. 2019년 <b>큰 불로</b> 지붕이 무너졌지만 전 세계가 힘을 모아 복원해 2024년 다시 문을 열었어. 뾰족한 첨탑과 무서운 얼굴의 <b>가고일 석상</b>을 찾아보렴!',
     transport:{ icon:'🚄', time:'15:55', end:'21:36', text:'<strong>TGV 9577</strong> · 15:55 파리 동역 출발 → 21:36 뮌헨 중앙역 · 앱: DB' },
     hotel:{ time:'21:36', text:'뮌헨 도착 → Aparthotel Adagio Access München City 체크인' },
     foot:'⛪ <b>노트르담(무료)</b> 예약 <a href="https://resa.notredamedeparis.fr" target="_blank" rel="noopener">resa.notredamedeparis.fr</a> · 앱 "Cathédrale Notre-Dame de Paris" · 슬롯 방문 2~3일 전 오픈(자정 직후 파리시간 성공률↑) · 목요일 22시까지·19시 후 한산<br>🚄 TGV 9577 <b>DB 앱에서 e티켓 오프라인 저장</b> (시내 와이파이 불안정 대비)<br>✅ <b>오늘 할 일</b> ☐ 아침(또는 전날 밤) 노트르담 당일 슬롯 예약 ☐ 동역 짐보관 실행 ☐ TGV e티켓 오프라인 ☐ 여권 소지',
@@ -1310,6 +1321,7 @@ const DAYS = [
     ] },
   { d:8, date:'10/2', wd:'금', city:'munich', badges:['뮌헨'],
     title:'올림픽공원 · FC Bayern Store',
+    story:'뮌헨 올림픽공원은 <b>1972년 올림픽</b>이 열린 곳이야. 지붕이 거미줄·텐트처럼 물결치는 특이한 모양인데 당시엔 아주 미래적인 디자인이었대. 지금은 넓은 잔디밭과 놀이터가 있어 뛰어놀기 딱 좋아. 근처 <b>FC 바이에른 뮌헨</b> 스토어는 축구 팬이라면 꼭!',
     foot:'⚽ <b>펍 축구 관람</b> — 숙소 인근 스포츠펍 전화/구글맵으로 <b>킥오프 시각·좌석 사전 확인</b> · 전반+후반만 보고 조기 복귀',
     acts:[
       {ic:'😴', t:'늦잠 · 아파트 취사 조식 (회복 최우선)', time:'08:30', endTime:'10:30'},
@@ -1324,6 +1336,7 @@ const DAYS = [
     ] },
   { d:9, date:'10/3', wd:'토', city:'munich', badges:['뮌헨'],
     title:'추크슈피체 알프스 정상 · 아이브제 호수',
+    story:'<b>추크슈피체</b>는 2,962m로 <b>독일에서 가장 높은 산</b>이야. 톱니바퀴 기차와 케이블카로 오르면 10월인데도 <b>안 녹고 쌓인 만년설</b>을 만질 수 있어! 정상에선 독일·오스트리아 알프스가 한눈에 보이고 발밑으로 구름이 지나간단다. 정상은 영하니까 방한복 꼭 챙기기!',
     foot:'⭐ <b>가르미셔 콤비티켓</b> — 뮌헨중앙역 자판기 or <a href="https://zugspitze.de" target="_blank" rel="noopener">zugspitze.de</a> · 날씨 유동성 위해 1~2일 전 구매 권장 (성인 €72 / 청소년 €57.5 / 아동 €36)<br>⚠️ 당일 아침 <a href="https://zugspitze.de" target="_blank" rel="noopener">zugspitze.de</a>에서 <b>케이블카 실시간 운행상태</b> 확인 (기상 악화 시 운휴)',
     acts:[
       {ic:'⏰', t:'기상·중앙역 이동 (택시·도시락 지참)', time:'06:00', endTime:'06:32'},
@@ -1339,6 +1352,7 @@ const DAYS = [
     ] },
   { d:10, date:'10/4', wd:'일', city:'munich', badges:['뮌헨'],
     title:'BMW 박물관 · 알리안츠 아레나 투어',
+    story:'<b>BMW</b>는 원래 자동차가 아니라 <b>비행기 엔진</b>을 만들던 회사였어. 그래서 로고의 파랑·흰 무늬가 빙글빙글 도는 <b>프로펠러</b>를 뜻한다는 이야기가 있지. 근처 <b>알리안츠 아레나</b>는 FC 바이에른의 홈 축구장인데, <b>바깥벽 전체가 밤이면 빨강·파랑·하양으로 빛나는</b> 세상에 하나뿐인 경기장이야!',
     foot:'⭐ <b>알리안츠 아레나 투어</b> <a href="https://fcbayern.com/en/tours" target="_blank" rel="noopener">fcbayern.com/en/tours</a> — 일요일 시간대 조기 마감·<b>사전 예약 필수</b>·홈경기 충돌 재확인 · 🚗 <b>BMW 박물관</b> <a href="https://bmw-welt.com" target="_blank" rel="noopener">bmw-welt.com</a> (온라인 소폭 할인)<br>⭐ <b>10/5 새벽 공항 택시</b> — 숙소 프런트 or Bolt/FreeNow 앱으로 <b>05:15 픽업 전날 예약</b>',
     acts:[
       {ic:'😴', t:'늦잠·조식 (회복)', time:'09:00', endTime:'10:00'},
@@ -1354,23 +1368,52 @@ const DAYS = [
       {ic:'💰', t:'비용: 224,270원'}
     ] },
   { d:11, date:'10/5', wd:'월', city:'florence', badges:['뮌헨','→','피렌체'],
-    title:'뮌헨 출발 → 피렌체 이동 (비행기)',
-    transport:{ icon:'✈️', time:'07:55', text:'<strong>Lufthansa LH</strong> · 07:55 뮌헨 MUC 출발 → 피렌체 FLR (약 1:15)' },
-    hotel:{ time:'14:00', text:'Hotel San Giorgio & Olimpic 체크인 14:00 · 신분증 지참' },
-    foot:'🚕 <b>10/5 새벽 공항 택시</b> 전날 예약 (숙소 프런트 or Bolt/FreeNow) · ✈️ 10/5 e티켓 오프라인 저장',
+    title:'뮌헨 출발 → 피렌체 · 두오모 지구',
+    transport:{ icon:'✈️', time:'07:55', end:'13:15', text:'<strong>Lufthansa LH</strong> · 07:55 뮌헨 MUC 출발 → 13:15 피렌체 FLR 도착 (약 1:15)' },
+    story:'피렌체 두오모의 거대한 붉은 <b>돔</b>은, 1436년 완성될 때 <b>인류가 만든 가장 큰 벽돌 돔</b>이었어. 고대 로마의 판테온 이후 이렇게 큰 돔은 처음이었지! 건축가 브루넬레스키는 "저 큰 지붕을 어떻게 안 무너지게 올리지?"라는 문제를 몇 년이나 고민해서 풀었고, 그래서 이 돔은 <b>"르네상스 공학의 상징"</b>이라 불려.<br><br>옆에 있는 세례당의 반짝이는 청동문은 별명이 <b>"천국의 문"</b>이고, 폰테 베키오 다리는 2차 세계대전 때 피렌체에서 유일하게 폭파되지 않고 살아남은 다리란다.',
+    foot:'🏛️ <b>월요일은 미술관 휴관</b> — 야외·건축으로 완벽 상쇄 (도착 첫날 무리 없이 좋아요) · 🚕 새벽 공항택시/e티켓은 전날 준비',
     acts:[
       {ic:'⏰', t:'기상·최종 확인', time:'04:45', endTime:'05:15'},
       {ic:'🚕', t:'숙소 → MUC 공항 (택시·사전예약 필수)', time:'05:15', endTime:'06:00'},
       {ic:'🛃', t:'체크인·보안·탑승', time:'06:00', endTime:'07:55'},
+      {ic:'🏨', t:'택시로 숙소 이동·체크인·짐 (Hotel San Giorgio·두오모 도보 5분)', time:'13:15', endTime:'14:30'},
+      {ic:'🍽️', t:'점심 (숙소 근처)', time:'14:30', endTime:'15:30'},
+      {ic:'⛪', t:'두오모(산타 마리아 델 피오레) 광장 — 브루넬레스키의 돔', time:'15:30', endTime:'17:00'},
+      {ic:'🚪', t:'산 조반니 세례당 — 천국의 문', time:'17:00', endTime:'17:30'},
+      {ic:'🌉', t:'베키오 다리(폰테 베키오) 산책', time:'17:30', endTime:'18:30'},
+      {ic:'🌇', t:'미켈란젤로 광장 일몰 (버스/택시) · 도시 전경·다비드 복제상', time:'18:30', endTime:'19:30'},
+      {ic:'🥩', t:'저녁 (피오렌티나 스테이크)', time:'19:30'},
       {ic:'⚠️', t:'사진 있는 신분증 지참 필수'}
     ] },
   { d:12, date:'10/6', wd:'화', city:'florence', badges:['피렌체'],
-    title:'피사 당일치기 · 오후 피렌체 산책', acts:[] },
+    title:'피사 당일치기 · 오후 피렌체',
+    story:'피사의 사탑은 <b>일부러 기울인 게 아니야!</b> 12세기에 종탑을 짓다가 땅이 물렁물렁해서 한쪽으로 서서히 기울어졌대. 사람들이 800년 넘게 "넘어질까?" 조마조마했지만 지금도 멀쩡히 서 있어. 이 도시엔 과학자 <b>갈릴레오</b>가 "무거운 공과 가벼운 공, 누가 먼저 떨어질까?"를 실험했다는 전설도 있단다.<br><br>오후에 볼 <b>다비드</b> 조각상은 미켈란젤로가 커다란 대리석 하나를 3년 동안 깎아 만든 건데, 키가 5m가 넘어!',
+    foot:'⭐ <b>아카데미아(다비드)</b> <a href="https://www.galleriaaccademiafirenze.it" target="_blank" rel="noopener">galleriaaccademiafirenze.it</a> (월 휴관·소규모라 조기 매진) · <b>피사 사탑 등탑</b>(원할 시) <a href="https://www.opapisa.it" target="_blank" rel="noopener">opapisa.it</a> (시간지정·아이 8세+) · 기차 <a href="https://www.trenitalia.com" target="_blank" rel="noopener">trenitalia.com</a>',
+    acts:[
+      {ic:'🍳', t:'조식·준비', time:'07:30', endTime:'08:00'},
+      {ic:'🚂', t:'피렌체 S.M.N. → 피사 첸트랄레 (약 1시간·지역열차·첫차 한산)', time:'08:00', endTime:'09:15'},
+      {ic:'🚶', t:'피사 도착 → 버스/도보로 미라콜리 광장', time:'09:15', endTime:'09:30'},
+      {ic:'🗼', t:'피사의 사탑 + 두오모 + 세례당', time:'09:30', endTime:'12:00'},
+      {ic:'🍽️', t:'점심 (피사)', time:'12:00', endTime:'13:00'},
+      {ic:'🚂', t:'피사 → 피렌체 복귀 · 이동', time:'13:00', endTime:'14:30'},
+      {ic:'🗿', t:'아카데미아 갤러리 (⭐예약·화요일 개관) — 미켈란젤로 다비드 원본', time:'14:30', endTime:'16:30'},
+      {ic:'🍦', t:'휴식·젤라토', time:'16:30', endTime:'18:00'},
+      {ic:'🍝', t:'저녁·중앙시장 (메르카토 첸트랄레)', time:'18:00'}
+    ] },
   { d:13, date:'10/7', wd:'수', city:'rome', badges:['피렌체','→','로마'],
-    title:'피렌체 → 로마 이동 (Italo)',
-    transport:{ icon:'🚄', time:'12:28', text:'<strong>Italo 8902</strong> 12:28 Firenze S.M.N. 출발 → 로마 (약 2시간반) · 앱: Italo' },
-    hotel:{ time:'14:00', text:"Mandruchello's 아파트 (바티칸 근처) 체크인 14:00 · 침실 2개" },
-    acts:[ {ic:'💳', t:'KRW 49,872원 · 사진 신분증 + 결제카드 지참'} ] },
+    title:'우피치 오전 → 로마행 (Italo)',
+    transport:{ icon:'🚄', time:'12:28', end:'15:00', text:'<strong>Italo 8902</strong> 12:28 Firenze S.M.N. 출발 → 로마 (약 2시간반) · 앱: Italo' },
+    hotel:{ time:'15:00', text:"Mandruchello's 아파트 (바티칸 근처) 체크인 · 침실 2개" },
+    story:'우피치 미술관은 원래 이름 뜻이 "사무실(office=우피치)"인 건물이었어. 피렌체를 다스린 부자 가문 <b>메디치</b>가 모은 그림들을 여기 모아뒀지. 보티첼리의 <b>"비너스의 탄생"</b>(조개껍데기 위에 선 여신!)과 "봄", 그리고 다빈치·라파엘로의 그림까지 다 있단다.<br><br>사실 피렌체 여행은 <b>"메디치 가문이 예술가들에게 돈을 대주며 르네상스를 꽃피웠다"</b>는 이야기 하나로 도시 전체가 쭉 연결돼. 이 흐름만 알면 아이도 훨씬 재밌어해요!',
+    foot:'⭐ <b>우피치 미술관</b> <a href="https://www.b-ticket.com/b-ticket/uffizi" target="_blank" rel="noopener">b-ticket.com/b-ticket/uffizi</a> (월 휴관·개관 직후 예약) · 두오모 돔 등반(선택·463계단) <a href="https://duomo.firenze.it" target="_blank" rel="noopener">duomo.firenze.it</a>',
+    acts:[
+      {ic:'🍳', t:'조식·체크아웃·짐 보관(호텔)', time:'08:00', endTime:'08:15'},
+      {ic:'🖼️', t:'우피치 미술관 (⭐예약·개관 직후) 핵심 관람 (약 2시간)', time:'08:15', endTime:'10:30'},
+      {ic:'🏛️', t:'시뇨리아 광장 · 베키오 궁전 외관', time:'10:30', endTime:'11:30'},
+      {ic:'🧳', t:'호텔 짐 회수 → S.M.N.역 (도보 5분)', time:'11:30', endTime:'12:00'},
+      {ic:'🚉', t:'역 도착·대기', time:'12:00', endTime:'12:28'},
+      {ic:'💳', t:'KRW 49,872원 · 사진 신분증 + 결제카드 지참'}
+    ] },
   { d:14, date:'10/8', wd:'목', city:'rome', badges:['로마'],
     title:'바티칸 박물관 & 성 베드로 성당', acts:[] },
   { d:15, date:'10/9', wd:'금', city:'rome', badges:['로마'],
@@ -1427,6 +1470,13 @@ const PREP_TODO = {
     {t:'BMW 박물관 (10/4)', a:'bmw-welt.com · 당일 가능하나 온라인 소폭 할인'},
     {t:'펍 축구 관람 (10/2)', a:'숙소 인근 스포츠펍 · 킥오프 시각·좌석 확인'},
     {t:'추크슈피체 날씨 확인', a:'악화 시 10/2·10/4와 순서 교체 (4박 고정이라 가능)'},
+  ],
+  florence:[
+    {t:'우피치 미술관 (10/7)', a:'b-ticket.com/b-ticket/uffizi · 월 휴관·개관 직후'},
+    {t:'아카데미아/다비드 (10/6)', a:'galleriaaccademiafirenze.it · 소규모라 조기 매진'},
+    {t:'피사 사탑 등탑 (선택)', a:'opapisa.it · 시간지정·아이 8세+'},
+    {t:'두오모 돔 등반 (선택)', a:'duomo.firenze.it · 463계단'},
+    {t:'피렌체→피사 기차', a:'trenitalia.com or 현장 · 지역열차 좌석지정 불필요'},
   ],
 };
 
@@ -1878,6 +1928,7 @@ function fillSchedModal(cur, isEdit){
   document.getElementById('schedModal').classList.add('open');
   setTimeout(()=>document.getElementById('schTitle').focus(), 60);
 }
+function openStory(d){ const day=DAYS.find(x=>x.d===d); if(!day||!day.story) return; document.getElementById('storyTitle').innerHTML='🪄 '+esc(day.date+' · '+day.title); document.getElementById('storyBody').innerHTML=day.story; document.getElementById('storyModal').classList.add('open'); }
 function openSchedNew(day, city, s, e){ schedTarget={src:'new', day, city}; fillSchedModal({time:s, endTime:e}, false); }
 function openSchedEdit(day, city, src, ref){
   let cur;
@@ -1978,6 +2029,7 @@ function renderCityTimeline(k){
     return `<div class="day-block">
       <div class="day-left"><div class="day-circle ${c.cls}"><span class="day-num">D${day.d}</span><span class="day-date">${day.date}</span></div>${last?'':`<div class="day-line ${c.cls}-line"></div>`}</div>
       <div class="day-right ${c.cls}-border">
+        ${day.story?`<button class="story-btn" onclick="openStory(${day.d})">🪄 흥미로운 이야기</button>`:''}
         <div class="day-meta"><span class="day-weekday">${day.wd}</span><span class="city-badge ${c.cls}">${c.name}</span></div>
         <div class="day-title">${esc(day.title)}</div>
         ${mid}
@@ -3442,6 +3494,15 @@ init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
+<!-- 흥미로운 이야기 MODAL -->
+<div class="modal-back" id="storyModal" onclick="if(event.target===this)closeModal('storyModal')">
+  <div class="modal story-modal">
+    <button class="story-x" onclick="closeModal('storyModal')" aria-label="닫기">✕</button>
+    <h3 id="storyTitle">🪄 흥미로운 이야기</h3>
+    <div id="storyBody" class="story-body"></div>
+  </div>
+</div>
+
 <!-- SCHEDULE (구글 캘린더식) MODAL -->
 <div class="modal-back" id="schedModal">
   <div class="modal">
@@ -3462,6 +3523,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11m</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-12c</div>
 </body>
 </html>
