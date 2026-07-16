@@ -656,6 +656,7 @@
   .tg-hint{font-size:11px;color:var(--text-light);margin:6px 0 2px;text-align:center;}
   .tg-block.point{padding:3px 8px;}
   .tg-block.editable{cursor:pointer;}
+  .tg-block.dragging{opacity:.9;box-shadow:0 6px 18px rgba(0,0,0,0.25);z-index:20;cursor:grabbing;}
   .tg-select{position:absolute;left:8px;right:2px;background:rgba(122,138,255,0.18);border:1.5px solid #7A8AFF;border-radius:8px;font-size:11px;font-weight:800;color:#4A57C8;padding:2px 6px;pointer-events:none;z-index:5;overflow:hidden;}
   .tg-block{position:absolute;left:8px;right:0;background:#fff;border:1px solid rgba(0,0,0,0.07);border-left:3px solid var(--slate);border-radius:8px;padding:5px 8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
   .tg-block.move{background:rgba(143,184,236,0.14);} .tg-block.hotel{background:rgba(255,158,134,0.13);} .tg-block.added{background:rgba(181,131,42,0.10);border-left-style:dashed;}
@@ -1646,7 +1647,46 @@ function addActivityInline(d,k){
   refreshTimelines();
   toast('일정이 추가됐어요 ✨');
 }
-let gridDrag=null;
+let gridDrag=null, blockDrag=null;
+function blockDragStart(e, day, city, src, ref, dur, gridStart, pxmin){
+  const isTouch=e.type==='touchstart'; const pt=isTouch?e.touches[0]:e; if(!pt) return;
+  if(!isTouch && e.button!==0) return;
+  e.stopPropagation(); e.preventDefault();
+  const el=e.currentTarget;
+  blockDrag={day,city,src,ref,dur,gridStart,pxmin, el, y0:pt.clientY, origTop:parseFloat(el.style.top)||0, moved:false};
+  if(isTouch){ document.addEventListener('touchmove',blockDragMove,{passive:false}); document.addEventListener('touchend',blockDragEnd); document.addEventListener('touchcancel',blockDragEnd); }
+  else { document.addEventListener('mousemove',blockDragMove); document.addEventListener('mouseup',blockDragEnd); }
+}
+function blockDragMove(e){
+  if(!blockDrag) return; const pt=e.touches?e.touches[0]:e; if(!pt) return;
+  const dy=pt.clientY-blockDrag.y0;
+  if(Math.abs(dy)>5) blockDrag.moved=true;
+  if(blockDrag.moved){
+    let nt=Math.max(0, blockDrag.origTop+dy);
+    blockDrag.el.style.top=nt+'px'; blockDrag.el.classList.add('dragging');
+    const ns=blockDrag.gridStart+Math.round((nt/blockDrag.pxmin)/15)*15;
+    const st=blockDrag.el.querySelector('.tg-start'); if(st) st.textContent=fmtHM(ns)+' ↕';
+    if(e.cancelable) e.preventDefault();
+  }
+}
+function blockDragEnd(e){
+  document.removeEventListener('touchmove',blockDragMove); document.removeEventListener('touchend',blockDragEnd); document.removeEventListener('touchcancel',blockDragEnd);
+  document.removeEventListener('mousemove',blockDragMove); document.removeEventListener('mouseup',blockDragEnd);
+  if(!blockDrag) return; const g=blockDrag; blockDrag=null;
+  if(!g.moved){ openSchedEdit(g.day, g.city, g.src, g.ref); return; }   // 탭 = 편집
+  const nt=parseFloat(g.el.style.top)||0;
+  const newStart=Math.max(0, Math.round((g.gridStart+nt/g.pxmin)/15)*15);
+  const newEnd = (g.dur!=null) ? newStart+g.dur : null;
+  if(g.src==='added'){
+    const a=(addedActs[g.day]||[])[g.ref];
+    if(a){ a.time=fmtHM(newStart); if(newEnd!=null) a.endTime=fmtHM(newEnd); save(LS.acts, addedActs); }
+  } else {
+    const cur=fixedItemData(g.day, g.ref)||{};
+    actEdits.overrides[g.ref]={ t:cur.t, time:fmtHM(newStart), endTime:(newEnd!=null?fmtHM(newEnd):(cur.endTime||'')), place:cur.place||'', memo:cur.memo||'' };
+    save(LS.actedit, actEdits);
+  }
+  refreshTimelines(); toast('일정을 옮겼어요 🕒');
+}
 function gridDragStart(e, day, city, gridStart, pxmin){
   const isTouch = e.type==='touchstart';
   const pt = isTouch ? e.touches[0] : e; if(!pt) return;
@@ -1749,9 +1789,11 @@ function dayGridHTML(day, c){
     const isPoint = sl.end==null;
     const h = isPoint ? 28 : Math.max(30,(sl.end-sl.start)*PXMIN)-3;
     const it0=sl.items[0]; const kind=it0.kind;
-    const clickAttr = it0.src==='added'
-      ? `onclick="event.stopPropagation();openSchedEdit(${day.d},'${day.city}','added',${it0.idx})"`
-      : `onclick="event.stopPropagation();openSchedEdit(${day.d},'${day.city}','fixed','${it0.fkey}')"`;
+    const refArg = it0.src==='added' ? it0.idx : `'${it0.fkey}'`;
+    const durArg = sl.end!=null ? (sl.end-sl.start) : 'null';
+    const clickAttr = sl.items.length===1
+      ? `ontouchstart="blockDragStart(event,${day.d},'${day.city}','${it0.src}',${refArg},${durArg},${gridStart},${PXMIN})" onmousedown="blockDragStart(event,${day.d},'${day.city}','${it0.src}',${refArg},${durArg},${gridStart},${PXMIN})"`
+      : `onclick="event.stopPropagation();openSchedEdit(${day.d},'${day.city}','${it0.src}',${refArg})"`;
     const body=sl.items.map(it=>{
       const rng = it.end?`<small class="tg-rng">~${esc(it.end)}</small>`:'';
       return `<div class="tg-item"><span class="tg-ic">${it.icon}</span><span class="tg-text">${it.html}${rng}</span></div>`;
@@ -1778,9 +1820,11 @@ function dayGridHTML(day, c){
 }
 function daySummaryHTML(day){
   const items=dayTimedItems(day);
+  if(!items.length) return '<p class="hint" style="padding:4px 0">아직 세부 일정이 없어요. 펼쳐서 추가해보세요.</p>';
   const majors=items.filter(it=> it.kind==='move'||it.kind==='hotel'|| it.end );
-  const show=(majors.length?majors:items).slice(0,5);
-  if(!show.length) return '<p class="hint" style="padding:4px 0">아직 세부 일정이 없어요. 펼쳐서 추가해보세요.</p>';
+  let show;
+  if(majors.length){ const keep=new Set(majors.map(m=>m._i)); keep.add(items[0]._i); show=items.filter(it=>keep.has(it._i)).slice(0,6); }
+  else show=items.slice(0,5);
   return `<div class="day-summary">${show.map(it=>{
     const t = timeKey(it.time)!==9999 ? `<span class="ds-time">${esc(it.time)}${it.end?'~'+esc(it.end):''}</span>` : '<span class="ds-time none">·</span>';
     return `<div class="ds-row">${t}<span class="ds-ic">${it.icon}</span><span class="ds-text">${it.html}</span></div>`;
@@ -3266,6 +3310,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11g</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11h</div>
 </body>
 </html>
