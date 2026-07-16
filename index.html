@@ -1276,17 +1276,38 @@ const DAYS = [
       {ic:'🅱️', t:'B안(체력 되면) · 타워브릿지 야경(~19:30) → 저녁 → 복귀', time:'18:00'}
     ] },
   { d:5, date:'9/29', wd:'화', city:'paris', badges:['런던','→','파리'],
-    title:'런던 출발 → 파리 이동 (유로스타)',
+    title:'런던 출발 → 파리 · 에펠 저녁 산책',
     transport:{ icon:'🚂', time:'12:31', text:'<strong>유로스타</strong> 12:31 런던 출발 → 15:59 파리 북역 · <strong>10:30까지 역 도착</strong>' },
-    hotel:{ time:'16:00', text:'루프라라 1호점 (파리시내 한인민박) 체크인 16:00 · 짐보관 가능' },
-    acts:[ {ic:'🚇', t:'파리 도착 후: 에펠탑 산책, 개선문, 세느강'}, {ic:'📞', t:'숙소 연락처는 팁 탭 › 긴급 연락처 참고 (비공개)'} ] },
+    hotel:{ time:'16:30', text:'루프라라 1호점 (파리시내 한인민박) 체크인 · 짐 정리 (택시) · 짐보관 가능' },
+    foot:'✅ <b>오늘 할 일</b><br>☐ 노트르담 앱 계정 미리 생성 (예약은 방문 2~3일 전에만 열림)<br>☐ 유심/이심 개통 확인 · 숙소 와이파이 연결',
+    acts:[
+      {ic:'🗼', t:'숙소 → 에펠탑 (도보 20분 or RER C 1정거장)', time:'18:00'},
+      {ic:'🌉', t:'센강 산책 (비르아켐 다리)', time:'18:30', endTime:'19:00'},
+      {ic:'🇫🇷', t:'개선문·샹젤리제 (6호선) — 체력 없으면 생략 OK', time:'19:30'},
+      {ic:'✨', t:'에펠탑 반짝임 (정시 5분간) 감상 → 복귀', time:'20:00'},
+      {ic:'📞', t:'숙소 연락처는 팁 탭 › 긴급 연락처 참고 (비공개)'}
+    ] },
   { d:6, date:'9/30', wd:'수', city:'paris', badges:['파리'],
-    title:'루브르 · 노트르담 성당', acts:[] },
+    title:'루브르 · 오르세 미술관',
+    foot:'🎟️ <b>예약</b> · 루브르 <a href="https://www.ticket.louvre.fr" target="_blank" rel="noopener">ticket.louvre.fr</a> (90일 전 오픈·지금 예약 가능 · 비EEA 성인 €32 · <b>18세 미만 무료</b> · 오전 9시 슬롯 먼저 매진 → 오후가 여유) · 오르세 <a href="https://billetterie.musee-orsay.fr" target="_blank" rel="noopener">billetterie.musee-orsay.fr</a> (권장 · 아동 무료)<br>✅ <b>오늘 할 일</b> ☐ 루브르 예약 재확인 ☐ 오르세 예약 ☐ 노트르담 슬롯 오픈 재확인(자정 파리시간) ☐ 아이에게 "루브르 2시간 = 핵심 3작품" 설명',
+    acts:[
+      {ic:'🖼️', t:'루브르 (1호선, ⭐예약 필수) — 모나리자·비너스 하이라이트 약 2시간', time:'10:00', endTime:'12:00'},
+      {ic:'🌳', t:'튈르리 공원 산책 + 벤치/카페 점심·휴식', time:'12:00', endTime:'14:00'},
+      {ic:'🎨', t:'오르세 미술관 (도보 10분) — 인상파 1.5~2h', time:'14:00', endTime:'16:00'},
+      {ic:'😌', t:'숙소 휴식 → 저녁 가볍게', time:'16:00'}
+    ] },
   { d:7, date:'10/1', wd:'목', city:'munich', badges:['파리','→','뮌헨'],
-    title:'파리 출발 → 뮌헨 이동 (TGV)',
+    title:'노트르담 → 파리 출발 · 뮌헨행 (TGV)',
     transport:{ icon:'🚄', time:'15:55', text:'<strong>TGV 9577</strong> · 15:55 파리 동역 출발 → 21:36 뮌헨 중앙역 · 앱: DB' },
-    hotel:{ time:'15:00', text:'Aparthotel Adagio Access München City 체크인 15:00' },
-    acts:[] },
+    hotel:{ time:'21:36', text:'뮌헨 도착 → Aparthotel Adagio Access München City 체크인' },
+    foot:'⛪ <b>노트르담(무료)</b> 예약 <a href="https://resa.notredamedeparis.fr" target="_blank" rel="noopener">resa.notredamedeparis.fr</a> · 앱 "Cathédrale Notre-Dame de Paris" · 슬롯 방문 2~3일 전 오픈(자정 직후 파리시간 성공률↑) · 목요일 22시까지·19시 후 한산<br>🚄 TGV 9577 <b>DB 앱에서 e티켓 오프라인 저장</b> (시내 와이파이 불안정 대비)<br>✅ <b>오늘 할 일</b> ☐ 아침(또는 전날 밤) 노트르담 당일 슬롯 예약 ☐ 동역 짐보관 실행 ☐ TGV e티켓 오프라인 ☐ 여권 소지',
+    acts:[
+      {ic:'🧳', t:'체크아웃 → 짐 들고 파리 동역으로 (택시) → 짐보관', time:'09:30'},
+      {ic:'⛪', t:'4호선 동역→시테 (직행) → 노트르담 대성당 (외관·내부)', time:'10:30'},
+      {ic:'🍽️', t:'시테/라탱 점심 마무리', time:'12:15'},
+      {ic:'🚇', t:'4호선으로 동역 복귀 · 짐 회수', time:'12:30'},
+      {ic:'🚉', t:'파리 동역 도착 (TGV 여유 확보)', time:'14:50'}
+    ] },
   { d:8, date:'10/2', wd:'금', city:'munich', badges:['뮌헨'],
     title:'올림픽공원 · FC Bayern Store', acts:[] },
   { d:9, date:'10/3', wd:'토', city:'munich', badges:['뮌헨'],
@@ -1346,6 +1367,14 @@ const PREP_TODO = {
     {t:'과학박물관 Wonderlab', a:'사전 예약 확인 (인기 슬롯)'},
     {t:'피카딜리선 운행', a:'9월 중순 TfL 재확인'},
     {t:'해리포터 귀로 기차', a:'당일 소요 20분 이하 열차만'},
+  ],
+  paris:[
+    {t:'루브르 티켓 예약', a:'ticket.louvre.fr · 9/30 오전 슬롯 (18세 미만 무료)'},
+    {t:'오르세 티켓 예약', a:'billetterie.musee-orsay.fr · 9/30 오후 (권장)'},
+    {t:'노트르담 앱 계정 생성', a:'앱 "Cathédrale Notre-Dame de Paris" · 예약은 현지 2~3일 전'},
+    {t:'동역 짐보관 방법 확정', a:'공식 라커 or Nannybag/Radical Storage 앱'},
+    {t:'TGV 9577 e티켓 오프라인', a:'DB 앱에서 미리 다운로드'},
+    {t:'여권 소지', a:'프랑스→독일 솅겐 내 이동 (신분증 원칙)'},
   ],
 };
 
@@ -3310,6 +3339,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11h</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11i</div>
 </body>
 </html>
