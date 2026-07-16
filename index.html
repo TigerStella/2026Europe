@@ -652,7 +652,7 @@
   .tg{position:relative;margin:8px 0 4px;padding-left:52px;}
   .tg-axis{position:absolute;left:0;top:0;width:48px;height:100%;}
   .tg-tick{position:absolute;left:0;font-size:10px;color:rgba(0,0,0,0.38);font-variant-numeric:tabular-nums;transform:translateY(-6px);border-top:1px solid rgba(0,0,0,0.06);width:48px;padding-top:1px;}
-  .tg-blocks{position:relative;height:100%;border-left:1px solid rgba(0,0,0,0.08);touch-action:none;cursor:crosshair;}
+  .tg-blocks{position:relative;height:100%;border-left:1px solid rgba(0,0,0,0.08);cursor:crosshair;}
   .tg-hint{font-size:11px;color:var(--text-light);margin:6px 0 2px;text-align:center;}
   .tg-block.point{padding:3px 8px;}
   .tg-block.editable{cursor:pointer;}
@@ -1729,63 +1729,117 @@ function addActivityInline(d,k){
   toast('일정이 추가됐어요 ✨');
 }
 let gridDrag=null, blockDrag=null;
+function blockCleanup(){
+  document.removeEventListener('touchmove',blockDragMove); document.removeEventListener('touchend',blockDragEnd); document.removeEventListener('touchcancel',blockDragEnd);
+  document.removeEventListener('mousemove',blockDragMove); document.removeEventListener('mouseup',blockDragEnd);
+  blockDrag=null;
+}
+function blockSnapshot(el, gridStart, pxmin){
+  const wrap=el.parentElement; const snap=[];
+  wrap.querySelectorAll('.tg-block[data-single="1"]').forEach(b=>{
+    snap.push({ el:b, isDragged:(b===el), start:+b.getAttribute('data-start'),
+      dur:(b.getAttribute('data-dur')!==''? +b.getAttribute('data-dur') : null),
+      src:b.getAttribute('data-src'), ref:b.getAttribute('data-ref') });
+  });
+  return snap;
+}
+function blockReflow(g, draggedStart, commit){
+  const list=g.snap.map(o=>Object.assign({},o));
+  const dr=list.find(o=>o.isDragged); if(dr) dr.start=draggedStart;
+  list.sort((a,b)=> (a.start-b.start) || (a.isDragged?-1:(b.isDragged?1:0)));
+  let cursor=null;
+  list.forEach(o=>{
+    let st=o.start; if(cursor!=null && st<cursor) st=cursor;
+    o.newStart=st; const d=(o.dur!=null?o.dur:30); cursor=st+d;
+    if(!o.isDragged){ o.el.style.top=((st-g.gridStart)*g.pxmin)+'px'; const lab=o.el.querySelector('.tg-start'); if(lab) lab.textContent=fmtHM(st); }
+  });
+  if(commit){
+    list.forEach(o=>{
+      const ns=o.newStart, ne=(o.dur!=null?o.newStart+o.dur:null);
+      if(o.src==='added'){ const a=(addedActs[g.day]||[])[+o.ref]; if(a){ a.time=fmtHM(ns); if(ne!=null) a.endTime=fmtHM(ne); } }
+      else { const cur=fixedItemData(g.day,o.ref)||{}; actEdits.overrides[o.ref]={t:cur.t,time:fmtHM(ns),endTime:(ne!=null?fmtHM(ne):(cur.endTime||'')),place:cur.place||'',memo:cur.memo||''}; }
+    });
+    save(LS.acts, addedActs); save(LS.actedit, actEdits);
+  }
+}
 function blockDragStart(e, day, city, src, ref, dur, gridStart, pxmin){
   const isTouch=e.type==='touchstart'; const pt=isTouch?e.touches[0]:e; if(!pt) return;
   if(!isTouch && e.button!==0) return;
-  e.stopPropagation(); e.preventDefault();
+  e.stopPropagation();
   const el=e.currentTarget;
-  blockDrag={day,city,src,ref,dur,gridStart,pxmin, el, y0:pt.clientY, origTop:parseFloat(el.style.top)||0, moved:false};
-  if(isTouch){ document.addEventListener('touchmove',blockDragMove,{passive:false}); document.addEventListener('touchend',blockDragEnd); document.addEventListener('touchcancel',blockDragEnd); }
-  else { document.addEventListener('mousemove',blockDragMove); document.addEventListener('mouseup',blockDragEnd); }
+  blockDrag={day,city,src,ref,dur,gridStart,pxmin, el, y0:pt.clientY, x0:pt.clientX, origTop:parseFloat(el.style.top)||0, moved:false, armed:!isTouch, snap:null};
+  if(isTouch){
+    blockDrag.timer=setTimeout(()=>{ if(blockDrag){ blockDrag.armed=true; blockDrag.snap=blockSnapshot(el,gridStart,pxmin); el.classList.add('dragging'); try{navigator.vibrate&&navigator.vibrate(12);}catch(_){} } }, 380);
+    document.addEventListener('touchmove',blockDragMove,{passive:false}); document.addEventListener('touchend',blockDragEnd); document.addEventListener('touchcancel',blockDragEnd);
+  } else {
+    blockDrag.snap=blockSnapshot(el,gridStart,pxmin);
+    document.addEventListener('mousemove',blockDragMove); document.addEventListener('mouseup',blockDragEnd);
+  }
 }
 function blockDragMove(e){
   if(!blockDrag) return; const pt=e.touches?e.touches[0]:e; if(!pt) return;
-  const dy=pt.clientY-blockDrag.y0;
-  if(Math.abs(dy)>5) blockDrag.moved=true;
-  if(blockDrag.moved){
-    let nt=Math.max(0, blockDrag.origTop+dy);
-    blockDrag.el.style.top=nt+'px'; blockDrag.el.classList.add('dragging');
-    const ns=blockDrag.gridStart+Math.round((nt/blockDrag.pxmin)/15)*15;
-    const st=blockDrag.el.querySelector('.tg-start'); if(st) st.textContent=fmtHM(ns)+' ↕';
-    if(e.cancelable) e.preventDefault();
+  const dy=pt.clientY-blockDrag.y0, dx=pt.clientX-blockDrag.x0;
+  if(!blockDrag.armed){
+    // 롱프레스 전 움직이면 = 스크롤/스와이프 → 드래그 취소(스크롤 허용)
+    if(Math.abs(dy)>10 || Math.abs(dx)>10){ clearTimeout(blockDrag.timer); blockCleanup(); }
+    return;
   }
+  if(!blockDrag.snap) blockDrag.snap=blockSnapshot(blockDrag.el, blockDrag.gridStart, blockDrag.pxmin);
+  blockDrag.moved=true;
+  let nt=Math.max(0, blockDrag.origTop+dy);
+  blockDrag.el.style.top=nt+'px'; blockDrag.el.classList.add('dragging');
+  const ns=blockDrag.gridStart+Math.round((nt/blockDrag.pxmin)/15)*15;
+  const st=blockDrag.el.querySelector('.tg-start'); if(st) st.textContent=fmtHM(ns)+' ↕';
+  blockReflow(blockDrag, ns, false);
+  if(e.cancelable) e.preventDefault();
 }
 function blockDragEnd(e){
+  if(!blockDrag){ return; }
+  clearTimeout(blockDrag.timer);
+  const g=blockDrag;
   document.removeEventListener('touchmove',blockDragMove); document.removeEventListener('touchend',blockDragEnd); document.removeEventListener('touchcancel',blockDragEnd);
   document.removeEventListener('mousemove',blockDragMove); document.removeEventListener('mouseup',blockDragEnd);
-  if(!blockDrag) return; const g=blockDrag; blockDrag=null;
-  if(!g.moved){ openSchedEdit(g.day, g.city, g.src, g.ref); return; }   // 탭 = 편집
+  blockDrag=null;
+  if(!g.moved){ openSchedEdit(g.day, g.city, g.src, g.ref); return; }   // 탭/롱프레스만 = 편집
   const nt=parseFloat(g.el.style.top)||0;
   const newStart=Math.max(0, Math.round((g.gridStart+nt/g.pxmin)/15)*15);
-  const newEnd = (g.dur!=null) ? newStart+g.dur : null;
-  if(g.src==='added'){
-    const a=(addedActs[g.day]||[])[g.ref];
-    if(a){ a.time=fmtHM(newStart); if(newEnd!=null) a.endTime=fmtHM(newEnd); save(LS.acts, addedActs); }
-  } else {
-    const cur=fixedItemData(g.day, g.ref)||{};
-    actEdits.overrides[g.ref]={ t:cur.t, time:fmtHM(newStart), endTime:(newEnd!=null?fmtHM(newEnd):(cur.endTime||'')), place:cur.place||'', memo:cur.memo||'' };
-    save(LS.actedit, actEdits);
-  }
+  blockReflow(g, newStart, true);   // 전체 재정렬 후 확정
   refreshTimelines(); toast('일정을 옮겼어요 🕒');
+}
+function gridCleanup(){
+  document.removeEventListener('touchmove', gridDragMove); document.removeEventListener('touchend', gridDragEnd); document.removeEventListener('touchcancel', gridDragEnd);
+  document.removeEventListener('mousemove', gridDragMove); document.removeEventListener('mouseup', gridDragEnd);
+  if(gridDrag && gridDrag.sel && gridDrag.sel.parentNode) gridDrag.sel.parentNode.removeChild(gridDrag.sel);
+  gridDrag=null;
 }
 function gridDragStart(e, day, city, gridStart, pxmin){
   const isTouch = e.type==='touchstart';
   const pt = isTouch ? e.touches[0] : e; if(!pt) return;
   const tgt = document.elementFromPoint(pt.clientX, pt.clientY);
-  if(tgt && tgt.closest('.tg-block')) return;   // 블록 탭은 각 블록의 편집(onclick)이 처리
+  if(tgt && tgt.closest('.tg-block')) return;   // 블록은 블록 핸들러가 처리
   if(!isTouch && e.button!==0) return;
   const blocks=e.currentTarget; const rect=blocks.getBoundingClientRect();
   const y0=Math.max(0, pt.clientY-rect.top);
-  gridDrag={day, city, gridStart, pxmin, rect, y0};
-  const sel=document.createElement('div'); sel.className='tg-select'; sel.style.top=y0+'px'; sel.style.height='6px';
-  blocks.appendChild(sel); gridDrag.sel=sel;
-  if(isTouch){ document.addEventListener('touchmove', gridDragMove, {passive:false}); document.addEventListener('touchend', gridDragEnd); document.addEventListener('touchcancel', gridDragEnd); }
-  else { document.addEventListener('mousemove', gridDragMove); document.addEventListener('mouseup', gridDragEnd); }
-  e.preventDefault();
+  gridDrag={day, city, gridStart, pxmin, rect, y0, x0:pt.clientX, armed:!isTouch, sel:null};
+  if(isTouch){
+    gridDrag.timer=setTimeout(()=>{ if(gridDrag){ gridDrag.armed=true;
+      const sel=document.createElement('div'); sel.className='tg-select'; sel.style.top=gridDrag.y0+'px'; sel.style.height='8px';
+      blocks.appendChild(sel); gridDrag.sel=sel; try{navigator.vibrate&&navigator.vibrate(12);}catch(_){}
+    } }, 380);
+    document.addEventListener('touchmove', gridDragMove, {passive:false}); document.addEventListener('touchend', gridDragEnd); document.addEventListener('touchcancel', gridDragEnd);
+  } else {
+    const sel=document.createElement('div'); sel.className='tg-select'; sel.style.top=y0+'px'; sel.style.height='6px'; blocks.appendChild(sel); gridDrag.sel=sel;
+    document.addEventListener('mousemove', gridDragMove); document.addEventListener('mouseup', gridDragEnd);
+  }
 }
 function gridDragMove(e){
   if(!gridDrag) return;
   const pt = e.touches ? e.touches[0] : e; if(!pt) return;
+  if(!gridDrag.armed){
+    if(Math.abs(pt.clientY-(gridDrag.rect.top+gridDrag.y0))>10 || Math.abs(pt.clientX-gridDrag.x0)>10){ clearTimeout(gridDrag.timer); gridCleanup(); }
+    return;
+  }
+  if(!gridDrag.sel) return;
   const y=Math.max(0, pt.clientY-gridDrag.rect.top);
   const top=Math.min(y, gridDrag.y0), h=Math.abs(y-gridDrag.y0);
   gridDrag.sel.style.top=top+'px'; gridDrag.sel.style.height=Math.max(6,h)+'px';
@@ -1795,12 +1849,12 @@ function gridDragMove(e){
   if(e.cancelable) e.preventDefault();
 }
 function gridDragEnd(e){
-  document.removeEventListener('touchmove', gridDragMove);
-  document.removeEventListener('touchend', gridDragEnd);
-  document.removeEventListener('touchcancel', gridDragEnd);
-  document.removeEventListener('mousemove', gridDragMove);
-  document.removeEventListener('mouseup', gridDragEnd);
-  if(!gridDrag) return; const g=gridDrag; gridDrag=null;
+  document.removeEventListener('touchmove', gridDragMove); document.removeEventListener('touchend', gridDragEnd); document.removeEventListener('touchcancel', gridDragEnd);
+  document.removeEventListener('mousemove', gridDragMove); document.removeEventListener('mouseup', gridDragEnd);
+  if(!gridDrag){ return; }
+  clearTimeout(gridDrag.timer);
+  const g=gridDrag; gridDrag=null;
+  if(!g.armed || !g.sel){ if(g.sel&&g.sel.parentNode) g.sel.parentNode.removeChild(g.sel); return; }  // 롱프레스 안 됨 = 무시(스크롤)
   const pt = (e.changedTouches&&e.changedTouches[0]) || e;
   const y = (pt&&pt.clientY!=null) ? Math.max(0, pt.clientY-g.rect.top) : g.y0;
   let topPx=Math.min(y,g.y0), botPx=Math.max(y,g.y0);
@@ -1872,17 +1926,19 @@ function dayGridHTML(day, c){
     const it0=sl.items[0]; const kind=it0.kind;
     const refArg = it0.src==='added' ? it0.idx : `'${it0.fkey}'`;
     const durArg = sl.end!=null ? (sl.end-sl.start) : 'null';
-    const clickAttr = sl.items.length===1
+    const single = sl.items.length===1;
+    const dataAttr = `data-start="${sl.start}" data-dur="${sl.end!=null?sl.end-sl.start:''}" data-src="${it0.src}" data-ref="${it0.src==='added'?it0.idx:it0.fkey}"${single?' data-single="1"':''}`;
+    const clickAttr = single
       ? `ontouchstart="blockDragStart(event,${day.d},'${day.city}','${it0.src}',${refArg},${durArg},${gridStart},${PXMIN})" onmousedown="blockDragStart(event,${day.d},'${day.city}','${it0.src}',${refArg},${durArg},${gridStart},${PXMIN})"`
       : `onclick="event.stopPropagation();openSchedEdit(${day.d},'${day.city}','${it0.src}',${refArg})"`;
     const body=sl.items.map(it=>{
       const rng = it.end?`<small class="tg-rng">~${esc(it.end)}</small>`:'';
       return `<div class="tg-item"><span class="tg-ic">${it.icon}</span><span class="tg-text">${it.html}${rng}</span></div>`;
     }).join('');
-    blocks+=`<div class="tg-block ${kind}${isPoint?' point':''} editable" ${clickAttr} style="top:${top}px;height:${h}px;border-left-color:${c.color}"><span class="tg-start">${fmtHM(sl.start)}</span><div class="tg-body">${body}</div></div>`;
+    blocks+=`<div class="tg-block ${kind}${isPoint?' point':''} editable" ${dataAttr} ${clickAttr} style="top:${top}px;height:${h}px;border-left-color:${c.color}"><span class="tg-start">${fmtHM(sl.start)}</span><div class="tg-body">${body}</div></div>`;
   });
   const gl=`repeating-linear-gradient(to bottom, transparent 0, transparent ${30*PXMIN-1}px, rgba(0,0,0,0.06) ${30*PXMIN-1}px, rgba(0,0,0,0.06) ${30*PXMIN}px)`;
-  grid=`<div class="tg-hint">👆 빈 시간대를 <b>드래그</b>하면 새 일정 · 블록을 <b>탭</b>하면 시간·내용 수정</div>
+  grid=`<div class="tg-hint">🖐️ <b>길게 눌러</b> 드래그 = 일정 추가/이동 · <b>탭</b> = 수정 · 스와이프 = 스크롤</div>
     <div class="tg" style="height:${H}px"><div class="tg-axis">${ruler}</div>
       <div class="tg-blocks" style="background-image:${gl}" ontouchstart="gridDragStart(event,${day.d},'${day.city}',${gridStart},${PXMIN})" onmousedown="gridDragStart(event,${day.d},'${day.city}',${gridStart},${PXMIN})">${blocks}</div>
     </div>`;
@@ -3399,13 +3455,13 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
     <div class="field" style="margin:8px 0"><label>📍 장소 (선택)</label><input type="text" id="schPlace" placeholder="예: 오르세 미술관, 7구"></div>
     <div class="field" style="margin-bottom:10px"><label>🗒️ 메모 (선택)</label><input type="text" id="schMemo" placeholder="예: 인상파 · 사전예약"></div>
     <div class="form-actions">
-      <button class="btn btn-primary" onclick="saveSched()">저장</button>
-      <button class="btn btn-ghost" onclick="closeModal('schedModal')">취소</button>
-      <button class="btn btn-ghost" id="schDelBtn" style="display:none;color:#E0607A" onclick="deleteSched()">🗑 삭제</button>
+      <button class="btn btn-primary" onmousedown="event.preventDefault()" onclick="saveSched()">저장</button>
+      <button class="btn btn-ghost" onmousedown="event.preventDefault()" onclick="closeModal('schedModal')">취소</button>
+      <button class="btn btn-ghost" id="schDelBtn" style="display:none;color:#E0607A" onmousedown="event.preventDefault()" onclick="deleteSched()">🗑 삭제</button>
     </div>
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11k</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11m</div>
 </body>
 </html>
