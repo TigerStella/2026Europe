@@ -1309,17 +1309,61 @@ const DAYS = [
       {ic:'🚉', t:'파리 동역 도착 (TGV 여유 확보)', time:'14:50', endTime:'15:55'}
     ] },
   { d:8, date:'10/2', wd:'금', city:'munich', badges:['뮌헨'],
-    title:'올림픽공원 · FC Bayern Store', acts:[] },
+    title:'올림픽공원 · FC Bayern Store',
+    foot:'⚽ <b>펍 축구 관람</b> — 숙소 인근 스포츠펍 전화/구글맵으로 <b>킥오프 시각·좌석 사전 확인</b> · 전반+후반만 보고 조기 복귀',
+    acts:[
+      {ic:'😴', t:'늦잠 · 아파트 취사 조식 (회복 최우선)', time:'08:30', endTime:'10:30'},
+      {ic:'🚇', t:'숙소 → 올림픽공원 (U3 올림피아첸트룸)', time:'10:30', endTime:'11:00'},
+      {ic:'🌳', t:'올림피아파크 놀이터·잔디언덕 (벤치 다수·엄마 착석 휴식)', time:'11:00', endTime:'13:00'},
+      {ic:'🍺', t:'공원 비어가르텐 점심 (이동 없음)', time:'13:00', endTime:'14:00'},
+      {ic:'🛍️', t:'FC 바이에른 스토어 (도보권·축구 최애 코스)', time:'14:00', endTime:'15:00'},
+      {ic:'😌', t:'숙소 복귀·낮잠 (저녁 관람 대비)', time:'15:00', endTime:'18:00'},
+      {ic:'🍽️', t:'저녁 (숙소 근처·도보 5분)', time:'18:00', endTime:'19:30'},
+      {ic:'⚽', t:'펍에서 분데스리가 관람 (도보권·조기 복귀)', time:'19:30', endTime:'21:30'},
+      {ic:'🛌', t:'취침 (~06:00 · 8h+ 확보)', time:'21:30'}
+    ] },
   { d:9, date:'10/3', wd:'토', city:'munich', badges:['뮌헨'],
-    title:'추크슈피체 알프스 정상 · 아이브제 호수', acts:[] },
+    title:'추크슈피체 알프스 정상 · 아이브제 호수',
+    foot:'⭐ <b>가르미셔 콤비티켓</b> — 뮌헨중앙역 자판기 or <a href="https://zugspitze.de" target="_blank" rel="noopener">zugspitze.de</a> · 날씨 유동성 위해 1~2일 전 구매 권장 (성인 €72 / 청소년 €57.5 / 아동 €36)<br>⚠️ 당일 아침 <a href="https://zugspitze.de" target="_blank" rel="noopener">zugspitze.de</a>에서 <b>케이블카 실시간 운행상태</b> 확인 (기상 악화 시 운휴)',
+    acts:[
+      {ic:'⏰', t:'기상·중앙역 이동 (택시·도시락 지참)', time:'06:00', endTime:'06:32'},
+      {ic:'🚆', t:'뮌헨→가르미슈 기차 (좌석=휴식·콤비티켓 개시)', time:'06:32', endTime:'08:00'},
+      {ic:'🔁', t:'톱니열차 환승·대기 (도보 2분)', time:'08:00', endTime:'08:30'},
+      {ic:'🚞', t:'톱니열차 → 추크슈플라트 (앉아서 이동)', time:'08:30', endTime:'09:45'},
+      {ic:'🏔️', t:'정상 케이블카 → 알프스 만년설 체험 (방한복 필수·고도 적응 수시 체크)', time:'09:45', endTime:'12:30'},
+      {ic:'🍽️', t:'정상 레스토랑 점심·휴식 (하산 전 충분히)', time:'12:30', endTime:'13:30'},
+      {ic:'🚡', t:'하산 → 아이브제 (케이블카·콤비티켓 내)', time:'13:30', endTime:'14:30'},
+      {ic:'🏞️', t:'아이브제 호숫가 짧은 산책 (평지·뷰포인트)', time:'14:30', endTime:'15:15'},
+      {ic:'🚆', t:'가르미슈 → 뮌헨 복귀 (좌석=휴식)', time:'15:15', endTime:'17:00'},
+      {ic:'🛌', t:'숙소 복귀·저녁·취침 (늦잠 허용)', time:'17:00'}
+    ] },
   { d:10, date:'10/4', wd:'일', city:'munich', badges:['뮌헨'],
-    title:'알리안츠 아레나 투어 · BMW 박물관',
-    acts:[ {ic:'💰', t:'비용: 224,270원'} ] },
+    title:'BMW 박물관 · 알리안츠 아레나 투어',
+    foot:'⭐ <b>알리안츠 아레나 투어</b> <a href="https://fcbayern.com/en/tours" target="_blank" rel="noopener">fcbayern.com/en/tours</a> — 일요일 시간대 조기 마감·<b>사전 예약 필수</b>·홈경기 충돌 재확인 · 🚗 <b>BMW 박물관</b> <a href="https://bmw-welt.com" target="_blank" rel="noopener">bmw-welt.com</a> (온라인 소폭 할인)<br>⭐ <b>10/5 새벽 공항 택시</b> — 숙소 프런트 or Bolt/FreeNow 앱으로 <b>05:15 픽업 전날 예약</b>',
+    acts:[
+      {ic:'😴', t:'늦잠·조식 (회복)', time:'09:00', endTime:'10:00'},
+      {ic:'🚇', t:'숙소 → BMW박물관 (U3 직행)', time:'10:00', endTime:'10:20'},
+      {ic:'🚗', t:'BMW 박물관·BMW월드 (실내·시뮬레이터 체험)', time:'10:20', endTime:'12:30'},
+      {ic:'🍽️', t:'점심', time:'12:30', endTime:'13:30'},
+      {ic:'🚶', t:'BMW → 알리안츠 아레나 (도보 10분권)', time:'13:30', endTime:'14:00'},
+      {ic:'🏟️', t:'알리안츠 아레나 투어 (홈경기 없는 주말 확인)', time:'14:00', endTime:'15:30'},
+      {ic:'🚇', t:'숙소 복귀 (대중교통)', time:'15:30', endTime:'16:00'},
+      {ic:'🧳', t:'휴식·짐 완전 정리 (새벽 이동 대비)', time:'16:00', endTime:'18:00'},
+      {ic:'🍽️', t:'이른 저녁 (숙소 근처)', time:'18:00', endTime:'19:30'},
+      {ic:'🛌', t:'조기 취침', time:'19:30', endTime:'21:00'},
+      {ic:'💰', t:'비용: 224,270원'}
+    ] },
   { d:11, date:'10/5', wd:'월', city:'florence', badges:['뮌헨','→','피렌체'],
     title:'뮌헨 출발 → 피렌체 이동 (비행기)',
     transport:{ icon:'✈️', time:'07:55', text:'<strong>Lufthansa LH</strong> · 07:55 뮌헨 MUC 출발 → 피렌체 FLR (약 1:15)' },
     hotel:{ time:'14:00', text:'Hotel San Giorgio & Olimpic 체크인 14:00 · 신분증 지참' },
-    acts:[ {ic:'⚠️', t:'사진 있는 신분증 지참 필수'} ] },
+    foot:'🚕 <b>10/5 새벽 공항 택시</b> 전날 예약 (숙소 프런트 or Bolt/FreeNow) · ✈️ 10/5 e티켓 오프라인 저장',
+    acts:[
+      {ic:'⏰', t:'기상·최종 확인', time:'04:45', endTime:'05:15'},
+      {ic:'🚕', t:'숙소 → MUC 공항 (택시·사전예약 필수)', time:'05:15', endTime:'06:00'},
+      {ic:'🛃', t:'체크인·보안·탑승', time:'06:00', endTime:'07:55'},
+      {ic:'⚠️', t:'사진 있는 신분증 지참 필수'}
+    ] },
   { d:12, date:'10/6', wd:'화', city:'florence', badges:['피렌체'],
     title:'피사 당일치기 · 오후 피렌체 산책', acts:[] },
   { d:13, date:'10/7', wd:'수', city:'rome', badges:['피렌체','→','로마'],
@@ -1375,6 +1419,14 @@ const PREP_TODO = {
     {t:'동역 짐보관 방법 확정', a:'공식 라커 or Nannybag/Radical Storage 앱'},
     {t:'TGV 9577 e티켓 오프라인', a:'DB 앱에서 미리 다운로드'},
     {t:'여권 소지', a:'프랑스→독일 솅겐 내 이동 (신분증 원칙)'},
+  ],
+  munich:[
+    {t:'가르미셔 콤비티켓 (10/3)', a:'zugspitze.de or 중앙역 자판기 · 날씨 유동성 위해 1~2일 전'},
+    {t:'알리안츠 아레나 투어 (10/4)', a:'fcbayern.com/en/tours · 일요일 조기마감·사전예약 필수'},
+    {t:'10/5 새벽 공항 택시', a:'Bolt/FreeNow or 숙소 프런트 · 05:15 픽업 전날 예약'},
+    {t:'BMW 박물관 (10/4)', a:'bmw-welt.com · 당일 가능하나 온라인 소폭 할인'},
+    {t:'펍 축구 관람 (10/2)', a:'숙소 인근 스포츠펍 · 킥오프 시각·좌석 확인'},
+    {t:'추크슈피체 날씨 확인', a:'악화 시 10/2·10/4와 순서 교체 (4박 고정이라 가능)'},
   ],
 };
 
@@ -2163,6 +2215,21 @@ const CHECKLIST = [
     ['우피치 미술관 투어'],
     ['피렌체 야경투어'],
     ['로마 시내투어'],
+  ]},
+  { cat:'🏔 추크슈피체 (10/3) 필수', must:true, items:[
+    ['방한 재킷·바람막이','정상 영하·강풍 · 엄마·아들 각각'],
+    ['장갑·비니·목도리·여벌 양말',''],
+    ['선글라스·선크림','설맹 방지 · 눈 반사 강함'],
+    ['미끄럼 방지 신발 (트레킹화)',''],
+    ['도시락·물·간식','정상 식당 비쌈'],
+    ['아이 멀미약','톱니열차 급경사'],
+  ]},
+  { cat:'🎒 뮌헨·공통 추가', items:[
+    ['유럽 멀티 어댑터·보조배터리',''],
+    ['여권·항공권 (10/5 e티켓 오프라인 저장)',''],
+    ['상비약 (두통·소화·해열)',''],
+    ['아이 축구공/작은 공','올림픽공원 잔디용 · 선택'],
+    ['아파트 취사용 기본 식재료','첫날 마트'],
   ]},
 ];
 const CK_CUSTOM_CAT='📝 나만의 준비물';
@@ -3339,6 +3406,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11j</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-11k</div>
 </body>
 </html>
