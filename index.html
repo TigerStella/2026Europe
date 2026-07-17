@@ -1340,19 +1340,21 @@ const DAYS = [
       {ic:'🚉', t:'파리 동역 도착 (TGV 여유 확보)', time:'14:50', endTime:'15:55'}
     ] },
   { d:8, date:'10/2', wd:'금', city:'munich', badges:['뮌헨'],
-    title:'올림픽공원 · FC Bayern Store',
-    story:'뮌헨 올림픽공원은 <b>1972년 올림픽</b>이 열린 곳이야. 지붕이 거미줄·텐트처럼 물결치는 특이한 모양인데 당시엔 아주 미래적인 디자인이었대. 지금은 넓은 잔디밭과 놀이터가 있어 뛰어놀기 딱 좋아. 근처 <b>FC 바이에른 뮌헨</b> 스토어는 축구 팬이라면 꼭!',
-    foot:'⚽ <b>펍 축구 관람</b> — 숙소 인근 스포츠펍 전화/구글맵으로 <b>킥오프 시각·좌석 사전 확인</b> · 전반+후반만 보고 조기 복귀',
+    title:'옥토버페스트 · 올림픽공원 · FC Bayern',
+    story:'오늘 가는 <b>옥토버페스트</b>는 세계에서 가장 큰 맥주 축제야! 1810년 바이에른 왕자님의 결혼식을 축하하는 잔치에서 시작됐는데, 너무 재미있어서 <b>200년 넘게 매년</b> 열리고 있대. 어른들은 맥주를 마시지만, 사실 축제 마당엔 <b>대관람차·회전목마·롤러코스터 같은 놀이기구</b>와 달콤한 <b>진저브레드 하트·구운 아몬드</b>가 가득해서 아이들 천국이란다.<br><br><b>FC 바이에른 뮌헨</b>은 독일에서 가장 강한 축구팀이야. 100년이 넘는 역사에 독일 리그 우승만 <b>30번 넘게</b> 했고, 우리가 갈 <b>알리안츠 아레나</b>가 그 홈 경기장이지.<br><br>마지막으로 <b>올림픽공원</b>은 1972년 올림픽이 열린 곳인데, 지붕이 거미줄·텐트처럼 물결치는 신기한 모양이야. 지금은 넓은 잔디밭에서 공 차고 뛰어놀기 딱 좋아!',
+    foot:'🍺 <b>옥토버페스트(테레지엔비제)</b> — 평일 낮이 가장 한산 · 입장 무료(맥주텐트·놀이기구는 개별 요금) · <b>미아방지 팔찌·소지품 주의</b> · U4/5 테레지엔비제역',
     acts:[
-      {ic:'😴', t:'늦잠 · 아파트 취사 조식 (회복 최우선)', time:'08:30', endTime:'10:30'},
-      {ic:'🚇', t:'숙소 → 올림픽공원 (U3 올림피아첸트룸)', time:'10:30', endTime:'11:00'},
-      {ic:'🌳', t:'올림피아파크 놀이터·잔디언덕 (벤치 다수·엄마 착석 휴식)', time:'11:00', endTime:'13:00'},
-      {ic:'🍺', t:'공원 비어가르텐 점심 (이동 없음)', time:'13:00', endTime:'14:00'},
-      {ic:'🛍️', t:'FC 바이에른 스토어 (도보권·축구 최애 코스)', time:'14:00', endTime:'15:00'},
-      {ic:'😌', t:'숙소 복귀·낮잠 (저녁 관람 대비)', time:'15:00', endTime:'18:00'},
-      {ic:'🍽️', t:'저녁 (숙소 근처·도보 5분)', time:'18:00', endTime:'19:30'},
-      {ic:'⚽', t:'펍에서 분데스리가 관람 (도보권·조기 복귀)', time:'19:30', endTime:'21:30'},
-      {ic:'🛌', t:'취침 (~06:00 · 8h+ 확보)', time:'21:30'}
+      {ic:'🍳', t:'기상·조식 (옥토버페스트 대비 여유 기상)', time:'09:30', endTime:'10:30'},
+      {ic:'🚇', t:'숙소 출발 → 테레지엔비제 (U3 환승1회→U4/5·약 25~30분)', time:'10:30', endTime:'11:00'},
+      {ic:'🎡', t:'테레지엔비제 도착', time:'11:00', endTime:'11:30'},
+      {ic:'🍺', t:'옥토버페스트 관람 (평일 낮=한산·놀이기구·전통음식 위주)', time:'11:30', endTime:'14:00'},
+      {ic:'🚇', t:'테레지엔비제 → 올림픽공원 (U4/5→U3·약 25~30분)', time:'14:00', endTime:'14:30'},
+      {ic:'🌳', t:'올림피아파크 놀이터·잔디언덕 (벤치 다수·엄마도 착석 휴식)', time:'14:30', endTime:'16:30'},
+      {ic:'🚇', t:'올림픽공원 → 알리안츠 (U6·약 15~20분)', time:'16:30', endTime:'16:50'},
+      {ic:'🛍️', t:'FC 바이에른 스토어 (축구 최애 코스)', time:'16:50', endTime:'17:50'},
+      {ic:'🚇', t:'숙소 복귀 (U6→U3)', time:'17:50', endTime:'18:20'},
+      {ic:'🍽️', t:'저녁 (숙소 근처·도보 5분)', time:'18:20', endTime:'19:30'},
+      {ic:'🛌', t:'휴식·취침 준비 (다음날 06:32 추크슈피체 기차 대비 조기 취침)', time:'19:30'}
     ] },
   { d:9, date:'10/3', wd:'토', city:'munich', badges:['뮌헨'],
     title:'추크슈피체 알프스 정상 · 아이브제 호수',
@@ -3543,6 +3545,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-12d</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-12e</div>
 </body>
 </html>
