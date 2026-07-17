@@ -662,6 +662,15 @@
   .story-x{position:absolute;top:10px;right:12px;border:none;background:transparent;font-size:20px;color:var(--text-light);cursor:pointer;line-height:1;}
   .story-body{font-family:'MaruBuri','Noto Sans KR',serif;font-size:15px;line-height:1.8;color:var(--text-dark);margin-top:8px;}
   .story-body b{color:#6B4FE0;}
+  .rec-books{margin:8px 0 4px;}
+  .rec-title{font-size:14px;font-weight:800;color:var(--text-dark);margin-bottom:8px;}
+  .rec-card{padding:10px 12px;border:1px solid rgba(0,0,0,0.07);border-left:3px solid var(--sunset-gold);border-radius:10px;background:#fff;margin-bottom:8px;}
+  .rec-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;}
+  .rec-h b{font-size:13.5px;color:var(--text-dark);}
+  .rec-tag{flex:0 0 auto;font-size:10.5px;font-weight:800;color:#B5832A;background:rgba(181,131,42,0.12);padding:2px 8px;border-radius:10px;}
+  .rec-card p{margin-top:5px;font-size:12.5px;line-height:1.6;color:var(--text-light);}
+  .rec-order{margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(124,110,255,0.08);border:1px solid rgba(124,110,255,0.25);font-size:12.5px;line-height:1.7;}
+  .rec-note{margin-top:8px;font-size:11px;color:var(--text-light);line-height:1.5;}
   .tg-select{position:absolute;left:8px;right:2px;background:rgba(122,138,255,0.18);border:1.5px solid #7A8AFF;border-radius:8px;font-size:11px;font-weight:800;color:#4A57C8;padding:2px 6px;pointer-events:none;z-index:5;overflow:hidden;}
   .tg-block{position:absolute;left:8px;right:0;background:#fff;border:1px solid rgba(0,0,0,0.07);border-left:3px solid var(--slate);border-radius:8px;padding:5px 8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
   .tg-block.move{background:rgba(143,184,236,0.14);} .tg-block.hotel{background:rgba(255,158,134,0.13);} .tg-block.added{background:rgba(181,131,42,0.10);border-left-style:dashed;}
@@ -887,8 +896,19 @@
     <div class="section-header">
       <span class="section-icon">📚</span>
       <span class="section-title">도서 리스트</span>
-      <span class="section-sub">Google Books 검색</span>
+      <span class="section-sub">여행 예습</span>
     </div>
+    <div class="rec-books">
+      <div class="rec-title">🎯 여행 예습 추천 도서 (아이용)</div>
+      <div class="rec-card"><div class="rec-h"><b>① Who was — 레오나르도 다빈치 / 미켈란젤로</b><span class="rec-tag">피렌체·바티칸</span></div><p>다비드상·시스티나 성당 천장화·비너스의 탄생이 왜 대단한지 아이 눈높이로. 얇고 삽화가 많아 부담 없어 여행 직전 읽기 딱.</p></div>
+      <div class="rec-card"><div class="rec-h"><b>② 먼나라 이웃나라: 영국 / 프랑스 / 이탈리아 편 (이원복)</b><span class="rec-tag">4개국 입문</span></div><p>이번 여행 4개국이 다 들어 있는 국내 최고 입문서. 만화라 술술 읽히면서 각 나라 역사·문화 맥락을 한 번에 예습.</p></div>
+      <div class="rec-card"><div class="rec-h"><b>③ 로마인 이야기 아동판 / 만화 로마사</b><span class="rec-tag">로마 필수</span></div><p>콜로세움·포로 로마노에서 진가 발휘. 검투사·황제·로마 건축이 왜 2천 년을 버텼는지 알면 돌덩이가 살아있는 이야기가 됨.</p></div>
+      <div class="rec-card"><div class="rec-h"><b>④ 해리포터 시리즈 (최소 1~2권)</b><span class="rec-tag">런던</span></div><p>9/27 스튜디오 투어 몰입도를 결정. 영화만 봤어도 OK지만, 책을 읽으면 그레이트홀·다이애건앨리에서 감동이 배가.</p></div>
+      <div class="rec-card"><div class="rec-h"><b>⑤ 곰브리치 세계사 (어린이·청소년판)</b><span class="rec-tag">전체 흐름</span></div><p>여행 전체를 하나의 줄기로. 고대 로마 → 중세 → 르네상스 → 근대 흐름을 이야기하듯 들려줘, "왜 피렌체 다음 로마인지" 스스로 연결.</p></div>
+      <div class="rec-order">📖 <b>읽는 순서</b> — 여행 2~3주 전 <b>②먼나라 이웃나라</b>(큰 그림) → <b>④해리포터</b>(런던) → <b>①다빈치/미켈란젤로</b>(피렌체) → <b>③로마사</b>(로마). 도시 방문 순서에 맞춰 읽으면 흐름이 자연스러워요.</div>
+      <div class="rec-note">※ 국내 출간본 제목·번역판·연령 표기는 도서관/서점에서 확인해 주세요 (특히 'Who was' 시리즈는 국내 번역본 여부가 책마다 달라요).</div>
+    </div>
+    <div class="rel-subhead" style="margin-top:20px">🔎 내 도서 검색·표지 추가</div>
     <p class="hint">+ 타일 → 책 제목으로 검색해 표지와 함께 추가. 다 읽으면 <strong>읽음</strong> 버튼을 눌러 체크하세요.</p>
     <div class="tiles" id="bookTiles"></div>
 
@@ -3523,6 +3543,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-12c</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-12d</div>
 </body>
 </html>
