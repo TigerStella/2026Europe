@@ -621,6 +621,25 @@
   .exp-group-head.local{background:rgba(91,155,110,0.12);color:#3E6E4F;}
   .exp-group-sub{font-size:11px;font-weight:600;opacity:.85;}
   .cost-line{cursor:pointer;}
+  .bg-summary{background:linear-gradient(135deg,rgba(91,155,110,.10),rgba(201,146,46,.10));border:1.5px solid rgba(91,155,110,.28);border-radius:12px;padding:12px 14px;margin:6px 0 4px;cursor:pointer;}
+  .bg-sum-row{display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:var(--text-mid);padding:3px 0;}
+  .bg-sum-total{display:flex;justify-content:space-between;font-size:13px;font-weight:800;color:var(--text-dark);border-top:1px dashed var(--border);margin-top:5px;padding-top:6px;}
+  .bg-sum-buf{font-size:11px;color:var(--text-light);margin-top:4px;}
+  .bg-toggle{text-align:center;font-size:11px;font-weight:700;color:#3E6E4F;margin-top:7px;letter-spacing:.3px;}
+  .bg-sec-head{display:flex;justify-content:space-between;align-items:baseline;margin:14px 2px 6px;padding:5px 10px;border-radius:8px;background:rgba(91,155,110,.10);color:#3E6E4F;font-weight:800;font-size:12px;}
+  .bg-day{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);padding:9px 12px;margin-bottom:8px;}
+  .bg-day-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .bg-day-date{font-size:12px;font-weight:700;color:var(--slate);}
+  .bg-day-tot{font-size:12px;font-weight:800;color:var(--dusk-coral);white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .bg-cats{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+  .bg-cats span{font-size:11px;color:var(--text-mid);background:var(--bg-soft,#F5F3EE);border-radius:6px;padding:3px 7px;}
+  .bg-note{font-size:11px;color:#8A6420;margin-top:6px;}
+  .bg-cmp{font-size:11px;font-weight:700;margin-top:6px;padding:4px 8px;border-radius:6px;}
+  .bg-cmp.under{background:rgba(91,155,110,.12);color:#3E6E4F;}
+  .bg-cmp.over{background:rgba(224,96,122,.12);color:#B23A55;}
+  .bg-paid{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);padding:10px 12px;margin-bottom:8px;}
+  .bg-paid-h{font-size:12px;font-weight:800;color:var(--slate);margin-bottom:5px;}
+  .bg-paid-i{font-size:11px;color:var(--text-mid);padding:2px 0;}
   .diary-cal{margin:4px 0 16px;padding:10px 12px;border-radius:12px;background:#fff;border:1px solid rgba(0,0,0,0.06);}
   .cal-title{font-size:13px;font-weight:800;color:var(--text-dark);display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
   .cal-legend{font-size:10px;font-weight:600;color:var(--text-light);display:inline-flex;align-items:center;gap:5px;}
@@ -815,6 +834,7 @@
       <button class="mini-refresh" onclick="openExpenseModal()" title="여행 경비 추가">＋ 비용 추가</button>
     </div>
     <div id="costWrap"></div>
+    <div id="budgetGuideWrap"></div>
     <div id="expenseWrap"></div>
     <div style="margin-top:12px; font-size:11px; color:var(--text-light); padding: 0 4px;">
       ※ 사전 결제 확정분 + 직접 입력한 경비를 <strong>원화로 환산</strong>해 합산해요. 환율은 상단 실시간 환율 기준(오프라인 시 참고치).
@@ -2213,10 +2233,45 @@ function renderCost(){
     `<div class="section-header" style="margin-top:4px"><span class="section-icon">💳</span><span class="section-title" style="font-size:12px">사전 결제 확정분</span></div>` + html +
     `<div class="cost-total" style="margin-top:12px"><span class="cost-total-label">사전 결제 합계</span><span class="cost-total-amount">${won(grand)}원</span></div>`;
   renderExpenses();
+  renderBudgetGuide();
 }
 
 /* ── 여행 경비 (직접 입력, 원화 환산) ── */
 const FX = { KRW:1, USD:1380, GBP:1750, EUR:1490 }; // KRW per 1 unit (loadFx가 실시간 갱신)
+// ── 예산 가이드(참고용 seed) — 실지출과 별도. 산정 환율은 상수로 분리(추후 수정 가능) ──
+const BUDGET_FX = { GBP:1930, EUR:1660 }; // 원/1단위 (예산 산정 전용, 실시간 FX와 무관)
+const BUDGET_GUIDE = [
+  { date:'2026-09-25', sec:'london', place:'London', ccy:'GBP', tr:0,    food:15, shop:0  },
+  { date:'2026-09-26', sec:'london', place:'London', ccy:'GBP', tr:10,   food:18, shop:10 },
+  { date:'2026-09-27', sec:'london', place:'London', ccy:'GBP', tr:21.6, food:20, shop:15 },
+  { date:'2026-09-28', sec:'london', place:'London', ccy:'GBP', tr:10,   food:18, shop:5  },
+  { date:'2026-09-29', sec:'paris',  place:'Paris',  ccy:'EUR', tr:8,    food:25, shop:0  },
+  { date:'2026-09-30', sec:'paris',  place:'Paris',  ccy:'EUR', tr:13,   food:54, shop:10 },
+  { date:'2026-10-01', sec:'paris',  place:'Paris',  ccy:'EUR', tr:5,    food:23, shop:5  },
+  { date:'2026-10-02', sec:'munich', place:'Munich', ccy:'EUR', tr:15,   food:56, shop:15 },
+  { date:'2026-10-03', sec:'munich', place:'Munich', ccy:'EUR', tr:0,    food:43, shop:5, note:'추크슈피체 콤비티켓 €108 별도(특별지출)' },
+  { date:'2026-10-04', sec:'munich', place:'Munich', ccy:'EUR', tr:15,   food:46, shop:10 },
+  { date:'2026-10-05', sec:'florence', place:'Florence',      ccy:'EUR', tr:10, food:25, shop:0  },
+  { date:'2026-10-06', sec:'florence', place:'Pisa/Florence', ccy:'EUR', tr:18, food:48, shop:15 },
+  { date:'2026-10-07', sec:'florence', place:'Florence',      ccy:'EUR', tr:5,  food:23, shop:5  },
+  { date:'2026-10-07', sec:'rome', place:'Rome',       ccy:'EUR', tr:5,  food:25, shop:0  },
+  { date:'2026-10-08', sec:'rome', place:'Rome',       ccy:'EUR', tr:14, food:51, shop:10 },
+  { date:'2026-10-09', sec:'rome', place:'Rome',       ccy:'EUR', tr:14, food:51, shop:10 },
+  { date:'2026-10-10', sec:'rome', place:'Rome',       ccy:'EUR', tr:14, food:48, shop:15 },
+  { date:'2026-10-11', sec:'rome', place:'Rome/Milan', ccy:'EUR', tr:10, food:10, shop:0  },
+];
+// 특별지출(일별 표에서 제외)
+const BUDGET_SPECIAL = [
+  { date:'2026-10-03', ccy:'EUR', amt:108, label:'추크슈피체 콤비티켓 (성인1+아동1)' },
+];
+// 이미 결제 완료 — 일별 예산에서 제외
+const BUDGET_PAID = [
+  '항공 (대한항공 인천-런던 / 밀라노-인천 왕복)',
+  '열차·항공 (유로스타·TGV·Italo·Lufthansa)',
+  '뮤지엄 입장권 (콜로세움·바티칸·해리포터·루브르·오르세·아카데미아·우피치)',
+];
+// 예산 버퍼(여유자금) 권장치 — 현지통화
+const BUDGET_BUFFER = { GBP:160, EUR:1000 };
 const EXP_CATS = [['🧾','기타비용'],['🍽','식비'],['🚕','교통비'],['🛍','쇼핑'],['🎫','티켓'],['🏨','숙박비'],['✈️','항공권'],['⛱','투어'],['🎉','유흥'],['🏃','액티비티'],['💵','팁'],['🎁','선물']];
 const CCY_SYM = { KRW:'₩', EUR:'€', GBP:'£', USD:'$' };
 let expenses = load(LS.expenses, []);
@@ -2319,6 +2374,58 @@ function renderExpenses(){
   });
   html+=`<div class="cost-total" style="margin-top:12px"><span class="cost-total-label">경비 합계</span><span class="cost-total-amount">${won(expTotal)}원</span></div>`;
   html+=`<div class="grand-total"><span class="lbl">총 합계 (예상 사전비용 + 경비)</span><span class="amt">${won(pre+expTotal)}원</span></div>`;
+  wrap.innerHTML=html;
+}
+
+/* ── 예산 가이드 (참고용 · 실지출과 별도 · 예산 대비 실지출 비교) ── */
+let budgetOpen=false;
+function toggleBudgetGuide(){ budgetOpen=!budgetOpen; renderBudgetGuide(); }
+function bWon(n){ return Math.round(n).toLocaleString('ko-KR'); }
+function bKrw(amt,ccy){ return Math.round((+amt||0)*(BUDGET_FX[ccy]||1)); }
+function bDayTot(b){ return (+b.tr||0)+(+b.food||0)+(+b.shop||0); }
+function actualForDay(iso){ // 해당 날짜 교통비/식비/쇼핑 실지출 합(원화)
+  return expenses.filter(e=>e.date===iso && ['교통비','식비','쇼핑'].includes(e.cat))
+    .reduce((a,e)=>a+toKrw(e.amount,e.ccy),0);
+}
+function renderBudgetGuide(){
+  const wrap=document.getElementById('budgetGuideWrap'); if(!wrap) return;
+  const sym={GBP:'£',EUR:'€'};
+  const gbpDaily=BUDGET_GUIDE.filter(b=>b.ccy==='GBP').reduce((a,b)=>a+bDayTot(b),0);
+  const eurDaily=BUDGET_GUIDE.filter(b=>b.ccy==='EUR').reduce((a,b)=>a+bDayTot(b),0);
+  const specialEur=BUDGET_SPECIAL.reduce((a,b)=>a+(b.ccy==='EUR'?b.amt:0),0);
+  const krwGbp=bKrw(gbpDaily,'GBP'), krwEur=bKrw(eurDaily+specialEur,'EUR');
+  const krwTotal=krwGbp+krwEur;
+  const bufKrw=bKrw(BUDGET_BUFFER.GBP,'GBP')+bKrw(BUDGET_BUFFER.EUR,'EUR');
+  let html=`<div class="section-header" style="margin-top:24px"><span class="section-icon">🎯</span><span class="section-title" style="font-size:12px">예산 가이드 (참고)</span><span class="section-sub">일별 권장 예산</span></div>`;
+  html+=`<div class="bg-summary" onclick="toggleBudgetGuide()">
+    <div class="bg-sum-row"><span>💷 런던 (GBP)</span><span>${sym.GBP}${bWon(gbpDaily)} · ₩${bWon(krwGbp)}</span></div>
+    <div class="bg-sum-row"><span>💶 유럽 (EUR·콤비티켓 €${specialEur} 포함)</span><span>${sym.EUR}${bWon(eurDaily+specialEur)} · ₩${bWon(krwEur)}</span></div>
+    <div class="bg-sum-total"><span>합계 (버퍼 전)</span><span>₩${bWon(krwTotal)}</span></div>
+    <div class="bg-sum-buf">여유자금 포함 권장 £${BUDGET_BUFFER.GBP} + €${BUDGET_BUFFER.EUR.toLocaleString()} (약 ₩${bWon(bufKrw)})</div>
+    <div class="bg-toggle">${budgetOpen?'▲ 접기':'▼ 도시별·일별 예산 펼치기'}</div>
+  </div>`;
+  if(budgetOpen){
+    const secs=[['london','💷 런던'],['paris','🗼 파리'],['munich','🍺 뮌헨'],['florence','🌸 피렌체·피사'],['rome','🏛 로마']];
+    secs.forEach(([sk,label])=>{
+      const rows=BUDGET_GUIDE.filter(b=>b.sec===sk); if(!rows.length) return;
+      const ccy=rows[0].ccy; const secTot=rows.reduce((a,b)=>a+bDayTot(b),0);
+      html+=`<div class="bg-sec-head"><span>${label}</span><span>${sym[ccy]}${bWon(secTot)} · ₩${bWon(bKrw(secTot,ccy))}</span></div>`;
+      rows.forEach(b=>{
+        const dd=ISO2DAY[b.date]; const tot=bDayTot(b); const krw=bKrw(tot,b.ccy); const act=actualForDay(b.date);
+        const cmp = act>0 ? `<div class="bg-cmp ${act>krw?'over':'under'}">실지출 ₩${bWon(act)} / 예산 ₩${bWon(krw)} · ${act>krw?'▲ 초과 ₩'+bWon(act-krw):'▼ 여유 ₩'+bWon(krw-act)}</div>` : '';
+        html+=`<div class="bg-day">
+          <div class="bg-day-top"><span class="bg-day-date">📅 ${dd?dd.date+'('+dd.wd+')':isoLabel(b.date)} · ${esc(b.place)}</span><span class="bg-day-tot">${sym[b.ccy]}${bWon(tot)} · ₩${bWon(krw)}</span></div>
+          <div class="bg-cats"><span>🚕 교통 ${sym[b.ccy]}${b.tr}</span><span>🍽 식비 ${sym[b.ccy]}${b.food}</span><span>🛍 쇼핑 ${sym[b.ccy]}${b.shop}</span></div>
+          ${b.note?`<div class="bg-note">💡 ${esc(b.note)}</div>`:''}${cmp}
+        </div>`;
+      });
+    });
+    html+=`<div class="bg-sec-head"><span>✨ 특별지출</span><span></span></div>`;
+    BUDGET_SPECIAL.forEach(sp=>{ const dd=ISO2DAY[sp.date];
+      html+=`<div class="bg-day"><div class="bg-day-top"><span class="bg-day-date">📅 ${dd?dd.date+'('+dd.wd+')':isoLabel(sp.date)}</span><span class="bg-day-tot">${sym[sp.ccy]}${sp.amt} · ₩${bWon(bKrw(sp.amt,sp.ccy))}</span></div><div class="bg-cats"><span>🎿 ${esc(sp.label)}</span></div></div>`; });
+    html+=`<div class="bg-paid"><div class="bg-paid-h">🧾 결제완료 (일별 예산 제외)</div>${BUDGET_PAID.map(pp=>`<div class="bg-paid-i">✅ ${esc(pp)}</div>`).join('')}</div>`;
+  }
+  html+=`<div class="hint" style="padding:6px 4px;font-size:11px;line-height:1.6">※ 예산 가이드는 <strong>권장 참고치</strong>(모두 '필수' 기준)예요. 실제 지출은 위 <strong>＋ 비용 추가</strong>로 기록하면 펼침 화면에서 <strong>예산 대비 실지출</strong>이 자동 비교돼요.<br>산정 환율: £1=${BUDGET_FX.GBP.toLocaleString()}원 · €1=${BUDGET_FX.EUR.toLocaleString()}원 (constants: <code>BUDGET_FX</code>).</div>`;
   wrap.innerHTML=html;
 }
 
@@ -3601,6 +3708,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-12h</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-13</div>
 </body>
 </html>
