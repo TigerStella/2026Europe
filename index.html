@@ -511,6 +511,10 @@
   /* ── DIARY ── */
   .diary-toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
   .diary-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .diary-cols.tiger .son-col { order: -1; }
+  .diary-cols.tiger .son-col .diary-col-head .who { color: var(--dusk-coral); }
+  .diary-cols.tiger .son-col .diary-col-head { border-bottom: 2px solid var(--dusk-coral); }
+  .tiger-toggle.on { background: rgba(224,140,60,.15); border-color: #E0A24B; color: #B4741E; font-weight: 800; }
   .diary-col-head {
     display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border);
   }
@@ -982,7 +986,8 @@
       <span class="section-sub" id="diaryDday">엄마 &amp; 아들</span>
     </div>
     <div class="diary-toolbar">
-      <button class="add-btn" onclick="openDiaryModal()">✏️ 오늘의 일기 쓰기</button>
+      <button class="add-btn" id="diaryWriteBtn" onclick="openDiaryModal()">✏️ 오늘의 일기 쓰기</button>
+      <button class="btn btn-ghost tiger-toggle" id="tigerToggle" onclick="toggleTigerMode()">🐯 타이거 전용</button>
       <button class="btn btn-ghost" onclick="openBrunch()">✍️ 브런치 발행</button>
       <button class="btn btn-ghost" onclick="openBlogPub()">📝 블로그 발행</button>
       <button class="btn btn-ghost" onclick="openEbook()">📖 전자책 만들기</button>
@@ -998,7 +1003,7 @@
 
     <div class="diary-cal" id="diaryCal"></div>
     <div class="diary-cols">
-      <div>
+      <div class="diary-col mom-col">
         <div class="diary-col-head">
           <span class="avatar" style="background:#FDECEF">👩</span>
           <span class="who" id="momWho">엄마</span>
@@ -1006,9 +1011,9 @@
         </div>
         <div class="postit-wrap" id="momWrap"></div>
       </div>
-      <div>
+      <div class="diary-col son-col">
         <div class="diary-col-head">
-          <span class="avatar" style="background:#E8F1FB">🧑</span>
+          <span class="avatar" id="sonAvatar" style="background:#E8F1FB">🧑</span>
           <span class="who" id="sonWho">아들</span>
           <span class="cnt" id="sonCnt"></span>
         </div>
@@ -1124,6 +1129,7 @@
       <div class="field"><label>엄마(화자) 이름</label><input id="setMomName" placeholder="노을"></div>
       <div class="field"><label>아들 이름</label><input id="setSonName" placeholder="타이거"></div>
     </div>
+    <label style="font-size:13px;display:flex;align-items:center;gap:8px;margin:6px 0 4px"><input type="checkbox" id="setTigerMode"> 🐯 타이거 전용모드 (아들 일기 우선 · 작성자 기본값=타이거)</label>
     <div class="field" style="margin:10px 0 14px"><label>기본 문체 톤</label>
       <select id="setTone"><option value="noeul">글선생 · 담백한 장면 (권장)</option><option value="warm">따뜻한 에세이</option><option value="plain">짧은 기록</option><option value="lyric">서정적</option></select></div>
     <div class="brunch-note" style="text-align:left;margin:0 0 14px">💡 '글선생 · 담백한 장면'은 감상을 절제하고 장면 중심으로, 노을(1인칭)의 목소리로 엮어요. 원고를 진짜 에세이 문장으로 다듬는 건 대화창에서 글선생(Claude)과 함께 하시면 가장 좋아요.</div>
@@ -1684,7 +1690,7 @@ let addedActs = load(LS.acts, {});   // { dayNum: [ {ic,t,type,time} ] }
 let reserveState = load(LS.reserve, {}); // { 'london:0': true }
 let diary = load(LS.diary, []);       // [ {id, who, day, date, title, body, photos:[{src,cap}] } ]
 let settings = load(LS.settings, {}); // {title, subtitle, author, tone, momName, sonName}
-const DEFAULT_SETTINGS = { title:'노을과 타이거, 유럽', subtitle:'둘이서 걸은 열여덟 밤', author:'글 · 노을', tone:'noeul', momName:'노을', sonName:'타이거' };
+const DEFAULT_SETTINGS = { title:'노을과 타이거, 유럽', subtitle:'둘이서 걸은 열여덟 밤', author:'글 · 노을', tone:'noeul', momName:'노을', sonName:'타이거', tigerMode:false };
 settings = Object.assign({}, DEFAULT_SETTINGS, settings);
 
 // normalize legacy photo format (string -> {src,cap})
@@ -2859,7 +2865,7 @@ function openDiaryModal(who){
   editingId=null; pendingPhotos=[];
   document.getElementById('diaryModalTitle').textContent='✏️ 오늘의 일기';
   document.getElementById('dDate').value = fxDateBack(0); // 오늘 날짜 자동
-  if(who) document.getElementById('dWho').value=who;
+  document.getElementById('dWho').value = who || (settings.tigerMode?'son':'mom');
   document.getElementById('dTitle').value=''; document.getElementById('dBody').value='';
   document.getElementById('dBody').placeholder=pickSeed(WRITE_HINTS, fxDateBack(0));
   document.getElementById('photoPreview').innerHTML=''; document.getElementById('dPhotos').value='';
@@ -2968,8 +2974,21 @@ function diaryCalClick(iso){
     if(el){ el.classList.add('open','flash'); el.scrollIntoView({behavior:'smooth', block:'center'}); setTimeout(()=>el.classList.remove('flash'),1600); }
   } else { openDiaryModalOn(iso); }
 }
-function openDiaryModalOn(iso){ openDiaryModal('mom'); const el=document.getElementById('dDate'); if(el){ el.value=iso; updateDDayHint(); } }
+function openDiaryModalOn(iso){ openDiaryModal(settings.tigerMode?'son':'mom'); const el=document.getElementById('dDate'); if(el){ el.value=iso; updateDDayHint(); } }
 function togglePostit(id){ const el=document.getElementById('pit-'+id); if(el) el.classList.toggle('open'); }
+function applyTigerMode(){
+  const on=!!settings.tigerMode, son=settings.sonName||'타이거';
+  const cols=document.querySelector('.diary-cols'); if(cols) cols.classList.toggle('tiger', on);
+  const tb=document.getElementById('tigerToggle'); if(tb){ tb.classList.toggle('on', on); tb.textContent = on?`🐯 ${son} 전용 ON`:'🐯 타이거 전용'; }
+  const wb=document.getElementById('diaryWriteBtn'); if(wb) wb.textContent = on?`✏️ ${son} 일기 쓰기`:'✏️ 오늘의 일기 쓰기';
+  const av=document.getElementById('sonAvatar'); if(av) av.textContent = on?'🐯':'🧑';
+}
+function toggleTigerMode(){
+  settings.tigerMode=!settings.tigerMode; save(LS.settings, settings);
+  applyTigerMode(); renderDiary();
+  const son=settings.sonName||'타이거';
+  toast(settings.tigerMode?`🐯 ${son} 전용모드 ON — 일기가 ${son} 칸 먼저, 작성자 기본값도 ${son}예요`:'타이거 전용모드 OFF');
+}
 function renderDiary(){
   const mw=document.getElementById('momWho'); if(mw) mw.textContent = `엄마 · ${settings.momName||'노을'}`;
   const _dd=document.getElementById('diaryDday'); if(_dd) _dd.textContent='✈ '+tripDday();
@@ -2994,6 +3013,7 @@ function renderDiary(){
         </div>
       </div>`).join('');
   });
+  applyTigerMode();
 }
 function viewImage(src){ document.getElementById('imgModalImg').src=src; document.getElementById('imgModal').classList.add('open'); }
 
@@ -3335,6 +3355,7 @@ function openSettings(){
   document.getElementById('setMomName').value=settings.momName||'';
   document.getElementById('setSonName').value=settings.sonName||'';
   document.getElementById('setTone').value=settings.tone||'noeul';
+  document.getElementById('setTigerMode').checked=!!settings.tigerMode;
   document.getElementById('settingsModal').classList.add('open');
 }
 function closeSettings(){ document.getElementById('settingsModal').classList.remove('open'); }
@@ -3345,6 +3366,7 @@ function saveSettings(){
   settings.momName=document.getElementById('setMomName').value.trim()||DEFAULT_SETTINGS.momName;
   settings.sonName=document.getElementById('setSonName').value.trim()||DEFAULT_SETTINGS.sonName;
   settings.tone=document.getElementById('setTone').value;
+  settings.tigerMode=document.getElementById('setTigerMode').checked;
   save(LS.settings, settings);
   const bt=document.getElementById('brunchTone'); if(bt) bt.value=settings.tone;
   renderDiary();
@@ -3786,6 +3808,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-14</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-15</div>
 </body>
 </html>
