@@ -697,6 +697,13 @@
   .tg-blocks{position:relative;height:100%;border-left:1px solid rgba(0,0,0,0.08);cursor:crosshair;}
   .tg-hint{font-size:11px;color:var(--text-light);margin:6px 0 2px;text-align:center;}
   .tg-block.point{padding:3px 8px;}
+  .tg-block.compact{display:flex;align-items:center;gap:6px;padding-top:2px;padding-bottom:2px;}
+  .tg-block.compact .tg-start{flex:0 0 auto;}
+  .tg-block.compact .tg-body{margin-top:0;flex:1;min-width:0;}
+  .tg-block.compact .tg-item{gap:4px;font-size:11.5px;line-height:1.25;align-items:center;min-width:0;}
+  .tg-block.compact .tg-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tg-block.compact .tg-item + .tg-item{display:none;}
+  .tg-block.compact .tg-rng{display:none;}
   .tg-block.editable{cursor:pointer;}
   .tg-block.dragging{opacity:.9;box-shadow:0 6px 18px rgba(0,0,0,0.25);z-index:20;cursor:grabbing;}
   .story-btn{display:inline-flex;align-items:center;gap:4px;margin:0 0 8px;padding:6px 13px;border:none;border-radius:16px;background:linear-gradient(135deg,#7C6EFF,#FF6ECF);color:#fff;font-size:12.5px;font-weight:800;cursor:pointer;box-shadow:0 2px 8px rgba(124,110,255,0.3);}
@@ -2098,6 +2105,7 @@ function dayGridHTML(day, c){
     const top=(sl.start-gridStart)*PXMIN;
     const isPoint = sl.end==null;
     const h = isPoint ? 26 : Math.max(16,(sl.end-sl.start)*PXMIN)-1;
+    const compact = isPoint || h < 40;   // 짧게 좁혀진 블록: 한 줄 압축(시간+내용) 표기
     const it0=sl.items[0]; const kind=it0.kind;
     const refArg = it0.src==='added' ? it0.idx : `'${it0.fkey}'`;
     const durArg = sl.end!=null ? (sl.end-sl.start) : 'null';
@@ -2110,7 +2118,7 @@ function dayGridHTML(day, c){
       const rng = it.end?`<small class="tg-rng">~${esc(it.end)}</small>`:'';
       return `<div class="tg-item"><span class="tg-ic">${it.icon}</span><span class="tg-text">${it.html}${rng}</span></div>`;
     }).join('');
-    blocks+=`<div class="tg-block ${kind}${isPoint?' point':''} editable" ${dataAttr} ${clickAttr} style="top:${top}px;height:${h}px;border-left-color:${c.color}"><span class="tg-start">${fmtHM(sl.start)}</span><div class="tg-body">${body}</div></div>`;
+    blocks+=`<div class="tg-block ${kind}${isPoint?' point':''}${compact?' compact':''} editable" ${dataAttr} ${clickAttr} style="top:${top}px;height:${h}px;border-left-color:${c.color}"><span class="tg-start">${fmtHM(sl.start)}</span><div class="tg-body">${body}</div></div>`;
   });
   const gl=`repeating-linear-gradient(to bottom, transparent 0, transparent ${30*PXMIN-1}px, rgba(0,0,0,0.06) ${30*PXMIN-1}px, rgba(0,0,0,0.06) ${30*PXMIN}px)`;
   grid=`<div class="tg-hint">🖐️ <b>길게 눌러</b> 드래그 = 일정 추가/이동 · <b>탭</b> = 수정 · 스와이프 = 스크롤</div>
@@ -3808,6 +3816,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-15</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-16</div>
 </body>
 </html>
