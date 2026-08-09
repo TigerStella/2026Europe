@@ -1462,7 +1462,7 @@ const DAYS = [
   { d:12, date:'10/6', wd:'화', city:'florence', badges:['피렌체'],
     title:'피사 당일치기 · 오후 우피치',
     story:'🌍 <b>왜 피사의 탑은 기울었을까?</b><br>1173년 착공 당시 지반이 무른 걸 몰랐어요. 3층까지 짓다 이미 기울기 시작했는데, 공사를 멈추지 않고 기운 채로 200년에 걸쳐 완성했어요. <b>갈릴레오</b>가 이 탑 꼭대기에서 무게가 다른 두 공을 떨어뜨려 "무게와 상관없이 같은 속도로 떨어진다"를 증명했다는 전설이 있는 곳이에요.<br><br>🌍 <b>로지아 데이 란치의 숨은 보물</b><br>광장 아치 아래, 조각가 첼리니가 만든 "메두사의 목을 든 페르세우스"가 있어요. 메두사를 무찌른 영웅 이야기가 청동으로 살아있죠 — 우피치 들어가기 전 무료로 보는 미술관인 셈!<br><br>🌍 <b>우피치는 원래 미술관이 아니었다?</b><br>"Uffizi"는 이탈리아어로 "사무실"이라는 뜻. 원래 메디치 가문의 행정 사무실이었는데, 이 가문이 수백 년간 모은 보티첼리·다빈치·라파엘로 작품을 모아 세계 최고 미술관이 됐답니다.',
-    foot:'🎟️ <b>예약</b> · 우피치 <a href="https://www.b-ticket.com/b-ticket/uffizi" target="_blank" rel="noopener">b-ticket.com</a> (화 15:00대) · 피사 <b>COMPLETE VISIT + TOWER €27</b> <a href="https://www.opapisa.it" target="_blank" rel="noopener">opapisa.it</a> (사탑 등탑 8세+·타이거 OK·등탑 시간슬롯 예약 필수) · 기차 <a href="https://www.trenitalia.com" target="_blank" rel="noopener">trenitalia.com</a><br>🧳 <b>준비할 것</b> ☐ 우피치 화 15:00대 예약 ☐ 피사 COMPLETE+TOWER €27 예약(등탑 10:15 슬롯) ☐ 피사행 기차(⭐직행 07:53 S.Rossore·사탑 도보 5분) ☐ 물·간식',
+    foot:'🎟️ <b>예약</b> · 우피치 <a href="https://www.b-ticket.com/b-ticket/uffizi" target="_blank" rel="noopener">b-ticket.com</a> (화 15:00대) · 피사 <b>COMPLETE VISIT + TOWER €27</b> <a href="https://www.opapisa.it" target="_blank" rel="noopener">opapisa.it</a> (사탑 등탑 8세+·타이거 OK·등탑 시간슬롯 예약 필수) · 캄포산토·박물관은 포함이나 생략 OK — 핵심=사탑·세례당·대성당 (사탑€20+세례당€8=€28이라 €27 콤플리트가 더 쌈) · 기차 <a href="https://www.trenitalia.com" target="_blank" rel="noopener">trenitalia.com</a><br>🧳 <b>준비할 것</b> ☐ 우피치 화 15:00대 예약 ☐ 피사 COMPLETE+TOWER €27 예약(등탑 10:15 슬롯) ☐ 피사행 기차(⭐직행 07:53 S.Rossore·사탑 도보 5분) ☐ 물·간식',
     acts:[
       {ic:'🍳', t:'조식·준비 (호텔이 S.M.N. 도보 5분)', time:'07:00', endTime:'07:45'},
       {ic:'🚂', t:'피렌체 S.M.N. → 피사 산로쏘레(S.Rossore) · ⭐직행 Regionale 18357 (사탑 도보 5분!)', time:'07:53', endTime:'09:13'},
@@ -1471,11 +1471,10 @@ const DAYS = [
       {ic:'⛪', t:'대성당(두오모) — 티켓 포함·화려한 천장·설교단 (등탑 전 여유)', time:'09:45', endTime:'10:15'},
       {ic:'🗼', t:'★피사의 사탑 등탑 (예약 10:15 슬롯·251계단·타이거 체험!)', time:'10:15', endTime:'10:55'},
       {ic:'🔔', t:'세례당 — ⭐경비원 아카펠라 에코 시연(정각·30분마다 · 11:00/11:30 시연 노리기!)', time:'10:55', endTime:'11:30'},
-      {ic:'🌿', t:'캄포산토(납골당) — 회랑·거대 프레스코', time:'11:30', endTime:'11:55'},
-      {ic:'🏛️', t:'오페라 박물관 (시간 남으면·사탑 원본 조각·전망)', time:'11:55', endTime:'12:15'},
-      {ic:'🍽️', t:'점심 (피사·광장 근처·간단히)', time:'12:15', endTime:'12:55'},
+      {ic:'📸', t:'광장 잔디밭 — "사탑 미는" 인증샷·휴식 (캄포산토·박물관은 생략)', time:'11:30', endTime:'12:00'},
+      {ic:'🍽️', t:'점심 (피사·광장 근처·여유)', time:'12:00', endTime:'12:55'},
       {ic:'🚶', t:'S.Rossore역 이동 (도보 5분)', time:'12:55', endTime:'13:10'},
-      {ic:'🚂', t:'피사 S.Rossore → 피렌체 · Reg 19359+RV4036 (경유1회·피사 첸트랄레 환승)', time:'13:14', endTime:'14:33'},
+      {ic:'🚂', t:'피사 S.Rossore → 피렌체 · Reg 19359+RV4036 (경유1회) · 여유 생기면 더 이른 기차도 OK', time:'13:14', endTime:'14:33'},
       {ic:'🚶', t:'피렌체 S.M.N. → 우피치 곧장 이동 (도보 15~18분·로지아 데이 란치 지나며 감상)', time:'14:33', endTime:'14:55'},
       {ic:'🖼️', t:'우피치 미술관 (⭐예약 15:00) — 2.5시간 여유 관람', time:'15:00', endTime:'17:30'},
       {ic:'🍝', t:'저녁', time:'18:00'}
@@ -3822,6 +3821,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-20c</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-20d</div>
 </body>
 </html>
