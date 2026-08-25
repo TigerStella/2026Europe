@@ -1299,23 +1299,26 @@ const ROUTE = [
 // Base itinerary — transport & hotel surfaced to top, activities as list.
 const DAYS = [
   { d:1, date:'9/25', wd:'금', city:'london', transit:'transit', badges:['이동','런던'],
-    title:'인천 출발 → 런던 히드로 도착',
+    title:'인천 출발 → 런던 파크 런던 도착',
     transport:{ icon:'✈️', time:'10:55', text:'대한항공 <strong>KE0907</strong> · 10:55 인천(ICN·T2) 출발 → 17:20 히드로(LHR·T4) 도착<br>총 14시간 25분 · 수하물 1개 · 일반석(U)' },
-    hotel:{ time:'16:00', text:'히드로 체크인 · Premier Inn Heathrow (T4)' },
-    acts:[ {ic:'🚇', t:'히드로 공항 → 숙소 이동 (히드로 익스프레스 or 지하철)'} ] },
-  { d:2, date:'9/26', wd:'토', city:'london', badges:['런던'],
-    title:'영국박물관 · 코벤트가든 · 뮤지컬',
-    story:'영국박물관에서 꼭 찾아야 할 건 <b>로제타석</b>이야. 시커먼 돌에 같은 내용이 <b>세 가지 문자(이집트 그림문자·이집트 흘림문자·그리스어)</b>로 적혀 있는데, 이 돌 덕분에 학자들이 <b>아무도 못 읽던 이집트 상형문자를 해독</b>했지 — 고대 이집트의 비밀을 푸는 열쇠였어! 미라관에선 3천 년 전 사람도 만날 수 있단다.',
-    hotel:{ time:'17:00', text:'<strong>파크 런던 (시내)</strong> 체크인 — 샤워·짐 정리' },
+    hotel:{ time:'19:00', text:'<strong>파크 런던 (시내)</strong> 체크인 — 샤워·짐 정리' },
     acts:[
-      {ic:'🚇', t:'T4 체크아웃 → 피카딜리선 (T4 종점 탑승) · ⚠️ 출발 2주 전 TfL 운행 확인', time:'08:20'},
-      {ic:'🚉', t:'킹스크로스 도착 → 도보 10~12분 (평탄)', time:'09:45'},
-      {ic:'🧳', t:'한인민박 짐 보관 · 데이백만 챙기기', time:'10:05'},
-      {ic:'🏛️', t:'영국박물관 (숙소 도보 5~10분) · 로제타스톤·미라관 직행, 무료', time:'10:30', endTime:'13:00'},
-      {ic:'🍽️', t:'점심 · 박물관 인근', time:'13:00', endTime:'14:00'},
-      {ic:'🎪', t:'코벤트가든 · 거리공연·마켓, 레고/디즈니스토어 자연스럽게', time:'14:00', endTime:'16:00'},
-      {ic:'🚇', t:'숙소 복귀·휴식', time:'16:00', endTime:'16:30'},
-      {ic:'🍽️', t:'저녁', time:'18:00'},
+      {ic:'🛃', t:'입국심사·수하물 수령', time:'17:20', endTime:'18:00'},
+      {ic:'🚇', t:'히드로 → 파크 런던(시내) 이동 · 피카딜리선 (약 1시간)', time:'18:00', endTime:'19:00'}
+    ] },
+  { d:2, date:'9/26', wd:'토', city:'london', badges:['런던'],
+    title:'영국박물관 · 내셔널갤러리 · 뮤지컬',
+    story:'영국박물관에서 꼭 찾아야 할 건 <b>로제타석</b>이야. 시커먼 돌에 같은 내용이 <b>세 가지 문자(이집트 그림문자·이집트 흘림문자·그리스어)</b>로 적혀 있는데, 이 돌 덕분에 학자들이 <b>아무도 못 읽던 이집트 상형문자를 해독</b>했지 — 고대 이집트의 비밀을 푸는 열쇠였어! 미라관에선 3천 년 전 사람도 만날 수 있단다.',
+    acts:[
+      {ic:'🍳', t:'한인민박 조식 (한식 아침 제공)', time:'08:30', endTime:'09:30'},
+      {ic:'🚶', t:'숙소 → 영국박물관 도보 이동 (5~10분)', time:'09:30', endTime:'09:50'},
+      {ic:'🏛️', t:'★영국박물관 투어 (⭐예약) — 로제타스톤·미라관 직행', time:'10:00', endTime:'12:30'},
+      {ic:'🍽️', t:'점심 · 박물관 인근', time:'12:30', endTime:'13:40'},
+      {ic:'🚶', t:'박물관 → 내셔널갤러리 이동 (도보/버스 약 25분)', time:'13:40', endTime:'14:20'},
+      {ic:'🖼️', t:'★내셔널갤러리 투어 (⭐예약) — 고흐 해바라기·터너', time:'14:20', endTime:'16:30'},
+      {ic:'🎪', t:'코벤트가든 (도보 5분) · 거리공연·마켓, 레고/디즈니스토어 자연스럽게', time:'16:30', endTime:'17:30'},
+      {ic:'🚇', t:'숙소 복귀·휴식·저녁 준비', time:'17:30', endTime:'18:30'},
+      {ic:'🍽️', t:'저녁', time:'18:30', endTime:'19:00'},
       {ic:'🎭', t:'뮤지컬 (웨스트엔드, 토요일 이브닝)', time:'19:30'}
     ] },
   { d:3, date:'9/27', wd:'일', city:'london', badges:['런던'],
@@ -1618,10 +1621,8 @@ const PREP_TODO = {
 };
 
 const HOTELS = [
-  { city:'london', label:'🏙 런던 (1박)', name:'Premier Inn Heathrow Ai 트리플룸', dates:'9/25 IN 16:00 → 9/26 OUT 12:00',
-    rows:[['📍','Terminal 4, Sheffield Road, 히스로, 런던 TW6 3FH'],['📞','@london_premier'],['🍴','조식 포함 확인'],['🔖','예약: 아고다']], cost:'137,087원' },
-  { city:'london', label:'🏙 런던 (3박)', name:'파크 런던 — 시내 한인민박 (링컨스 스위트 A)', dates:'9/26 IN 17:00 → 9/29 OUT 11:00',
-    rows:[['🍱','한인 밥집 아침/저녁 식사 제공'],['📱','@london_minbak'],['🔖','예약: 마이리얼트립']], cost:'1,040,526원' },
+  { city:'london', label:'🏙 런던 (4박)', name:'파크 런던 — 시내 한인민박 (링컨스 스위트 A)', dates:'9/25 IN 19:00 → 9/29 OUT 11:00',
+    rows:[['🍱','한인 밥집 아침/저녁 식사 제공'],['📱','@london_minbak'],['🔖','예약: 마이리얼트립']], cost:'1,277,459원' },
   { city:'paris', label:'🗼 파리 (2박)', name:'루프라라 1호점 (시내 한인민박)', dates:'9/29 IN 16:00 → 10/1 OUT 11:30',
     rows:[['📍','4 Rue Robert de Flers, 75015 Paris'],['🧳','짐 보관 가능'],['📞','@paris_luprara'],['🔖','예약: 마이리얼트립']], cost:'784,283원' },
   { city:'munich', label:'🍺 뮌헨 (4박)', name:'Aparthotel Adagio Access München City', dates:'10/1 IN 15:00 → 10/5 OUT 11:00',
@@ -1642,7 +1643,7 @@ const TRANSPORT = [
   { icon:'✈️', route:'밀라노 → 인천 (귀국)', detail:'10/11(일) 22:00 밀라노 말펜사(MXP·T1) 출발 → 10/12(월) 16:40 인천(ICN·T2) 도착<br>총 11시간 40분 · 수하물 1개 · 일반석(H)' },
 ];
 
-// 사전 결제 확정 비용 (KRW) — Total 8,786,320
+// 사전 결제 확정 비용 (KRW) — Total 8,886,166
 const COSTS = [
   { cat:'✈️ 항공', items:[ ['대한항공 인천-런던 / 밀라노 말펜사-인천 (왕복)', 2952800] ] },
   { cat:'🛂 비자', items:[ ['영국 ETA 비자 (1인 27.99 USD)', 89520] ] },
@@ -1652,8 +1653,7 @@ const COSTS = [
       ['뮌헨→피렌체 항공 (10/5 07:55, €293.94)', 534397],
   ] },
   { cat:'🏨 숙소', items:[
-      ['히드로 (9/25~9/26)', 137087],
-      ['런던 (9/26~9/29)', 1040526],
+      ['런던 파크 런던 (9/25~9/29)', 1277459],
       ['파리 (9/29~10/1)', 783283],
       ['뮌헨 (10/1~10/5)', 1020000],
       ['피렌체 (10/5~10/7)', 546774],
@@ -1717,8 +1717,7 @@ diary.forEach(e => { e.photos = normPhotos(e.photos); if(!e.iso){ const dd=DAYS.
 // 비공개 연락처 (공개 저장소에 저장 안 함, 브라우저 localStorage에만 보관)
 let contacts = load(LS.contacts, {}); // { slotId: '값' }
 const CONTACT_SLOTS = [
-  { id:'london_premier', title:'🏙 런던 Premier Inn (히드로)', color:'var(--london)',   ph:'전화번호' },
-  { id:'london_minbak',  title:'🏙 런던 한인민박 (파크런던)',  color:'var(--london)',   ph:'카카오톡 ID' },
+  { id:'london_minbak',  title:'🏙 런던 한인민박 (파크런던, 9/25~29)',  color:'var(--london)',   ph:'카카오톡 ID' },
   { id:'paris_luprara',  title:'🗼 파리 루프라라',            color:'var(--paris)',    ph:'전화 · 카카오톡' },
   { id:'florence_hotel', title:'🌸 피렌체 San Giorgio',       color:'var(--florence)', ph:'이메일' },
   { id:'rome_apt',       title:'🏛 로마 아파트',              color:'var(--rome)',     ph:'전화번호' },
@@ -3854,6 +3853,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-22</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-23</div>
 </body>
 </html>
