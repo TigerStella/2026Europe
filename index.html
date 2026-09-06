@@ -235,6 +235,20 @@
   .day-weekday { font-size: 11px; font-weight: 700; color: var(--text-light); letter-spacing: 1px; text-transform: uppercase; }
   .city-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; color: white; letter-spacing: 0.5px; }
   .rest-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; background: rgba(91,155,110,.15); color: #2F6B44; letter-spacing: 0.5px; }
+  .ec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .ec-card { background: #fff; border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-left: 3px solid var(--slate); }
+  .ec-card.ec-current { border-left-color: var(--dusk-coral); box-shadow: 0 3px 12px rgba(224,96,122,0.18); background: rgba(255,158,134,0.05); }
+  .ec-head { display: flex; align-items: center; gap: 4px; margin-bottom: 2px; }
+  .ec-city { font-size: 13px; font-weight: 800; color: var(--text-dark); }
+  .ec-office { font-size: 11.5px; color: var(--text-mid); margin-bottom: 8px; }
+  .ec-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 11.5px; padding: 3px 0; border-bottom: 1px dashed var(--border); }
+  .ec-row:last-of-type { border-bottom: none; }
+  .ec-label { color: var(--text-light); flex: 0 0 auto; }
+  .ec-tel { color: #3B6EA8; font-weight: 700; text-decoration: none; }
+  .ec-tel.emergency { color: #B23A55; }
+  .ec-note { font-size: 11px; color: var(--text-light); margin-top: 6px; }
+  .ec-112 { margin-top: 8px; padding: 6px 8px; background: rgba(224,96,122,0.08); border-radius: 8px; font-size: 11px; color: #B23A55; }
+  .ec-112 .ec-tel { margin-left: 4px; }
   .tour-status { display: inline-block; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 8px; margin-left: 6px; vertical-align: middle; white-space: nowrap; }
   .tour-status.booked { background: rgba(91,155,110,.16); color: #2F6B44; }
   .tour-status.confirmed { background: rgba(122,138,255,.16); color: #4A57C8; }
@@ -819,6 +833,7 @@
   <button class="nav-tab" onclick="showTab('cost', this)">💰 비용</button>
   <button class="nav-tab" onclick="showTab('tips', this)">💡 팁</button>
   <button class="nav-tab" onclick="showTab('checklist', this)">🎒 준비물</button>
+  <button class="nav-tab" onclick="showTab('emergency', this)">🆘 비상연락망</button>
   <button class="nav-tab" onclick="showTab('community', this)">🌍 커뮤니티</button>
   <button class="nav-tab" onclick="showTab('related', this)">🔗 관련정보</button>
   <button class="nav-tab" onclick="showTab('diary', this)">📔 일기</button>
@@ -919,11 +934,25 @@
     </div>
 
     <div class="section-header" style="margin-top:28px">
-      <span class="section-icon">📞</span><span class="section-title">긴급 연락처</span>
+      <span class="section-icon">📞</span><span class="section-title">숙소·현지 연락처</span>
       <button class="mini-refresh" onclick="openContacts()" title="연락처 입력/수정">✏️ 편집</button>
     </div>
-    <p class="hint">🔒 연락처는 공개 저장소에 저장되지 않고 <strong>이 브라우저에만</strong> 보관돼요. (백업 파일로만 이동)</p>
+    <p class="hint">🔒 연락처는 공개 저장소에 저장되지 않고 <strong>이 브라우저에만</strong> 보관돼요. (백업 파일로만 이동) · 대사관·응급 연락처는 <strong>🆘 비상연락망</strong> 탭에 따로 있어요.</p>
     <div class="tips-grid" id="contactsWrap"></div>
+  </div>
+</div>
+
+<!-- ── TAB: 비상연락망 ── -->
+<div id="emergency" class="tab-section">
+  <div class="container">
+    <div id="emergencyWrap"></div>
+    <div class="section-header" style="margin-top:24px"><span class="section-icon">🩺</span><span class="section-title">해외 사건사고 시 대응 순서</span></div>
+    <div class="tips-grid">
+      <div class="tip-card"><div class="tip-title">1️⃣ 현장 안전 확보</div><div class="tip-text">현지 <strong>112/999 긴급신고</strong>로 경찰·구급차·소방 먼저 요청 (대사관은 신고 접수기관이 아니에요).</div></div>
+      <div class="tip-card"><div class="tip-title">2️⃣ 대사관·총영사관 연락</div><div class="tip-text">여권 분실·사건사고 등은 근무시간엔 대표전화, 그 외엔 <strong>긴급전화</strong>로 연락.</div></div>
+      <div class="tip-card"><div class="tip-title">3️⃣ 영사콜센터 백업</div><div class="tip-text">현지 연락이 안 될 때 <strong>외교부 영사콜센터(24시간)</strong>로 전화하면 다른 방법을 안내받을 수 있어요.</div></div>
+      <div class="tip-card"><div class="tip-title">📄 여권 분실 시</div><div class="tip-text">가까운 경찰서에서 <strong>분실신고확인서(Police Report)</strong> 먼저 받은 뒤 대사관 방문 — 여행증명서 발급에 필요해요.</div></div>
+    </div>
   </div>
 </div>
 
@@ -2000,6 +2029,44 @@ function tourBookingHTML(tb){
       ${row('📜 취소규정', tb.cancellationPolicy)}
     </div>
   </details>`;
+}
+const EMERGENCY_CONTACTS = [
+  { cityKey:'london', city:'런던 (London)', office:'주영국 대한민국 대사관', mainPhone:'+44-20-7227-5500', mainHours:'월-금 09:00-12:00, 14:00-16:00', emergencyPhone:'+44-78-7650-6895', note:'근무시간 외 긴급전용', local112:{ num:'999', text:'999 (또는 112) — 경찰·소방·구급차' } },
+  { cityKey:'paris', city:'파리 (Paris)', office:'주프랑스 대한민국 대사관', mainPhone:'+33-1-4753-0101', mainHours:'09:30-18:00', emergencyPhone:'+33-6-8028-5396', note:'근무시간 외 당직', local112:{ num:'112', text:'112 — 경찰·소방·구급차 (17경찰·18소방·15구급차)' } },
+  { cityKey:'munich', city:'뮌헨 (Munich)', office:'주프랑크푸르트 대한민국 총영사관 (바이에른주 관할)', mainPhone:'+49-69-795-6980', mainHours:'확인 필요 — 총영사관 홈페이지 재확인', emergencyPhone:'+49-173-363-4854', note:'뮌헨 현지 대사관 없음, 프랑크푸르트 총영사관이 관할', local112:{ num:'112', text:'112 — 경찰·소방·구급차 (경찰 단독 110)' } },
+  { cityKey:'rome', city:'로마·피렌체 (같은 관할)', office:'주이탈리아 대한민국 대사관', mainPhone:'+39-06-420-402-1', mainHours:'월-금 09:30-12:00, 14:00-16:30', emergencyPhone:'+39-335-185-0499', note:'근무시간 외 긴급전용', local112:{ num:'112', text:'112 — 경찰·소방·구급차 통합신고' } },
+  { cityKey:null, city:'전체 공통', office:'외교부 영사콜센터', mainPhone:'+82-2-3210-0404', mainHours:'24시간 (유료)', emergencyPhone:'+82-2-3210-0404', note:'현지 연락 두절 시 백업용', local112:null },
+];
+function telHref(num){ return 'tel:'+String(num||'').replace(/[^0-9+]/g,''); }
+function todayCityKey(){
+  const now=new Date();
+  const iso=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  const day=ISO2DAY[iso];
+  return day ? day.city : null;
+}
+function emergencyCardHTML(e, big){
+  return `<div class="ec-card${big?' ec-current':''}">
+    <div class="ec-head">${big?'🚨 ':''}<span class="ec-city">${esc(e.city)}</span></div>
+    <div class="ec-office">${esc(e.office)}</div>
+    <div class="ec-row"><span class="ec-label">☎️ 대표전화</span><a class="ec-tel" href="${telHref(e.mainPhone)}">${esc(e.mainPhone)}</a></div>
+    <div class="ec-row"><span class="ec-label">🕐 근무시간</span><span>${esc(e.mainHours)}</span></div>
+    <div class="ec-row"><span class="ec-label">🆘 긴급전화</span><a class="ec-tel emergency" href="${telHref(e.emergencyPhone)}">${esc(e.emergencyPhone)}</a></div>
+    <div class="ec-note">${esc(e.note)}</div>
+    ${e.local112?`<div class="ec-112">🚓 현지 긴급신고<a class="ec-tel" href="${telHref(e.local112.num)}">${esc(e.local112.text)}</a></div>`:''}
+  </div>`;
+}
+function renderEmergency(){
+  const wrap=document.getElementById('emergencyWrap'); if(!wrap) return;
+  const cur=todayCityKey();
+  const curEntry = cur ? EMERGENCY_CONTACTS.find(e=>e.cityKey===cur) : null;
+  let html='';
+  if(curEntry){
+    html += `<div class="section-header" style="margin-top:0"><span class="section-icon">🚨</span><span class="section-title">지금 있는 도시</span><span class="section-sub">오늘 날짜 기준 자동 표시</span></div>`;
+    html += `<div class="ec-grid">${emergencyCardHTML(curEntry, true)}</div>`;
+  }
+  html += `<div class="section-header" style="margin-top:${curEntry?24:0}px"><span class="section-icon">🆘</span><span class="section-title">전체 비상연락망</span><span class="section-sub">탭하면 바로 전화 연결</span></div>`;
+  html += `<div class="ec-grid">${EMERGENCY_CONTACTS.map(e=>emergencyCardHTML(e,false)).join('')}</div>`;
+  wrap.innerHTML = html;
 }
 function bookingRequiredHTML(br){
   if(!br) return '';
@@ -4007,6 +4074,7 @@ function init(){
   renderCost();
   renderCommunity();
   renderChecklist();
+  renderEmergency();
   renderContacts();
   renderRelated();
   renderDiary();
@@ -4047,6 +4115,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-26</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-27</div>
 </body>
 </html>
