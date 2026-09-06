@@ -234,6 +234,19 @@
   .day-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
   .day-weekday { font-size: 11px; font-weight: 700; color: var(--text-light); letter-spacing: 1px; text-transform: uppercase; }
   .city-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; color: white; letter-spacing: 0.5px; }
+  .rest-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; background: rgba(91,155,110,.15); color: #2F6B44; letter-spacing: 0.5px; }
+  .tour-status { display: inline-block; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 8px; margin-left: 6px; vertical-align: middle; white-space: nowrap; }
+  .tour-status.booked { background: rgba(91,155,110,.16); color: #2F6B44; }
+  .tour-status.confirmed { background: rgba(122,138,255,.16); color: #4A57C8; }
+  .tour-detail { display: block; margin-top: 5px; font-size: 11px; }
+  .tour-detail summary { cursor: pointer; font-weight: 700; color: var(--slate); list-style: none; }
+  .tour-detail summary::-webkit-details-marker { display: none; }
+  .tour-detail summary::before { content: '▸ '; }
+  .tour-detail[open] summary::before { content: '▾ '; }
+  .tour-detail-body { margin-top: 6px; padding: 8px 10px; background: rgba(0,0,0,0.03); border-radius: 8px; line-height: 1.6; }
+  .tour-detail-body b { color: var(--text-dark); }
+  .tour-detail-body ul { margin: 4px 0 0 18px; padding: 0; }
+  .tour-detail-body li { margin-bottom: 2px; }
   .day-title { font-size: 14px; font-weight: 500; color: var(--text-dark); margin-bottom: 6px; }
   .day-details { display: flex; flex-direction: column; gap: 5px; }
   .detail-row { display: flex; gap: 8px; font-size: 12px; color: var(--text-mid); align-items: flex-start; }
@@ -1531,41 +1544,81 @@ const DAYS = [
   { d:14, date:'10/8', wd:'목', city:'rome', badges:['로마'],
     title:'바티칸 박물관 · 시스티나 · 성 베드로 돔 등정',
     story:'🌍 <b>시스티나 성당 천장 — 미켈란젤로의 4년 목 통증</b><br>미켈란젤로는 원래 조각가였어요. "나는 화가가 아니다"라며 투덜댔지만, 교황의 명령으로 시스티나 성당 천장(길이 40m!)에 그림을 그리게 됐죠. 4년간 목을 뒤로 젖힌 채 서서 그렸는데, 나중엔 편지도 고개를 젖혀야 읽을 수 있었대요. 천장 한가운데 <b>하느님이 아담에게 손가락을 뻗는 그림</b>이 바로 그거예요. 두 손가락이 <b>닿을 듯 말 듯</b> 한 그 유명한 장면!<br><br>🌍 <b>돔 위에서 — 두 천재의 건축 대결 완성</b><br>피렌체에서 봤던 두오모 돔(브루넬레스키) 기억나죠? 미켈란젤로는 그걸 보고 "더 크게는 못 만들어도 더 아름답게 만들겠다"며 성 베드로 돔을 설계했어요. 오늘 551계단을 올라가는 그 돔이에요. 꼭대기에서 로마 전체가 발 아래 펼쳐진답니다!',
-    foot:'🎟️ <b>바티칸 박물관</b> <a href="https://www.museivaticani.va" target="_blank" rel="noopener">museivaticani.va</a> (목 08:00 입장·일요일 휴관·개장 직후 골든타임) · <b>돔 등정</b> 현장 매표 (엘베+320계단 €10 / 도보 551계단 €8)<br>🧳 <b>준비할 것</b> ☐ 바티칸 08:00 e티켓 ☐ 어깨·무릎 가리는 복장(필수) ☐ 물·간식 ☐ 돔 등정 현금',
+    foot:'🎟️ <b>바티칸 투어</b>(유로자전거나라) 목 <b>07:40 CIPRO역 미팅</b> — 티켓 상황에 따라 08:00으로 변경될 수 있어요(전날 가이드 연락) · 일요일 휴관 · <b>돔 등정</b> 현장 매표 (엘베+320계단 €10 / 도보 551계단 €8)<br>🧳 <b>준비할 것</b> ☐ 여권 원본/사본 ☐ 3.5mm 이어폰(수신기 연결용) ☐ 어깨·무릎 가리는 복장(필수) ☐ 물·간식 ☐ 돔 등정 현금',
     acts:[
-      {ic:'🍳', t:'기상 · 조식', time:'07:30', endTime:'08:00'},
-      {ic:'🖼️', t:'★바티칸 박물관 (⭐08:00 예약) — 지도갤러리→라파엘로의 방→시스티나', time:'08:00', endTime:'11:00'},
-      {ic:'☕', t:'카페 휴식', time:'11:00', endTime:'11:30'},
-      {ic:'🍝', t:'점심', time:'11:30', endTime:'13:00'},
-      {ic:'⛪', t:'★★성 베드로 돔 등정 (엘베+320계단 €10 / 도보 551계단 €8)', time:'13:00', endTime:'14:30'},
-      {ic:'🛋️', t:'숙소 휴식', time:'14:30', endTime:'16:00'}
+      {ic:'🍳', t:'기상 · 조식 (간단히, 이동 여유 확보)', time:'06:50', endTime:'07:20', status:'confirmed'},
+      {ic:'🚕', t:'숙소 → CIPRO역 이동 (바티칸 인근·도보/택시, 정확한 도보 거리 사전 확인 필요) · 대중교통 중단 대비 택시 권장', time:'07:20', endTime:'07:40', status:'confirmed'},
+      {ic:'🖼️', t:'★바티칸 박물관 투어 (⭐07:40 미팅) — 지도갤러리→라파엘로의 방→시스티나', time:'07:40', endTime:'11:00', status:'booked',
+        tourBooking:{
+          provider:'유로자전거나라 (프리미엄 패스트트랙)',
+          meetingTime:'07:40 (⚠️ 티켓 수급 상황에 따라 08:00으로 변경될 수 있음 — 변경 시 투어 전날 가이드가 연락)',
+          meetingPlace:'유로자전거나라 바티칸 투어 모임장소 — CIPRO역 (개찰구 1곳 통과 후 광장에서 왼쪽 계단으로 올라가면 가이드 대기) · 테르미니역에서 지하철 A선 약 30분 거리, 단 숙소가 바티칸 인근이라 도보/단거리 이동 가능성 있음(정확한 도보 거리 사전 확인 필요)',
+          price:'65,000원~ (가이드비만 포함, 옵션에 따라 상이)',
+          extraCosts:[
+            '바티칸 입장료(필수입장/패스트트랙 티켓비+수신기비+그룹예약비 포함) — 만19세 이상 45유로 / 국제학생증 소지자(만19~25세) 35유로 / 만7~18세(여권지참) 35유로 ← 타이거(11세) 해당 / 만4~6세 무료',
+            '성 베드로 대성전 패스트트랙 입장료: 만7세 이상 1인 7유로',
+            '※ 박물관→대성전 이동 제한 시, 패스트트랙비 없이 외부 설명 후 투어 종료될 수 있음'
+          ],
+          cautions:[
+            '지하철 등 대중교통이 갑자기 중단되는 경우가 잦음 → 택시 이용 권장, 숙소에서 충분히 일찍 출발',
+            '투어 참여자는 여권 원본 또는 사본 지참 필수',
+            '개인 이어폰(3.5mm 스테레오 잭) 지참 권장 — 무선 수신기 연결용',
+            '취소 규정: 이용일 7일 전 취소 시 수수료 제외 환불 / 6일 전 취소 시 수수료+사전티켓비 제외 환불 / 1주일 미만 취소 시 환불규정+티켓비 공제'
+          ]
+        } },
+      {ic:'☕', t:'카페 휴식', time:'11:00', endTime:'11:30', status:'confirmed'},
+      {ic:'🍝', t:'점심', time:'11:30', endTime:'13:00', status:'confirmed'},
+      {ic:'⛪', t:'★★성 베드로 돔 등정 (엘베+320계단 €10 / 도보 551계단 €8)', time:'13:00', endTime:'14:30', status:'confirmed'},
+      {ic:'🛋️', t:'숙소 휴식', time:'14:30', endTime:'16:00', status:'confirmed'}
     ] },
   { d:15, date:'10/9', wd:'금', city:'rome', badges:['로마'],
     title:'콜로세움 지하 · 포로 로마노 · 산 클레멘테 시간여행',
     story:'🌍 <b>콜로세움 — 5만 명이 열광한 고대의 경기장</b><br>2000년 전, 이곳에서 검투사들이 싸우고 심지어 <b>바다처럼 물을 채워 배 전투</b>도 재현했대요! 오늘 우리는 관광객이 잘 못 가는 <b>지하(히포게움)</b>에 들어가요. 여기엔 맹수 우리와 엘리베이터가 있어서, 사자가 갑자기 바닥에서 솟아올랐다고 해요. 검투사가 이기면 관중이 엄지를 치켜들었죠!<br><br>🌍 <b>산 클레멘테 — 지하로 내려가는 타임머신</b><br>이 성당은 층층이 <b>시간이 쌓여</b> 있어요. 1층은 12세기 성당, 지하로 내려가면 4세기 교회, 더 내려가면 <b>1세기 로마 신전(미트라교)</b>까지! 계단을 하나 내려갈 때마다 1000년씩 과거로 가는 거예요.<br><br>🌍 <b>치르코 마시모 — 벤허의 전차 경주장</b><br>25만 명이 앉던 거대한 전차 경주 트랙! 지금은 잔디밭이라 <b>아이들이 실제로 뛰어볼 수</b> 있어요. 옛날 로마 소년들도 여기서 달렸겠죠?',
-    foot:'🎟️ <b>콜로세움 Full Experience</b>(지하+경기장 바닥) <a href="https://www.colosseo.it" target="_blank" rel="noopener">colosseo.it</a> (30일 전 9/9 오픈·€24~·이름·여권 일치) · <b>산 클레멘테 지하</b> €10 현장 · 산 피에트로 인 빈콜리(모세상) 무료<br>🧳 <b>준비할 것</b> ☐ 콜로세움 Full Exp. 9/9 예약 ☐ 여권(티켓 이름 일치) ☐ 소매치기 주의(콜로세움·64번 버스) ☐ 편한 신발',
+    foot:'🎟️ <b>콜로세움+포로로마노 투어</b>(형제투어) 금 <b>08:30 콜로세오(B선) 미팅</b> · <b>산 클레멘테 지하</b> €10 현장 · 산 피에트로 인 빈콜리(모세상) 무료<br>🧳 <b>준비할 것</b> ☐ 여권(티켓 이름 일치) ☐ 아들 요금 카테고리 가이드 사전확인 ☐ 소매치기 주의(콜로세움·64번 버스) ☐ 편한 신발',
     acts:[
-      {ic:'🏟️', t:'★콜로세움 Full Experience (⭐예약) — 지하 히포게움+경기장 바닥', time:'09:00', endTime:'11:00'},
-      {ic:'🏛️', t:'포로 로마노 · 팔라티노 언덕', time:'11:00', endTime:'12:30'},
-      {ic:'🏃', t:'★치르코 마시모 — 잔디 트랙 뛰어보기', time:'12:30', endTime:'13:00'},
-      {ic:'🍕', t:'점심', time:'13:00', endTime:'14:00'},
-      {ic:'🗿', t:'산 피에트로 인 빈콜리 (미켈란젤로 모세상·무료)', time:'14:00', endTime:'14:40'},
-      {ic:'⏳', t:'★산 클레멘테 지하 3층 (12C→4C→1C 미트라교)', time:'14:40', endTime:'15:40'},
-      {ic:'⛲', t:'트레비 분수 — 동전 던지기', time:'15:40', endTime:'16:20'},
-      {ic:'🏛️', t:'판테온 (2000년 된 콘크리트 돔)', time:'16:20', endTime:'17:00'},
-      {ic:'🎨', t:'나보나 광장 — 베르니니 분수·거리 화가', time:'17:00', endTime:'17:40'},
-      {ic:'🍝', t:'저녁', time:'18:00'}
+      {ic:'🍳', t:'기상·조식', time:'07:00', endTime:'07:45', status:'confirmed'},
+      {ic:'🚇', t:'숙소 → 콜로세오 이동 (메트로 A→테르미니→B 환승)', time:'07:45', endTime:'08:15', status:'confirmed'},
+      {ic:'🏛️', t:'★포로로마노 진입 · 티투스 개선문', time:'08:30', endTime:'08:50', status:'booked',
+        tourBooking:{
+          provider:'형제투어 (패스트트랙, 한국인 가이드)',
+          meetingTime:'08:30',
+          meetingPlace:'Colosseo — 콜로세움 B선 지하철역 앞',
+          price:'65,000원~ (가이드비만 포함, 옵션에 따라 상이)',
+          includes:'형제투어 전문 로컬 가이드비(한국인)',
+          extraCosts:[
+            '콜로세움+포로로마노 통합권: 성인 1인 35유로 / 학생(만17세까지, 여권 본인증명) 10유로',
+            '무선 수신기 대여비: 3유로',
+            '개인 여행자보험'
+          ],
+          cautions:[
+            '티켓은 가이드 사전예약으로 진행되며 상세 내용은 메시지로 문의 필요',
+            '타이거(11세)가 "학생 10유로" 요금에 해당하는지, 별도 "아동" 요금이 있는지 예약 전 가이드에게 확인 필요'
+          ]
+        } },
+      {ic:'🔭', t:'포로로마노 전망대', time:'08:50', endTime:'09:05', status:'confirmed'},
+      {ic:'🏛️', t:'안토니우스·파우스티나 신전', time:'09:05', endTime:'09:20', status:'confirmed'},
+      {ic:'🏛️', t:'대제사장 신전 (레기아)', time:'09:20', endTime:'09:35', status:'confirmed'},
+      {ic:'🔥', t:'베스타 신전', time:'09:35', endTime:'09:50', status:'confirmed'},
+      {ic:'🏛️', t:'포로로마노 중심 광장', time:'09:50', endTime:'10:10', status:'confirmed'},
+      {ic:'🏛️', t:'세베루스 황제 개선문', time:'10:10', endTime:'10:25', status:'confirmed'},
+      {ic:'🏟️', t:'★콜로세움 내부 (지하 히포게움+경기장 바닥 Full Experience)', time:'10:30', endTime:'12:00', status:'booked'},
+      {ic:'🏃', t:'치르코 마시모 — 직접 뛰어보기', time:'12:15', endTime:'12:35', status:'confirmed'},
+      {ic:'🗿', t:'산 피에트로 인 빈콜리 (모세상·무료)', time:'12:35', endTime:'13:00', status:'confirmed'},
+      {ic:'⏳', t:'산 클레멘테 바실리카 (지하 3층)', time:'13:00', endTime:'13:45', status:'confirmed'},
+      {ic:'🍝', t:'점심', time:'13:45', endTime:'14:30', status:'confirmed'},
+      {ic:'⛲', t:'트레비 분수', time:'14:50', endTime:'15:50', status:'confirmed'},
+      {ic:'🏛️', t:'판테온', time:'15:50', endTime:'16:50', status:'confirmed'},
+      {ic:'🛋️', t:'숙소 복귀 · 조기 휴식', time:'17:00', status:'confirmed'}
     ] },
-  { d:16, date:'10/10', wd:'토', city:'rome', badges:['로마'],
-    title:'트라스테베레 골목 · 스페인 계단 · 마지막 만찬',
+  { d:16, date:'10/10', wd:'토', city:'rome', badges:['로마','휴식일'],
+    title:'휴식일 · 트라스테베레 골목 · 스페인 계단 · 마지막 만찬',
     story:'🌍 <b>트라스테베레 — 로마인의 진짜 동네</b><br>관광지 말고, 로마 사람들이 진짜 사는 골목이에요. 좁은 돌길에 담쟁이가 늘어지고, 빨래가 창문 사이에 걸려 있죠. 여기 <b>젤라토</b>가 로마에서 제일 맛있다는 소문이 있어요. 골목을 걷다 보면 숨은 광장과 작은 분수를 발견하는 재미가 있답니다.<br><br>🌍 <b>스페인 계단 — 영화 속 그 계단</b><br>영화 &lt;로마의 휴일&gt;에서 오드리 헵번이 젤라토를 먹던 그 유명한 계단! 135개의 계단인데, 봄엔 진달래로 뒤덮여요. 오늘은 토요일이라 제일 붐비니까, 사람 구경도 여행의 일부라 여기며 느긋하게 즐겨요.',
     foot:'💡 토요일은 로마에서 가장 붐비는 날 — 유명 관광지는 오전 일찍 or 저녁에. 오늘은 트라스테베레·골목 산책 위주로 여유롭게<br>🧳 <b>준비할 것</b> ☐ 늦잠 OK ☐ 마지막 만찬 식당 예약(트라스테베레 추천) ☐ 기념품·쇼핑 리스트 ☐ 짐 정리 시작',
     acts:[
-      {ic:'😴', t:'늦잠 · 느긋한 조식', time:'09:30', endTime:'11:00'},
-      {ic:'🌿', t:'트라스테베레 골목 산책 · 젤라토', time:'11:00', endTime:'13:00'},
-      {ic:'🍝', t:'점심', time:'13:00', endTime:'14:30'},
-      {ic:'🛍️', t:'스페인 계단 · 콘도티 거리 쇼핑', time:'15:00', endTime:'17:00'},
-      {ic:'🥂', t:'★로마 마지막 만찬', time:'19:00'}
+      {ic:'😴', t:'늦잠 · 자유 기상 (휴식일)', status:'confirmed'},
+      {ic:'⛲', t:'나보나 광장 산책 (선택) — 분수·카페, 강제 아님', status:'confirmed'},
+      {ic:'🌿', t:'트라스테베레 자유 산책 (선택)', status:'confirmed'},
+      {ic:'🥂', t:'★로마 마지막 만찬 (저녁)', status:'confirmed'}
     ] },
   { d:17, date:'10/11', wd:'일', city:'rome', transit:'transit', badges:['로마','→','밀라노'],
     title:'로마 → 밀라노 · 두오모 반나절 · 귀국행',
@@ -1636,7 +1689,7 @@ const PREP_TODO = {
   ],
   rome:[
     {t:'콜로세움 Full Experience (10/9 금)', a:'colosseo.it · 30일 전 9/9 오픈·€24~·지하+경기장 바닥·이름/여권 일치'},
-    {t:'바티칸 박물관 (10/8 목 08:00)', a:'museivaticani.va · 일요일 휴관·개장 직후 골든타임'},
+    {t:'바티칸 투어 (10/8 목 07:40 CIPRO역 미팅)', a:'유로자전거나라 · 08:00 변경 가능(전날 연락)·일요일 휴관'},
     {t:'성 베드로 대성전 (10/7 도착일)', a:'무료 입장·어깨/무릎 가리는 복장 필수'},
     {t:'성 베드로 돔 등정 (10/8)', a:'현장 매표 €8~10·현금 준비'},
     {t:'산 클레멘테 지하 (10/9)', a:'€10 현장 결제·지하 3층 시간여행'},
@@ -1851,7 +1904,7 @@ function renderHscroll(){
     </div>`;
   }).join('');
 }
-function badgeColor(b){ const map={'런던':'#5B7FA6','파리':'#C4788A','뮌헨':'#6B9E7A','피렌체':'#D4735A','로마':'#B5832A','이동':'#8B96A8','밀라노':'#8B96A8','귀국':'#8B96A8'}; return map[b]||'#8B96A8'; }
+function badgeColor(b){ const map={'런던':'#5B7FA6','파리':'#C4788A','뮌헨':'#6B9E7A','피렌체':'#D4735A','로마':'#B5832A','이동':'#8B96A8','밀라노':'#8B96A8','귀국':'#8B96A8','휴식일':'#5B9B6E'}; return map[b]||'#8B96A8'; }
 function toggleHday(el, ev){
   if(ev && ev.target.closest('.hday-jump')) return;
   const was = el.classList.contains('expanded');
@@ -1899,12 +1952,33 @@ function renderCityPanel(k, active){
 }
 function toggleReserve(city,i){ const key=city+':'+i; reserveState[key]=!reserveState[key]; save(LS.reserve, reserveState); }
 function timeKey(t){ const m=/^\s*(\d{1,2}):(\d{2})/.exec(t||''); return m ? (+m[1])*60+(+m[2]) : 9999; }
+function statusBadgeHTML(status){
+  if(status==='booked') return ' <span class="tour-status booked">예약완료</span>';
+  if(status==='confirmed') return ' <span class="tour-status confirmed">확정</span>';
+  return '';
+}
+function tourBookingHTML(tb){
+  if(!tb) return '';
+  const row=(label,val)=> val ? `<div><b>${label}</b> ${esc(val)}</div>` : '';
+  const list=(label,arr)=> (arr&&arr.length) ? `<div><b>${label}</b><ul>${arr.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>` : '';
+  return `<details class="tour-detail"><summary>📋 투어 예약 정보</summary>
+    <div class="tour-detail-body">
+      ${row('🏢 예약처', tb.provider)}
+      ${row('⏰ 만나는시간', tb.meetingTime)}
+      ${row('📍 만나는장소', tb.meetingPlace)}
+      ${row('💰 가격', tb.price)}
+      ${row('✅ 포함사항', tb.includes)}
+      ${list('💶 추가비용(불포함)', tb.extraCosts)}
+      ${list('⚠️ 주의사항', tb.cautions)}
+    </div>
+  </details>`;
+}
 // 하루의 일정을 시간순으로 자동 배치 (숙소 체크인·기차/비행 시간·추가 일정)
 function fixedList(day){
   const f=[];
   if(day.transport) f.push({kind:'move', icon:day.transport.icon||'🚆', rawHtml:day.transport.text, title:strip(day.transport.text), time:day.transport.time||'', end:day.transport.end||''});
   if(day.hotel) f.push({kind:'hotel', icon:'🏨', rawHtml:day.hotel.text, title:strip(day.hotel.text), time:day.hotel.time||'', end:''});
-  (day.acts||[]).forEach(a=> f.push({kind:'act', icon:a.ic||'•', rawHtml:esc(a.t), title:a.t, time:a.time||'', end:a.endTime||''}));
+  (day.acts||[]).forEach(a=> f.push({kind:'act', icon:a.ic||'•', rawHtml:esc(a.t)+statusBadgeHTML(a.status)+tourBookingHTML(a.tourBooking), title:a.t, time:a.time||'', end:a.endTime||''}));
   return f;
 }
 function hashStr(x){ let h=0; x=String(x||''); for(let i=0;i<x.length;i++){ h=(h*31+x.charCodeAt(i))>>>0; } return h.toString(36); }
@@ -2199,7 +2273,7 @@ function renderCityTimeline(k){
       <div class="day-left"><div class="day-circle ${c.cls}"><span class="day-num">D${day.d}</span><span class="day-date">${day.date}</span></div>${last?'':`<div class="day-line ${c.cls}-line"></div>`}</div>
       <div class="day-right ${c.cls}-border">
         ${day.story?`<button class="story-btn" onclick="openStory(${day.d})">🪄 흥미로운 이야기</button>`:''}
-        <div class="day-meta"><span class="day-weekday">${day.wd}</span><span class="city-badge ${c.cls}">${c.name}</span></div>
+        <div class="day-meta"><span class="day-weekday">${day.wd}</span><span class="city-badge ${c.cls}">${c.name}</span>${(day.badges&&day.badges.includes('휴식일'))?'<span class="rest-badge">😌 휴식일</span>':''}</div>
         <div class="day-title">${esc(day.title)}</div>
         ${mid}
         <button class="day-expand" onclick="toggleDayExpand(${day.d})">${open?'▲ 접기':`▼ 전체 일정 펼치기 (${total})`}</button>
@@ -3941,6 +4015,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-24</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-25</div>
 </body>
 </html>
