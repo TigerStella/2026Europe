@@ -247,6 +247,8 @@
   .tour-detail-body b { color: var(--text-dark); }
   .tour-detail-body ul { margin: 4px 0 0 18px; padding: 0; }
   .tour-detail-body li { margin-bottom: 2px; }
+  .booking-req { display: inline-block; margin-top: 5px; font-size: 11px; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--dusk-coral), #E0607A); padding: 4px 10px; border-radius: 8px; text-decoration: none; }
+  .booking-req:hover { opacity: .9; }
   .day-title { font-size: 14px; font-weight: 500; color: var(--text-dark); margin-bottom: 6px; }
   .day-details { display: flex; flex-direction: column; gap: 5px; }
   .detail-row { display: flex; gap: 8px; font-size: 12px; color: var(--text-mid); align-items: flex-start; }
@@ -1338,25 +1340,39 @@ const DAYS = [
   { d:1, date:'9/25', wd:'금', city:'london', transit:'transit', badges:['이동','런던'],
     title:'인천 출발 → 런던 파크 런던 도착',
     transport:{ icon:'✈️', time:'10:55', text:'대한항공 <strong>KE0907</strong> · 10:55 인천(ICN·T2) 출발 → 17:20 히드로(LHR·T4) 도착<br>총 14시간 25분 · 수하물 1개 · 일반석(U)' },
-    hotel:{ time:'19:00', text:'<strong>파크 런던 (시내)</strong> 체크인 — 샤워·짐 정리' },
+    hotel:{ time:'20:00', text:'<strong>파크 런던 (시내)</strong> 체크인 — 샤워·짐 정리' },
     acts:[
-      {ic:'🛃', t:'입국심사·수하물 수령', time:'17:20', endTime:'18:00'},
-      {ic:'🚇', t:'히드로 → 파크 런던(시내) 이동 · 피카딜리선 (약 1시간)', time:'18:00', endTime:'19:00'}
+      {ic:'🛬', t:'히드로 공항 도착', time:'17:30'},
+      {ic:'🛃', t:'입국심사·수하물 수취', time:'17:30', endTime:'18:30'},
+      {ic:'🚆', t:'엘리자베스 라인 탑승 (히드로→토트넘코트로드) · 환승 없음, 약 50분', time:'18:30', endTime:'19:20'},
+      {ic:'🚶', t:'TCR역 하차 → 도보/우버로 숙소 이동 (블룸즈버리)', time:'19:20', endTime:'19:30'},
+      {ic:'🏠', t:'숙소 도착(예상)', time:'20:00'}
     ] },
   { d:2, date:'9/26', wd:'토', city:'london', badges:['런던'],
-    title:'영국박물관 · 내셔널갤러리 · 뮤지컬',
+    title:'대영박물관 도슨트투어 · 그리니치',
     story:'영국박물관에서 꼭 찾아야 할 건 <b>로제타석</b>이야. 시커먼 돌에 같은 내용이 <b>세 가지 문자(이집트 그림문자·이집트 흘림문자·그리스어)</b>로 적혀 있는데, 이 돌 덕분에 학자들이 <b>아무도 못 읽던 이집트 상형문자를 해독</b>했지 — 고대 이집트의 비밀을 푸는 열쇠였어! 미라관에선 3천 년 전 사람도 만날 수 있단다.',
+    foot:'🎟️ <b>대영박물관 도슨트투어</b> 토 <b>10:10 미팅</b>(대영박물관 맞은편 스타벅스 앞) · <b>Uber Boat</b> 14:00 Embankment→Greenwich <a href="https://www.thamesclippers.com/booking" target="_blank" rel="noopener">thamesclippers.com/booking</a> ⚠️예약필수<br>🧳 <b>준비할 것</b> ☐ 모임 10분 전 도착 ☐ 수신기 대여료 컨택리스 카드 준비(현금 불가) ☐ Uber Boat 예약 완료 ☐ 여행자보험',
     acts:[
-      {ic:'🍳', t:'한인민박 조식 (한식 아침 제공)', time:'08:30', endTime:'09:30'},
-      {ic:'🚶', t:'숙소 → 영국박물관 도보 이동 (5~10분)', time:'09:30', endTime:'09:50'},
-      {ic:'🏛️', t:'★영국박물관 투어 (⭐예약) — 로제타스톤·미라관 직행', time:'10:00', endTime:'12:30'},
-      {ic:'🍽️', t:'점심 · 박물관 인근', time:'12:30', endTime:'13:40'},
-      {ic:'🚶', t:'박물관 → 내셔널갤러리 이동 (도보/버스 약 25분)', time:'13:40', endTime:'14:20'},
-      {ic:'🖼️', t:'★내셔널갤러리 투어 (⭐예약) — 고흐 해바라기·터너', time:'14:20', endTime:'16:30'},
-      {ic:'🎪', t:'코벤트가든 (도보 5분) · 거리공연·마켓, 레고/디즈니스토어 자연스럽게', time:'16:30', endTime:'17:30'},
-      {ic:'🚇', t:'숙소 복귀·휴식·저녁 준비', time:'17:30', endTime:'18:30'},
-      {ic:'🍽️', t:'저녁', time:'18:30', endTime:'19:00'},
-      {ic:'🎭', t:'뮤지컬 (웨스트엔드, 토요일 이브닝)', time:'19:30'}
+      {ic:'🏛️', t:'대영박물관 앞 도착·대기 (모임시간 10분 전 도착 필수)', time:'10:00', endTime:'10:10'},
+      {ic:'🏛️', t:'★대영박물관 도슨트투어 — 전문가 세계사·문명 해설', time:'10:10', endTime:'12:00', status:'booked',
+        tourBooking:{
+          meetingTime:'10:10 (모임시간 10분 전 도착 필수)',
+          meetingPlace:'대영박물관 맞은편 스타벅스 앞, 51 Great Russell St, London WC1B 3BA',
+          extraCosts:[
+            '수신기(리시버) 대여료 1인당 £2 — 현장에서 가이드에게 컨택리스 카드만 결제 가능(현금 불가)'
+          ],
+          cautions:[
+            '수신기 분실·미반납·파손 시 £80 배상 청구',
+            '지각 시 중간 합류 불가 — 모임시간 반드시 엄수',
+            '개인 사유 취소는 별도 보상 없음, 여행자보험 가입 권장'
+          ]
+        } },
+      {ic:'🍽️', t:'점심', time:'12:00', endTime:'13:00'},
+      {ic:'🚶', t:'도보 이동 (박물관→트라팔가광장→빅벤→국회의사당→웨스트민스터 사원, 약 30~40분)', time:'13:00', endTime:'13:40'},
+      {ic:'⛴️', t:'Uber Boat 탑승 (Embankment→Greenwich)', time:'14:00', endTime:'14:40',
+        bookingRequired:{ label:'Uber Boat 예약 (Thames Clippers)', url:'https://www.thamesclippers.com/booking' } },
+      {ic:'🔭', t:'그리니치 자유관람 — 천문대 우선, 여유시 커티삭·마켓·해양박물관·퀸스하우스', time:'14:40', endTime:'17:00'},
+      {ic:'🚇', t:'DLR 탑승 (Cutty Sark역→Bank역 환승→Central line→Holborn역) · 숙소 복귀', time:'17:00'}
     ] },
   { d:3, date:'9/27', wd:'일', city:'london', badges:['런던'],
     title:'해리포터 스튜디오 투어',
@@ -1388,18 +1404,28 @@ const DAYS = [
       {ic:'🍟', t:'저녁 (피시앤칩스 등) · 숙소 복귀', time:'19:40'}
     ] },
   { d:4, date:'9/28', wd:'월', city:'london', badges:['런던'],
-    title:'사우스켄싱턴 뮤지엄 데이',
-    story:'런던 자연사박물관엔 거대한 <b>공룡 뼈</b>가 가득해. 특히 힌츠홀 천장엔 <b>진짜 대왕고래(블루웨일) 뼈</b>가 매달려 있는데, 지구에서 <b>가장 큰 동물</b>이라 심장만 해도 자동차만 하대! 옆 과학박물관 원더랩에선 번개·우주·힘을 직접 만져보며 실험할 수 있어.',
+    title:'자연사박물관 · 내셔널갤러리 도슨트투어',
+    story:'런던 자연사박물관엔 거대한 <b>공룡 뼈</b>가 가득해. 특히 힌츠홀 천장엔 <b>진짜 대왕고래(블루웨일) 뼈</b>가 매달려 있는데, 지구에서 <b>가장 큰 동물</b>이라 심장만 해도 자동차만 하대!',
+    foot:'🎟️ <b>내셔널갤러리 도슨트투어</b> 월 <b>14:10 미팅</b>(정면 맨 오른쪽 George Washington 동상 앞) · 자연사박물관 사전예약 시간슬롯 확인 필요<br>🧳 <b>준비할 것</b> ☐ 자연사박물관 시간슬롯 예약 ☐ 모임 10분 전 도착 ☐ 컨택리스 카드(현금 불가) ☐ 취소규정 사전 확인',
     acts:[
-      {ic:'🚇', t:'숙소 출발 → 피카딜리선 (러셀스퀘어→사우스켄싱턴, 20분)', time:'09:20'},
-      {ic:'🦕', t:'자연사박물관 오픈런 · 무료 시간지정권 사전예약 필수', time:'10:00'},
-      {ic:'🦖', t:'공룡관(T-Rex) → 힌츠홀(블루웨일) → 지구관', time:'10:00', endTime:'12:30'},
-      {ic:'🍽️', t:'점심', time:'12:30', endTime:'13:30'},
-      {ic:'🔬', t:'과학박물관 (도보 3분) · Wonderlab 체험관(유료 ~£10) 강력추천', time:'13:30', endTime:'16:30'},
-      {ic:'🌳', t:'하이드파크 산책 (도보 10분) · 날씨 좋으면, 아니면 생략', time:'16:30', endTime:'17:30'},
-      {ic:'🔀', t:'갈림길 — 아이 컨디션에 따라 선택 ⬇️', time:'17:30'},
-      {ic:'🅰️', t:'A안(무리 없음) · 숙소 복귀 → 저녁 → 여유롭게 짐 정리 · 유로스타 전날 권장 ⭐', time:'18:00'},
-      {ic:'🅱️', t:'B안(체력 되면) · 타워브릿지 야경(~19:30) → 저녁 → 복귀', time:'18:00'}
+      {ic:'🚇', t:'숙소 출발→Russell Square역→Piccadilly line (South Kensington역, 약 15분)', time:'09:50', endTime:'10:05'},
+      {ic:'🦕', t:'자연사박물관 관람 · 사전예약 시간슬롯 확인 필요', time:'10:30', endTime:'12:30'},
+      {ic:'🍽️', t:'점심', time:'12:30', endTime:'13:15'},
+      {ic:'🚇', t:'Piccadilly line 탑승 (South Kensington→Piccadilly Circus)', time:'13:15', endTime:'13:50'},
+      {ic:'🖼️', t:'내셔널갤러리 앞 도착·대기 (모임시간 10분 전 도착 필수)', time:'14:00', endTime:'14:10'},
+      {ic:'🖼️', t:'★내셔널갤러리 도슨트투어 — 전문가 명화해설', time:'14:10', endTime:'15:00', status:'booked',
+        tourBooking:{
+          meetingTime:'14:10 (모임시간 10분 전 도착 필수)',
+          meetingPlace:'내셔널갤러리 정면 마주보고 맨 오른쪽, George Washington 동상 앞',
+          extraCosts:[
+            '결제는 컨택리스 카드만 가능(현금 불가)'
+          ],
+          cautions:[
+            '투어 인원 최대 20명'
+          ],
+          cancellationPolicy:'국외여행 표준약관 제6조 특약 적용 — 일반 소비자분쟁해결기준과 다름, 예약 전 취소규정 반드시 재확인'
+        } },
+      {ic:'🚇', t:'Piccadilly line 탑승 (Piccadilly Circus→Russell Square) · 숙소 복귀', time:'15:00'}
     ] },
   { d:5, date:'9/29', wd:'화', city:'paris', badges:['런던','→','파리'],
     title:'런던 출발 → 파리 · 에펠 저녁 산책',
@@ -1644,7 +1670,7 @@ const WD_KR = ['일','월','화','수','목','금','토'];
 function isoLabel(iso){ if(!iso) return ''; const [y,m,d]=iso.split('-').map(Number); const wd = WD_KR[new Date(Date.UTC(y,m-1,d)).getUTCDay()]; return `${m}/${d}(${wd})`; }
 
 const PREP = {
-  london: { must:['Oyster/컨택리스 카드 (히드로 익스프레스 비쌈)','우천 대비 우산·방수 겉옷','뮤지컬 사전 예약','해리포터 스튜디오 투어 예약'],
+  london: { must:['Oyster/컨택리스 카드 (히드로 익스프레스 비쌈)','우천 대비 우산·방수 겉옷','대영박물관·내셔널갤러리 도슨트투어 예약','해리포터 스튜디오 투어 예약'],
     tip:['자연사·영국박물관·내셔널갤러리 무료','파크런던 한식 아침/저녁 확인','일요일 상점 영업시간 짧음'] },
   paris: { must:['유로스타 10:30까지 도착·여권 지참','뮤지엄 패스 or 루브르 온라인 예약','소매치기 주의 (지하철·에펠탑)'],
     tip:['루프라라 짐 보관 가능','노트르담 주변·세느강 야경','물·화장실 유료 대비 잔돈'] },
@@ -1658,9 +1684,10 @@ const PREP = {
 
 const PREP_TODO = {
   london:[
-    {t:'자연사박물관 무료 티켓', a:'9/28(월) 10:00 슬롯 예약'},
-    {t:'뮤지컬', a:'9/26(토) 19:30 이브닝 예매'},
-    {t:'과학박물관 Wonderlab', a:'사전 예약 확인 (인기 슬롯)'},
+    {t:'대영박물관 도슨트투어 (9/26 토 10:10)', a:'모임 10분 전 도착·수신기 대여 £2(컨택리스만)'},
+    {t:'Uber Boat 예약 (9/26 토 14:00 Embankment→Greenwich)', a:'thamesclippers.com/booking · 예약 필수'},
+    {t:'내셔널갤러리 도슨트투어 (9/28 월 14:10)', a:'모임 10분 전 도착·컨택리스만 결제'},
+    {t:'자연사박물관 (9/28 월 10:30)', a:'사전예약 시간슬롯 확인 필요'},
     {t:'피카딜리선 운행', a:'9월 중순 TfL 재확인'},
     {t:'해리포터 귀로 기차', a:'당일 소요 20분 이하 열차만'},
   ],
@@ -1970,15 +1997,20 @@ function tourBookingHTML(tb){
       ${row('✅ 포함사항', tb.includes)}
       ${list('💶 추가비용(불포함)', tb.extraCosts)}
       ${list('⚠️ 주의사항', tb.cautions)}
+      ${row('📜 취소규정', tb.cancellationPolicy)}
     </div>
   </details>`;
+}
+function bookingRequiredHTML(br){
+  if(!br) return '';
+  return ` <a class="booking-req" href="${esc(br.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🔗 예약필요: ${esc(br.label)}</a>`;
 }
 // 하루의 일정을 시간순으로 자동 배치 (숙소 체크인·기차/비행 시간·추가 일정)
 function fixedList(day){
   const f=[];
   if(day.transport) f.push({kind:'move', icon:day.transport.icon||'🚆', rawHtml:day.transport.text, title:strip(day.transport.text), time:day.transport.time||'', end:day.transport.end||''});
   if(day.hotel) f.push({kind:'hotel', icon:'🏨', rawHtml:day.hotel.text, title:strip(day.hotel.text), time:day.hotel.time||'', end:''});
-  (day.acts||[]).forEach(a=> f.push({kind:'act', icon:a.ic||'•', rawHtml:esc(a.t)+statusBadgeHTML(a.status)+tourBookingHTML(a.tourBooking), title:a.t, time:a.time||'', end:a.endTime||''}));
+  (day.acts||[]).forEach(a=> f.push({kind:'act', icon:a.ic||'•', rawHtml:esc(a.t)+statusBadgeHTML(a.status)+tourBookingHTML(a.tourBooking)+bookingRequiredHTML(a.bookingRequired), title:a.t, time:a.time||'', end:a.endTime||''}));
   return f;
 }
 function hashStr(x){ let h=0; x=String(x||''); for(let i=0;i<x.length;i++){ h=(h*31+x.charCodeAt(i))>>>0; } return h.toString(36); }
@@ -4015,6 +4047,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-25</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-26</div>
 </body>
 </html>
