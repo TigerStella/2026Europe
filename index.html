@@ -949,6 +949,16 @@
 <div id="related" class="tab-section">
   <div class="container">
     <div class="section-header">
+      <span class="section-icon">📺</span>
+      <span class="section-title">유튜브 영상</span>
+      <span class="section-sub">국가별로 모아보기</span>
+      <button class="mini-refresh" onclick="openVideoModal()">＋ 영상·채널 추가</button>
+    </div>
+    <div class="exp-filter" id="videoCountryFilter"></div>
+    <input type="text" id="videoSearchInput" placeholder="🔎 영상 제목 검색" oninput="onVideoSearchInput(this.value)" style="margin:8px 0 14px;width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid rgba(0,0,0,0.08);border-radius:10px;font-size:13px;font-family:inherit;">
+    <div id="videoGroups"></div>
+
+    <div class="section-header" style="margin-top:32px">
       <span class="section-icon">📚</span>
       <span class="section-title">도서 리스트</span>
       <span class="section-sub">여행 예습</span>
@@ -966,16 +976,6 @@
     <div class="rel-subhead" style="margin-top:20px">🔎 내 도서 검색·표지 추가</div>
     <p class="hint">+ 타일 → 책 제목으로 검색해 표지와 함께 추가. 다 읽으면 <strong>읽음</strong> 버튼을 눌러 체크하세요.</p>
     <div class="tiles" id="bookTiles"></div>
-
-    <div class="section-header" style="margin-top:32px">
-      <span class="section-icon">📺</span>
-      <span class="section-title">유튜브 영상</span>
-      <span class="section-sub">+ 타일로 URL 추가</span>
-    </div>
-    <div class="rel-subhead">🗺 관광지 정보</div>
-    <div class="tiles" id="videoTiles-spot"></div>
-    <div class="rel-subhead" style="margin-top:18px">📜 역사 공부</div>
-    <div class="tiles" id="videoTiles-history"></div>
 
     <div class="section-header" style="margin-top:32px">
       <span class="section-icon">✍️</span>
@@ -1199,11 +1199,35 @@
     <h3>📺 유튜브 영상 · 채널 추가</h3>
     <div class="field" style="margin-bottom:10px"><label>유튜브 URL</label>
       <input id="vUrl" placeholder="영상 https://youtu.be/... 또는 채널 https://youtube.com/@..."></div>
+    <div class="field" style="margin-bottom:10px"><label>메모 (선택)</label><input id="vTitle" placeholder="예: 루브르 관람 순서"></div>
     <div class="row">
-      <div class="field" style="flex:2"><label>메모 (선택)</label><input id="vTitle" placeholder="예: 루브르 관람 순서"></div>
-      <div class="field" style="flex:1"><label>분류</label>
-        <select id="vCat"><option value="spot">🗺 관광지 정보</option><option value="history">📜 역사 공부</option></select></div>
+      <div class="field" style="flex:1"><label>주제</label>
+        <select id="vTopic" onchange="onVideoTopicChange()">
+          <option value="brit_museum" data-country="uk">영국박물관</option>
+          <option value="national_gallery" data-country="uk">내셔널갤러리</option>
+          <option value="louvre" data-country="fr">루브르 박물관</option>
+          <option value="vatican" data-country="it">바티칸 박물관</option>
+          <option value="colosseum" data-country="it">콜로세움</option>
+          <option value="orsay" data-country="fr">오르세 미술관</option>
+          <option value="uffizi" data-country="it">우피치 미술관</option>
+          <option value="pisa" data-country="it">피사의 사탑</option>
+          <option value="oktoberfest" data-country="de">독일 맥주축제</option>
+          <option value="history" data-country="">역사이야기</option>
+          <option value="etc" data-country="">그 외 관광정보</option>
+          <option value="custom" data-country="">직접추가</option>
+        </select>
+      </div>
+      <div class="field" style="flex:1"><label>국가</label>
+        <select id="vCountry">
+          <option value="common">🌍 전체(공통)</option>
+          <option value="uk">🇬🇧 영국</option>
+          <option value="fr">🇫🇷 프랑스</option>
+          <option value="de">🇩🇪 독일</option>
+          <option value="it">🇮🇹 이탈리아</option>
+        </select>
+      </div>
     </div>
+    <div class="field" id="vCustomTopicWrap" style="display:none;margin-top:10px"><label>주제 이름 (직접 입력)</label><input id="vCustomTopic" placeholder="예: 아이와 가볼 공원"></div>
     <div class="form-actions" style="margin-top:12px">
       <button class="btn btn-primary" onclick="addVideo()">추가</button>
       <button class="btn btn-ghost" onclick="closeModal('videoModal')">취소</button>
@@ -1726,7 +1750,11 @@ const CONTACT_SLOTS = [
 let related = load(LS.related, null);
 if(!related || typeof related!=='object'){ related = { videos:[{id:'6PC8FqfRi1E', url:'https://youtu.be/6PC8FqfRi1E', title:'유럽 여행 참고 영상', cat:'spot'}], books:[], blogs:[] }; save(LS.related, related); }
 related.videos = related.videos||[]; related.books = related.books||[]; related.blogs = related.blogs||[];
-related.videos.forEach(v=>{ if(!v.cat) v.cat='spot'; }); // 기존 영상은 관광지 정보로
+related.videos.forEach(v=>{
+  if(!v.cat) v.cat='spot';
+  if(!v.topic){ v.topic = v.cat==='history' ? 'history' : 'etc'; } // 기존 영상 자동 이전
+  if(!v.country){ v.country = 'common'; }
+});
 
 // 사용자 메모 기반 큐레이션 1회 병합 (중복 방지)
 const SEED_BLOGS = [
@@ -2736,7 +2764,26 @@ function ytChannel(url){
 }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 
-function renderRelated(){ renderVideos(); renderBooks(); renderBlogs(); }
+function renderRelated(){ renderVideoCountryFilter(); renderVideos(); renderBooks(); renderBlogs(); }
+
+/* 영상 주제(고정 순서) — 국가 자동매핑은 모달의 data-country로 처리 */
+const VIDEO_TOPICS = [
+  { key:'brit_museum',      label:'영국박물관' },
+  { key:'national_gallery', label:'내셔널갤러리' },
+  { key:'louvre',           label:'루브르 박물관' },
+  { key:'vatican',          label:'바티칸 박물관' },
+  { key:'colosseum',        label:'콜로세움' },
+  { key:'orsay',            label:'오르세 미술관' },
+  { key:'uffizi',           label:'우피치 미술관' },
+  { key:'pisa',             label:'피사의 사탑' },
+  { key:'oktoberfest',      label:'독일 맥주축제' },
+  { key:'history',          label:'역사이야기' },
+  { key:'etc',              label:'그 외 관광정보' },
+];
+const TOPIC_ICON = { brit_museum:'🏛', national_gallery:'🖼', louvre:'🖼', vatican:'⛪', colosseum:'🏟', orsay:'🖼', uffizi:'🎨', pisa:'🗼', oktoberfest:'🍺', history:'📜', etc:'🗺' };
+function topicIcon(key){ return TOPIC_ICON[key]||'📺'; }
+let videoCountryFilter='all';
+let videoSearchQuery='';
 
 function videoTileHTML(v, gi){
   if(v.type==='channel'){
@@ -2760,31 +2807,72 @@ function videoTileHTML(v, gi){
       <div class="tile-body"><div class="tile-title">${esc(v.title||'유튜브 영상')}</div></div>
     </div>`;
 }
+function renderVideoCountryFilter(){
+  const el=document.getElementById('videoCountryFilter'); if(!el) return;
+  const opts=[['all','🌍 전체'],['uk','🇬🇧 영국'],['fr','🇫🇷 프랑스'],['de','🇩🇪 독일'],['it','🇮🇹 이탈리아']];
+  el.innerHTML = opts.map(([k,label])=>`<button class="exp-fbtn ${videoCountryFilter===k?'on':''}" onclick="setVideoCountryFilter('${k}')">${label}</button>`).join('');
+}
+function setVideoCountryFilter(k){ videoCountryFilter=k; renderVideoCountryFilter(); renderVideos(); }
+function onVideoSearchInput(v){ videoSearchQuery=v; renderVideos(); }
 function renderVideos(){
-  [['spot','videoTiles-spot'],['history','videoTiles-history']].forEach(([cat,id])=>{
-    const el=document.getElementById(id); if(!el) return;
-    const tiles = related.videos.filter(v=>(v.cat||'spot')===cat).map(v=>videoTileHTML(v)).join('');
-    el.innerHTML = tiles + `<button class="add-tile" onclick="openVideoModal('${cat}')"><span class="plus">＋</span>영상 추가</button>`;
+  const wrap=document.getElementById('videoGroups'); if(!wrap) return;
+  const cf=videoCountryFilter;
+  const q=(videoSearchQuery||'').trim().toLowerCase();
+  const match=v=>{
+    if(cf!=='all' && (v.country||'common')!==cf) return false;
+    if(q && !(v.title||'').toLowerCase().includes(q) && !(v.handle||'').toLowerCase().includes(q)) return false;
+    return true;
+  };
+  const filtered = related.videos.filter(match);
+  let html='';
+  VIDEO_TOPICS.forEach(t=>{
+    const items=filtered.filter(v=>(v.topic||'etc')===t.key);
+    if(!items.length) return;
+    html += `<div class="rel-subhead" style="margin-top:18px">${topicIcon(t.key)} ${esc(t.label)}</div><div class="tiles">${items.map(v=>videoTileHTML(v)).join('')}</div>`;
   });
+  const customItems = filtered.filter(v=>v.topic==='custom');
+  if(customItems.length){
+    const groups={};
+    customItems.forEach(v=>{ const key=v.customTopic||'기타'; (groups[key]=groups[key]||[]).push(v); });
+    Object.keys(groups).forEach(key=>{
+      html += `<div class="rel-subhead" style="margin-top:18px">📌 ${esc(key)}</div><div class="tiles">${groups[key].map(v=>videoTileHTML(v)).join('')}</div>`;
+    });
+  }
+  wrap.innerHTML = html || `<p class="hint" style="padding:8px 4px">조건에 맞는 영상이 없어요.</p>`;
 }
 function openModal(id){ document.getElementById(id).classList.add('open'); }
-function openVideoModal(cat){ document.getElementById('vUrl').value=''; document.getElementById('vTitle').value=''; document.getElementById('vCat').value=cat||'spot'; openModal('videoModal'); }
+function openVideoModal(){
+  document.getElementById('vUrl').value=''; document.getElementById('vTitle').value='';
+  document.getElementById('vTopic').value='etc'; document.getElementById('vCountry').value='common';
+  document.getElementById('vCustomTopic').value=''; document.getElementById('vCustomTopicWrap').style.display='none';
+  openModal('videoModal');
+}
+function onVideoTopicChange(){
+  const sel=document.getElementById('vTopic');
+  const country=sel.selectedOptions[0].dataset.country;
+  if(country) document.getElementById('vCountry').value=country;
+  document.getElementById('vCustomTopicWrap').style.display = sel.value==='custom' ? '' : 'none';
+}
 function addVideo(){
   const url=document.getElementById('vUrl').value.trim();
   const title=document.getElementById('vTitle').value.trim();
-  const cat=document.getElementById('vCat').value;
+  const topic=document.getElementById('vTopic').value;
+  const country=document.getElementById('vCountry').value;
+  const customTopic=document.getElementById('vCustomTopic').value.trim();
+  if(topic==='custom' && !customTopic){ toast('주제 이름을 입력해주세요'); return; }
+  const base={ topic, country, customTopic: topic==='custom'?customTopic:'' };
   const id=ytId(url);
   if(id){
-    related.videos.push({ id, url, title, cat });
+    related.videos.push(Object.assign({}, base, { id, url, title }));
   } else {
     const ch=ytChannel(url);
     if(!ch){ toast('유효한 유튜브 영상/채널 URL이 아니에요'); return; }
     const cid='ch:'+ch;
     if(related.videos.some(v=>v.id===cid)){ toast('이미 추가된 채널이에요'); return; }
-    related.videos.push({ id:cid, url:(url.indexOf('http')===0?url:'https://youtube.com/'+ch), title:title||ch, cat, type:'channel', handle:ch });
+    related.videos.push(Object.assign({}, base, { id:cid, url:(url.indexOf('http')===0?url:'https://youtube.com/'+ch), type:'channel', handle:ch, title:title||ch }));
   }
   saveRelated(); renderVideos();
-  document.getElementById('vUrl').value=''; document.getElementById('vTitle').value='';
+  document.getElementById('vUrl').value=''; document.getElementById('vTitle').value=''; document.getElementById('vCustomTopic').value='';
   closeModal('videoModal'); toast(id?'영상이 추가됐어요 📺':'채널이 추가됐어요 📺');
 }
 function delVideo(id){ related.videos=related.videos.filter(v=>v.id!==id); saveRelated(); renderVideos(); }
@@ -3853,6 +3941,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-23</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-24</div>
 </body>
 </html>
