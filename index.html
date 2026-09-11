@@ -252,6 +252,8 @@
   .tour-status { display: inline-block; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 8px; margin-left: 6px; vertical-align: middle; white-space: nowrap; }
   .tour-status.booked { background: rgba(91,155,110,.16); color: #2F6B44; }
   .tour-status.confirmed { background: rgba(122,138,255,.16); color: #4A57C8; }
+  .tour-status.need-ticket { background: rgba(224,140,60,.18); color: #8A4E14; }
+  .tour-status.later { background: rgba(139,150,168,.18); color: #525F70; }
   .tour-detail { display: block; margin-top: 5px; font-size: 11px; }
   .tour-detail summary { cursor: pointer; font-weight: 700; color: var(--slate); list-style: none; }
   .tour-detail summary::-webkit-details-marker { display: none; }
@@ -1470,27 +1472,45 @@ const DAYS = [
       {ic:'📞', t:'숙소 연락처는 팁 탭 › 긴급 연락처 참고 (비공개)'}
     ] },
   { d:6, date:'9/30', wd:'수', city:'paris', badges:['파리'],
-    title:'루브르 · 오르세 미술관',
-    story:'루브르는 원래 <b>성(요새)이자 왕이 살던 궁전</b>이었어 — 그래서 이렇게 어마어마하게 크지! 가장 유명한 그림 다빈치의 <b>모나리자</b>는 1911년에 <b>도둑맞은 사건</b> 덕분에 전 세계에 더 유명해졌대. 2년 뒤 되찾았고, 지금은 방탄유리 안에서 은은하게 웃고 있단다.',
-    foot:'🎟️ <b>예약</b> · 루브르 <a href="https://www.ticket.louvre.fr" target="_blank" rel="noopener">ticket.louvre.fr</a> (90일 전 오픈·지금 예약 가능 · 비EEA 성인 €32 · <b>18세 미만 무료</b> · 오전 9시 슬롯 먼저 매진 → 오후가 여유) · 오르세 <a href="https://billetterie.musee-orsay.fr" target="_blank" rel="noopener">billetterie.musee-orsay.fr</a> (권장 · 아동 무료)<br>✅ <b>오늘 할 일</b> ☐ 루브르 예약 재확인 ☐ 오르세 예약 ☐ 노트르담 슬롯 오픈 재확인(자정 파리시간) ☐ 아이에게 "루브르 2시간 = 핵심 3작품" 설명',
+    title:'루브르 투어 · 노트르담',
+    story:'루브르는 원래 <b>성(요새)이자 왕이 살던 궁전</b>이었어 — 그래서 이렇게 어마어마하게 크지! 가장 유명한 그림 다빈치의 <b>모나리자</b>는 1911년에 <b>도둑맞은 사건</b> 덕분에 전 세계에 더 유명해졌대. 2년 뒤 되찾았고, 지금은 방탄유리 안에서 은은하게 웃고 있단다.<br><br>노트르담 대성당은 약 850년 전에 짓기 시작한 거대한 성당이야. 소설 "노트르담의 꼽추"에서 종지기 콰지모도가 살던 곳이지. 2019년 큰 불로 지붕이 무너졌지만 전 세계가 힘을 모아 복원해 2024년 다시 문을 열었어. 뾰족한 첨탑과 무서운 얼굴의 <b>가고일 석상</b>을 찾아보렴!',
+    foot:'🎟️ <b>루브르 투어</b> 09:20 미팅(카페 마를리) · 입장권 별도 예약 필수 <a href="https://www.ticket.louvre.fr" target="_blank" rel="noopener">ticket.louvre.fr</a>(€22·18세 미만 무료·시간예약 필수) · ⛪ <b>노트르담(무료)</b> 예약 <a href="https://resa.notredamedeparis.fr" target="_blank" rel="noopener">resa.notredamedeparis.fr</a>(방문 2~3일 전 오픈)<br>✅ <b>오늘 할 일</b> ☐ 루브르 입장권 예약(투어와 별도) ☐ 타이거 여권 지참(무료입장 확인용) ☐ 노트르담 슬롯 오픈 재확인(자정 파리시간)',
     acts:[
-      {ic:'🖼️', t:'루브르 (1호선, ⭐예약 필수) — 모나리자·비너스 하이라이트 약 2시간', time:'10:00', endTime:'12:00'},
-      {ic:'🌳', t:'튈르리 공원 산책 + 벤치/카페 점심·휴식', time:'12:00', endTime:'14:00'},
-      {ic:'🎨', t:'오르세 미술관 (도보 10분) — 인상파 1.5~2h', time:'14:00', endTime:'16:00'},
-      {ic:'😌', t:'숙소 휴식 → 저녁 가볍게', time:'16:00'}
+      {ic:'🚶', t:'숙소 출발 · La Motte-Picquet–Grenelle역까지 도보', time:'08:40'},
+      {ic:'🖼️', t:'★루브르 박물관 투어 — 공인가이드 해설', time:'09:20', endTime:'13:00', status:'need_ticket',
+        tourBooking:{
+          meetingTime:'09:20',
+          meetingPlace:'카페 마를리(Le Café Marly), 루브르 피라미드 광장 왼쪽 작은 피라미드 옆',
+          price:'58,001원',
+          includes:'공인가이드 해설',
+          extraCosts:['입장권 €22 (현장/온라인 별도 구매 필요)'],
+          cautions:['17세 이하 무료입장이나 시간예약 필수, 여권 지참']
+        } },
+      {ic:'🍽️', t:'점심', time:'13:00', endTime:'14:00'},
+      {ic:'⛪', t:'노트르담 대성당 내부 관람', time:'14:00', status:'later',
+        bookingRequired:{ label:'노트르담 예약 (방문 2~3일 전 오픈)', url:'https://resa.notredamedeparis.fr' } }
     ] },
   { d:7, date:'10/1', wd:'목', city:'munich', badges:['파리','→','뮌헨'],
-    title:'노트르담 → 파리 출발 · 뮌헨행 (TGV)',
-    story:'<b>노트르담 대성당</b>은 약 850년 전에 짓기 시작한 거대한 성당이야. 소설 "노트르담의 꼽추"에서 종지기 콰지모도가 살던 곳이지. 2019년 <b>큰 불로</b> 지붕이 무너졌지만 전 세계가 힘을 모아 복원해 2024년 다시 문을 열었어. 뾰족한 첨탑과 무서운 얼굴의 <b>가고일 석상</b>을 찾아보렴!',
+    title:'오르세 미술관 투어 · 뮌헨행 (TGV)',
+    story:'오르세 미술관은 원래 1900년에 지어진 <b>기차역</b>이었어! 지금도 커다란 유리 시계가 남아있어서, 시계 뒤에서 파리 시내를 내다보는 게 인기 포토스팟이야. 반 고흐의 "론 강의 별이 빛나는 밤"과 모네·르누아르 같은 인상파 화가들의 그림으로 가득한데, <b>"인상파"</b>라는 이름은 원래 비평가들이 "그림을 대충 인상만 그렸다"고 놀리던 말이었대 — 지금은 세계에서 가장 사랑받는 화풍이 됐지!',
     transport:{ icon:'🚄', time:'15:55', end:'21:36', text:'<strong>TGV 9577</strong> · 15:55 파리 동역 출발 → 21:36 뮌헨 중앙역 · 앱: DB' },
     hotel:{ time:'21:36', text:'뮌헨 도착 → Aparthotel Adagio Access München City 체크인' },
-    foot:'⛪ <b>노트르담(무료)</b> 예약 <a href="https://resa.notredamedeparis.fr" target="_blank" rel="noopener">resa.notredamedeparis.fr</a> · 앱 "Cathédrale Notre-Dame de Paris" · 슬롯 방문 2~3일 전 오픈(자정 직후 파리시간 성공률↑) · 목요일 22시까지·19시 후 한산<br>🚄 TGV 9577 <b>DB 앱에서 e티켓 오프라인 저장</b> (시내 와이파이 불안정 대비)<br>✅ <b>오늘 할 일</b> ☐ 아침(또는 전날 밤) 노트르담 당일 슬롯 예약 ☐ 동역 짐보관 실행 ☐ TGV e티켓 오프라인 ☐ 여권 소지',
+    foot:'🎟️ <b>오르세 투어</b> 09:20 미팅(정문 코끼리상 앞) · 입장권 개별 준비(뮤지엄패스 사용 가능) <a href="https://billetterie.musee-orsay.fr" target="_blank" rel="noopener">billetterie.musee-orsay.fr</a><br>🚄 TGV 9577 <b>DB 앱에서 e티켓 오프라인 저장</b> (시내 와이파이 불안정 대비)<br>✅ <b>오늘 할 일</b> ☐ 오르세 입장권/뮤지엄패스 준비 ☐ 체크아웃 전 짐 정리 ☐ TGV e티켓 오프라인 ☐ 여권 소지',
     acts:[
-      {ic:'🧳', t:'체크아웃 → 짐 들고 파리 동역으로 (택시) → 짐보관', time:'09:30', endTime:'10:30'},
-      {ic:'⛪', t:'4호선 동역→시테 (직행) → 노트르담 대성당 (외관·내부)', time:'10:30', endTime:'12:15'},
-      {ic:'🍽️', t:'시테/라탱 점심 마무리', time:'12:15', endTime:'12:30'},
-      {ic:'🚇', t:'4호선으로 동역 복귀 · 짐 회수', time:'12:30', endTime:'14:50'},
-      {ic:'🚉', t:'파리 동역 도착 (TGV 여유 확보)', time:'14:50', endTime:'15:55'}
+      {ic:'🚶', t:"숙소 출발 · Javel역(RER C)까지 도보 10분", time:'08:50'},
+      {ic:'🚆', t:"RER C 이동 (Javel→Musée d'Orsay, 환승 없음)", time:'09:05', endTime:'09:15'},
+      {ic:'🎨', t:'★오르세 미술관 투어 — 전문 공인가이드 해설', time:'09:20', endTime:'12:40', status:'need_ticket',
+        tourBooking:{
+          meetingTime:'09:20',
+          meetingPlace:'오르세 미술관 정문 코끼리상 앞',
+          price:'65,000원',
+          includes:'미술관 전문 공인가이드 해설 · 송수신기 대여',
+          extraCosts:['입장권 개별 준비 (뮤지엄패스 사용 가능)']
+        } },
+      {ic:'🚆', t:'RER C로 숙소 복귀', time:'12:40', endTime:'13:10'},
+      {ic:'🍽️', t:'점심 · 체크아웃 마무리 · 짐 챙기기', time:'13:10', endTime:'14:00'},
+      {ic:'🚕', t:"택시로 동역(Gare de l'Est) 이동", time:'14:00', endTime:'14:35'},
+      {ic:'🚉', t:'동역 도착', time:'14:35'}
     ] },
   { d:8, date:'10/2', wd:'금', city:'munich', badges:['뮌헨'],
     title:'옥토버페스트 · 올림픽공원 · FC Bayern',
@@ -1731,10 +1751,9 @@ const PREP_TODO = {
     {t:'해리포터 귀로 기차', a:'당일 소요 20분 이하 열차만'},
   ],
   paris:[
-    {t:'루브르 티켓 예약', a:'ticket.louvre.fr · 9/30 오전 슬롯 (18세 미만 무료)'},
-    {t:'오르세 티켓 예약', a:'billetterie.musee-orsay.fr · 9/30 오후 (권장)'},
-    {t:'노트르담 앱 계정 생성', a:'앱 "Cathédrale Notre-Dame de Paris" · 예약은 현지 2~3일 전'},
-    {t:'동역 짐보관 방법 확정', a:'공식 라커 or Nannybag/Radical Storage 앱'},
+    {t:'루브르 투어 (9/30 09:20 미팅)', a:'카페 마를리 · 입장권은 별도 예약 필요(ticket.louvre.fr, €22·18세 미만 무료)'},
+    {t:'노트르담 예약 (9/30 오후)', a:'resa.notredamedeparis.fr · 방문 2~3일 전 슬롯 오픈'},
+    {t:'오르세 투어 (10/1 09:20 미팅)', a:'정문 코끼리상 앞 · 입장권 개별 준비(뮤지엄패스 가능)'},
     {t:'TGV 9577 e티켓 오프라인', a:'DB 앱에서 미리 다운로드'},
     {t:'여권 소지', a:'프랑스→독일 솅겐 내 이동 (신분증 원칙)'},
   ],
@@ -2021,6 +2040,8 @@ function timeKey(t){ const m=/^\s*(\d{1,2}):(\d{2})/.exec(t||''); return m ? (+m
 function statusBadgeHTML(status){
   if(status==='booked') return ' <span class="tour-status booked">예약완료</span>';
   if(status==='confirmed') return ' <span class="tour-status confirmed">확정</span>';
+  if(status==='need_ticket') return ' <span class="tour-status need-ticket">입장권 필요</span>';
+  if(status==='later') return ' <span class="tour-status later">추후예약</span>';
   return '';
 }
 function tourBookingHTML(tb){
@@ -4126,6 +4147,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-28b</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-29</div>
 </body>
 </html>
