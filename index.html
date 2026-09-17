@@ -1007,6 +1007,8 @@
   <div class="container">
     <div id="trhHome"></div>
     <div id="trhCity" style="display:none"></div>
+    <div id="trhMuseumList" style="display:none"></div>
+    <div id="trhMuseum" style="display:none"></div>
     <div id="trhPassport" style="display:none"></div>
   </div>
 </div>
@@ -4270,13 +4272,36 @@ function init(){
      (※ 본 환경은 위키피디아/위키미디어 실시간 접근이 네트워크 정책상 차단됨)
    ══════════════════════════════════════════════════════════════════ */
 const TRH_LS = {
-  visited:  'trapble_history_visited_v1',   // { siteId: true }  ← 방문 도장(퀴즈 통과) 완료
-  cityquiz: 'trapble_history_cityquiz_v1',   // { city: bestScore } ← 도시 종합퀴즈 최고점
+  visited:    'trapble_history_visited_v1',    // { siteId: true }  ← 방문 도장(퀴즈 통과) 완료
+  cityquiz:   'trapble_history_cityquiz_v1',   // { city: bestScore } ← 도시 종합퀴즈 최고점
+  museumquiz: 'trapble_history_museumquiz_v1', // { museumKey: bestScore } ← 박물관 종합미션 최고점
 };
 function trhLoad(key, def){ try{ const v=JSON.parse(localStorage.getItem(key)); return (v===null||v===undefined)?def:v; }catch(e){ return def; } }
 function trhSave(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){ toast('저장 공간이 부족해요'); } }
-let trhVisited  = trhLoad(TRH_LS.visited, {});
-let trhCityQuiz = trhLoad(TRH_LS.cityquiz, {});
+let trhVisited    = trhLoad(TRH_LS.visited, {});
+let trhCityQuiz   = trhLoad(TRH_LS.cityquiz, {});
+let trhMuseumQuiz = trhLoad(TRH_LS.museumquiz, {});
+
+// 방문 주요 박물관 6곳 — "꼭 봐야 할 작품"을 인터넷 검색(공식 하이라이트·평론 기사)으로 교차 검증해 구성.
+// 여행 동선 순서(런던 2관 → 파리 2관 → 피렌체 → 로마·바티칸) 그대로 배열.
+const MUSEUMS = {
+  british:  { key:'british',  name:'영국박물관',   en:'British Museum',     city:'london',   country:'영국',   flag:'🇬🇧', icon:'🏺' },
+  national: { key:'national', name:'내셔널 갤러리', en:'National Gallery',   city:'london',   country:'영국',   flag:'🇬🇧', icon:'🖼' },
+  louvre:   { key:'louvre',   name:'루브르박물관',  en:'Musée du Louvre',    city:'paris',    country:'프랑스', flag:'🇫🇷', icon:'🔺' },
+  orsay:    { key:'orsay',    name:'오르세미술관',  en:"Musée d'Orsay",      city:'paris',    country:'프랑스', flag:'🇫🇷', icon:'🕰' },
+  uffizi:   { key:'uffizi',   name:'우피치미술관',  en:'Uffizi Gallery',     city:'florence', country:'이탈리아', flag:'🇮🇹', icon:'🎨' },
+  vatican:  { key:'vatican',  name:'바티칸미술관',  en:'Vatican Museums',    city:'rome',     country:'바티칸(세계에서 가장 작은 나라)', flag:'🇻🇦', icon:'⛪' },
+};
+const MUSEUM_ORDER = ['british','national','louvre','orsay','uffizi','vatican'];
+// 나라별 그룹(여행 동선 순서)
+const MUSEUM_COUNTRY_GROUPS = [
+  { country:'영국',   flag:'🇬🇧', museums:['british','national'] },
+  { country:'프랑스', flag:'🇫🇷', museums:['louvre','orsay'] },
+  { country:'이탈리아', flag:'🇮🇹', museums:['uffizi'] },
+  { country:'바티칸',  flag:'🇻🇦', museums:['vatican'] },
+];
+const PERIOD_CAT_ORDER = ['ancient','medieval','modern','contemporary'];
+const PERIOD_CAT_LABEL = { ancient:'🏺 고대', medieval:'🏰 중세', modern:'🖼 근대 (르네상스~19세기)', contemporary:'🌆 현대' };
 
 // 도시별 부제(시대 흐름) — 홈/배너 표기용. 탭 진행 순서는 여행 동선(CITY_ORDER) 그대로.
 const TRH_CITY_ERA = {
@@ -4294,36 +4319,36 @@ const TRH_CITY_STAMP = { london:'🎡', paris:'🗼', munich:'🍺', florence:'�
 //         emoji, source(신규만), note(불확실성 안내·선택), quiz:[{q,opts,a,why}]
 const HISTORY_SITES = [
   /* ════════ 런던 (동선 1) ════════ */
-  { id:'lamassu', city:'london', order:10, era:'고대 오리엔트', name:'라마수(날개 달린 황소상)', by:'고대 아시리아 · 기원전 9~7세기경', place:'영국박물관', emoji:'🐂',
+  { id:'lamassu', city:'london', order:10, era:'고대 오리엔트', name:'라마수(날개 달린 황소상)', by:'고대 아시리아 · 기원전 9~7세기경', place:'영국박물관', emoji:'🐂', museum:'british', periodCat:'ancient',
     sig:'메소포타미아 <b>아시리아 제국</b>의 궁전을 지키던 수호상 — 교과서 「고대 오리엔트·메소포타미아 문명」과 연결돼요.',
     kid:'사람 얼굴에 황소 몸, 독수리 날개를 가진 거대한 석상이야. 아시리아 왕궁 대문을 지키던 수호신인데, 나쁜 기운이 궁전에 들어오지 못하게 막는 역할이었대. 앞에서 보면 서 있고 옆에서 보면 걷는 것처럼 보이도록 다리를 5개로 조각한 옛 사람들의 아이디어가 재미있어. 3천 년 전 메소포타미아 사람들의 웅장한 상상력을 느껴봐!',
     quiz:[{q:'라마수는 어느 문명이 만든 수호상일까?', opts:['이집트','아시리아','로마'], a:1, why:'라마수는 메소포타미아의 아시리아 제국이 궁전을 지키려고 만든 수호상이야.'}] },
-  { id:'rosetta', city:'london', order:20, era:'고대 이집트', name:'로제타석', by:'고대 이집트 · 기원전 196년', place:'영국박물관', emoji:'🪨',
+  { id:'rosetta', city:'london', order:20, era:'고대 이집트', name:'로제타석', by:'고대 이집트 · 기원전 196년', place:'영국박물관', emoji:'🪨', museum:'british', periodCat:'ancient',
     sig:'이집트 <b>상형문자 해독의 열쇠</b> — 교과서 「고대 이집트 문명·문자」와 연결돼요.',
     kid:'검은 돌 하나에 똑같은 내용이 세 가지 문자(이집트 그림문자·이집트 흘림문자·그리스어)로 적혀 있어. 아무도 못 읽던 이집트 상형문자를, 학자 샹폴리옹이 이 돌의 그리스어와 비교해 마침내 해독했지. 덕분에 3천 년 전 이집트의 비밀이 풀렸어. 그래서 「고대 문자를 푸는 열쇠」라고 불려!',
     quiz:[{q:'로제타석에는 몇 가지 문자가 적혀 있을까?', opts:['한 가지','두 가지','세 가지'], a:2, why:'그림문자·흘림문자·그리스어, 이렇게 세 가지가 적혀 있어서 비교로 해독할 수 있었어.'},
           {q:'로제타석은 무엇을 푸는 열쇠가 되었을까?', opts:['이집트 상형문자','로마 숫자','한자'], a:0, why:'그리스어와 비교해 이집트 상형문자를 해독했어.'}] },
-  { id:'mummy', city:'london', order:25, era:'고대 이집트', name:'이집트 미라', by:'고대 이집트', place:'영국박물관', emoji:'⚱️',
+  { id:'mummy', city:'london', order:25, era:'고대 이집트', name:'이집트 미라', by:'고대 이집트', place:'영국박물관', emoji:'⚱️', museum:'british', periodCat:'ancient',
     sig:'고대 이집트인의 <b>내세관(죽음 이후의 믿음)</b> — 교과서 「고대 이집트 종교」와 연결돼요.',
     kid:'고대 이집트 사람들은 죽은 뒤에도 영혼이 다시 몸으로 돌아온다고 믿었어. 그래서 몸이 썩지 않게 특별한 방법으로 보존한 게 바로 미라야. 붕대로 칭칭 감고, 관 속에 부적과 보물을 함께 넣었지. 3천 년이 지난 지금도 그 모습이 남아 있다는 게 정말 신기하지?',
     quiz:[{q:'이집트 사람들이 미라를 만든 이유는?', opts:['벌을 주려고','죽은 뒤 영혼이 돌아온다고 믿어서','장난으로'], a:1, why:'영혼이 다시 몸으로 돌아온다고 믿어서 몸을 보존했어.'}] },
-  { id:'parthenon', city:'london', order:30, era:'고대 그리스', name:'파르테논 조각(엘긴 마블)', by:'고대 그리스 · 기원전 447~438년경', place:'영국박물관', emoji:'🏛',
+  { id:'parthenon', city:'london', order:30, era:'고대 그리스', name:'파르테논 조각(엘긴 마블)', by:'고대 그리스 · 기원전 447~438년경', place:'영국박물관', emoji:'🏛', museum:'british', periodCat:'ancient',
     sig:'아테네 <b>파르테논 신전</b> 조각 · <b>반환 논쟁</b>의 주인공 — 교과서 「고대 그리스·아테네」와 연결돼요.',
     kid:'그리스 아테네의 파르테논 신전을 장식하던 대리석 조각이야. 약 200년 전 영국의 엘긴 경이 그리스에서 뜯어 영국으로 가져와서 「엘긴 마블」이라고도 불러. 지금 그리스는 "우리 것이니 돌려달라"고 하고, 영국은 "우리가 잘 보관한다"며 맞서고 있어. 유물은 원래 있던 곳에 있어야 할까? 너도 한번 생각해봐.',
     quiz:[{q:'이 조각은 원래 어느 나라 신전의 것일까?', opts:['영국','그리스','이탈리아'], a:1, why:'그리스 아테네의 파르테논 신전 조각이야. 그래서 반환 논쟁이 있어.'}] },
-  { id:'haywain', city:'london', order:60, era:'19세기 영국 · 낭만주의', name:'건초 마차', by:'존 컨스터블 · 1821년', place:'내셔널 갤러리', emoji:'🌳',
+  { id:'haywain', city:'london', order:60, era:'19세기 영국 · 낭만주의', name:'건초 마차', by:'존 컨스터블 · 1821년', place:'내셔널 갤러리', emoji:'🌳', museum:'national', periodCat:'modern',
     sig:'영국 <b>낭만주의 풍경화</b>, 평범한 시골의 아름다움 — 「근대 유럽 문화」와 연결돼요.',
     kid:'영국 시골의 평화로운 강가 풍경을 그린 그림이야. 말이 끄는 건초 마차가 강을 건너고, 하늘엔 구름이 흘러가지. 컨스터블은 화려한 사건 대신 「아무 일 없는 평범한 시골」의 아름다움을 그렸어. 산업혁명으로 도시가 시끄러워지던 시절, 사람들이 그리워한 고향 같은 풍경이야.',
     quiz:[{q:'컨스터블이 이 그림에서 그린 것은?', opts:['전쟁 장면','평화로운 시골 풍경','왕의 초상화'], a:1, why:'평범한 시골의 아름다움을 담은 낭만주의 풍경화야.'}] },
-  { id:'temeraire', city:'london', order:65, era:'19세기 영국 · 산업혁명', name:'전함 테메레르', by:'윌리엄 터너 · 1839년', place:'내셔널 갤러리', emoji:'🚢',
+  { id:'temeraire', city:'london', order:65, era:'19세기 영국 · 산업혁명', name:'전함 테메레르', by:'윌리엄 터너 · 1839년', place:'내셔널 갤러리', emoji:'🚢', museum:'national', periodCat:'modern',
     sig:'낡은 <b>범선을 증기선</b>이 끌고 감 — 「산업혁명·기술의 변화」와 연결돼요.',
     kid:'노을 지는 강 위에서, 늙은 나무 범선을 작은 증기선이 끌고 가는 장면이야. 이 범선 테메레르호는 나폴레옹과 싸운 영웅이었지만, 이제 낡아서 해체되러 가는 길이지. 바람으로 가던 범선의 시대가 끝나고 증기기관의 시대가 온다는 걸 보여줘. 터너는 「시대가 바뀌는 순간」을 노을에 담았어.',
     quiz:[{q:'낡은 범선을 끌고 가는 것은 무엇일까?', opts:['증기선','바람','또 다른 범선'], a:0, why:'작은 증기선이 끌고 가지 — 산업혁명으로 증기기관 시대가 왔다는 뜻이야.'}] },
-  { id:'bathers', city:'london', order:70, era:'19세기 · 후기인상주의', name:'아스니에르에서의 물놀이', by:'조르주 쇠라 · 1884년', place:'내셔널 갤러리', emoji:'🏊',
+  { id:'bathers', city:'london', order:70, era:'19세기 · 후기인상주의', name:'아스니에르에서의 물놀이', by:'조르주 쇠라 · 1884년', place:'내셔널 갤러리', emoji:'🏊', museum:'national', periodCat:'modern',
     sig:'작은 점을 찍어 그리는 <b>점묘법</b> — 「19세기 미술」과 연결돼요.',
     kid:'파리 근교 강가에서 사람들이 물놀이하며 쉬는 장면이야. 가까이 보면 그림이 수많은 작은 점으로 이루어져 있어 — 이걸 「점묘법」이라고 해. 쇠라는 물감을 섞는 대신 작은 색점을 촘촘히 찍어, 멀리서 보면 색이 섞여 보이게 했지. 과학처럼 치밀하게 그린 그림이야.',
     quiz:[{q:'쇠라가 사용한, 작은 점으로 그리는 기법은?', opts:['점묘법','수채화','판화'], a:0, why:'작은 색점을 촘촘히 찍는 점묘법이야.'}] },
-  { id:'umbrellas', city:'london', order:75, era:'19세기 · 인상주의', name:'우산들', by:'오귀스트 르누아르 · 1881~1886년', place:'내셔널 갤러리', emoji:'☂️',
+  { id:'umbrellas', city:'london', order:75, era:'19세기 · 인상주의', name:'우산들', by:'오귀스트 르누아르 · 1881~1886년', place:'내셔널 갤러리', emoji:'☂️', museum:'national', periodCat:'modern',
     sig:'빛과 순간을 그린 <b>인상주의</b> — 「19세기 인상주의」와 연결돼요.',
     kid:'비 오는 파리 거리에서 사람들이 우산을 펼친 순간을 그린 그림이야. 르누아르는 인상주의 화가로, 사진처럼 정확하게가 아니라 「그 순간의 느낌과 빛」을 부드럽게 그렸어. 자세히 보면 우산의 파란빛과 사람들의 표정이 생생하지. 비 오는 날의 북적임이 그대로 느껴져.',
     quiz:[{q:'르누아르가 속한 미술 사조는?', opts:['인상주의','사실주의','고전주의'], a:0, why:'빛과 순간의 느낌을 그린 인상주의 화가야.'}] },
@@ -4341,16 +4366,16 @@ const HISTORY_SITES = [
     quiz:[{q:'웨스트민스터 사원에서 열리는 영국 왕실의 행사는?', opts:['운동회','대관식','시장'], a:1, why:'영국 왕이 왕관을 쓰는 대관식이 이곳에서 열려.'}] },
 
   /* ════════ 파리 (동선 2) ════════ */
-  { id:'venus-milo', city:'paris', order:10, era:'고대 그리스 · 헬레니즘', name:'밀로의 비너스', by:'작자 미상(고대 그리스) · 기원전 130~100년경', place:'루브르', emoji:'🗿',
+  { id:'venus-milo', city:'paris', order:10, era:'고대 그리스 · 헬레니즘', name:'밀로의 비너스', by:'작자 미상(고대 그리스) · 기원전 130~100년경', place:'루브르', emoji:'🗿', museum:'louvre', periodCat:'ancient',
     note:'두 팔이 원래 어떤 모습이었는지는 아직 밝혀지지 않았어요.',
     sig:'<b>헬레니즘</b> 조각의 아름다움 — 「헬레니즘 문화」와 연결돼요.',
     kid:'두 팔이 없는 채로 발견된 대리석 여신상이야. 사랑의 여신 아프로디테(로마 이름 비너스)를 조각한 것으로 보여. 팔이 어떤 모습이었는지 아무도 몰라서 지금도 미스터리야. 팔이 없는데도 몸의 곡선과 흘러내리는 옷 주름이 너무 아름다워, 세계에서 가장 유명한 조각 중 하나가 됐어.',
     quiz:[{q:'밀로의 비너스에게 없는 것은?', opts:['머리','두 팔','다리'], a:1, why:'두 팔이 없는 채로 발견됐고, 원래 모습은 아직 미스터리야.'}] },
-  { id:'nike', city:'paris', order:15, era:'고대 그리스 · 헬레니즘', name:'사모트라케의 니케', by:'작자 미상(고대 그리스) · 기원전 190년경', place:'루브르', emoji:'🕊',
+  { id:'nike', city:'paris', order:15, era:'고대 그리스 · 헬레니즘', name:'사모트라케의 니케', by:'작자 미상(고대 그리스) · 기원전 190년경', place:'루브르', emoji:'🕊', museum:'louvre', periodCat:'ancient',
     sig:'<b>승리의 여신</b>, 헬레니즘의 역동성 — 「헬레니즘 미술」과 연결돼요.',
     kid:'뱃머리에 막 내려앉은, 날개 달린 승리의 여신 조각이야. 머리와 팔은 없지만, 바닷바람에 옷이 펄럭이고 날개가 활짝 펼쳐져 금방이라도 날아오를 것 같지. 전쟁에서 이긴 걸 기념해 만든 조각이래. 참, 운동화 브랜드 「나이키」의 이름과 로고가 바로 이 여신에서 왔어!',
     quiz:[{q:'니케는 무엇의 여신일까?', opts:['사랑','승리','바다'], a:1, why:'승리의 여신 니케야. 스포츠 브랜드 나이키 이름의 유래이기도 해.'}] },
-  { id:'mona-lisa', city:'paris', order:30, era:'르네상스', name:'모나리자', by:'레오나르도 다빈치 · 1503~1519년경', place:'루브르', emoji:'🖼',
+  { id:'mona-lisa', city:'paris', order:30, era:'르네상스', name:'모나리자', by:'레오나르도 다빈치 · 1503~1519년경', place:'루브르', emoji:'🖼', museum:'louvre', periodCat:'modern',
     sig:'<b>르네상스</b> 대표작, 신비한 미소와 스푸마토 기법 — 「르네상스」와 연결돼요.',
     kid:'세계에서 가장 유명한 그림, 신비한 미소의 여인이야. 다빈치는 「스푸마토」라는 기법으로 윤곽선을 안개처럼 부드럽게 흐려, 볼 때마다 미소가 달라 보이게 그렸어. 생각보다 그림이 작아서(가로 53cm) 처음 보면 놀랄지도 몰라. 방탄유리 안에서 전 세계 사람들의 사랑을 받고 있지.',
     quiz:[{q:'모나리자를 그린 화가는?', opts:['미켈란젤로','레오나르도 다빈치','라파엘로'], a:1, why:'르네상스의 천재 레오나르도 다빈치가 그렸어.'},
@@ -4361,7 +4386,7 @@ const HISTORY_SITES = [
     kid:'프랑스 왕 루이 14세가 지은 어마어마하게 크고 화려한 궁전이야. 그는 "내가 곧 국가다"라고 할 만큼 강한 왕이어서 「태양왕」이라 불렸지. 온통 금빛에 거울로 뒤덮인 「거울의 방」이 특히 유명해. 나중에 이 화려함이 백성들을 화나게 해, 프랑스 혁명이 일어나는 배경이 되기도 했어.',
     quiz:[{q:'베르사유 궁전을 지은 왕은?', opts:['루이 14세','나폴레옹','헨리 3세'], a:0, why:'절대왕정의 상징 「태양왕」 루이 14세가 지었어.'},
           {q:'루이 14세의 별명은?', opts:['달의 왕','태양왕','바다왕'], a:1, why:'스스로를 태양에 빗대 「태양왕」이라 불렸어.'}] },
-  { id:'liberty', city:'paris', order:55, era:'19세기 · 프랑스 혁명기', name:'민중을 이끄는 자유의 여신', by:'외젠 들라크루아 · 1830년', place:'루브르 (7월 혁명)', emoji:'🚩',
+  { id:'liberty', city:'paris', order:55, era:'19세기 · 프랑스 혁명기', name:'민중을 이끄는 자유의 여신', by:'외젠 들라크루아 · 1830년', place:'루브르 (7월 혁명)', emoji:'🚩', museum:'louvre', periodCat:'modern',
     sig:'1830년 <b>7월 혁명</b>, 자유와 시민 — 「프랑스 혁명·시민혁명」과 연결돼요.',
     kid:'프랑스 국기를 든 여신이 총과 깃발을 들고 시민들을 이끄는 그림이야. 1830년 「7월 혁명」 때 왕의 억압에 맞서 일어난 시민들을 그렸어. 여신은 「자유」를 상징하고, 그 뒤에는 노동자·소년·신사가 함께 싸우고 있지. 신분이 달라도 자유를 위해 하나가 된 모습이야.',
     quiz:[{q:'여신이 상징하는 것은?', opts:['전쟁','자유','부자'], a:1, why:'억압에 맞선 시민들을 이끄는 「자유」를 상징해.'}] },
@@ -4375,19 +4400,19 @@ const HISTORY_SITES = [
     sig:'<b>나폴레옹</b>이 승리를 기념해 세운 문 — 「나폴레옹 시대」와 연결돼요.',
     kid:'파리 한복판, 열두 갈래 길이 만나는 곳에 서 있는 거대한 문이야. 나폴레옹이 전쟁에서 이긴 군대를 기념하려고 짓기 시작했어. 정작 완성됐을 땐 나폴레옹은 이미 세상을 떠난 뒤였지. 문 아래에는 「무명용사의 묘」가 있어, 나라를 위해 싸운 이름 없는 병사들을 기려. 꼭대기에 오르면 파리 시내가 한눈에 보여!',
     quiz:[{q:'개선문을 짓게 한 인물은?', opts:['루이 14세','나폴레옹','다빈치'], a:1, why:'나폴레옹이 전쟁 승리를 기념해 짓기 시작했어.'}] },
-  { id:'gleaners', city:'paris', order:70, era:'19세기 · 사실주의', name:'이삭 줍는 여인들', by:'장 프랑수아 밀레 · 1857년', place:'오르세', emoji:'🌾',
+  { id:'gleaners', city:'paris', order:70, era:'19세기 · 사실주의', name:'이삭 줍는 여인들', by:'장 프랑수아 밀레 · 1857년', place:'오르세', emoji:'🌾', museum:'orsay', periodCat:'modern',
     sig:'가난한 농민의 삶을 진지하게 그린 <b>사실주의</b> — 「19세기 사실주의」와 연결돼요.',
     kid:'추수가 끝난 밭에서 세 여인이 허리를 굽혀 떨어진 이삭을 줍고 있어. 가장 가난한 사람들이 남은 곡식을 주워 살아가던 모습이야. 밀레는 화려한 왕이나 신화 대신, 평범하고 고단한 농민의 삶을 진지하게 그렸어 — 이걸 「사실주의」라고 해. 성실한 사람들에게 보내는 존경이 담겨 있지.',
     quiz:[{q:'밀레가 이 그림에서 그린 사람들은?', opts:['왕과 귀족','평범한 농민','군인'], a:1, why:'가난한 농민의 삶을 진지하게 그린 사실주의 작품이야.'}] },
-  { id:'angelus', city:'paris', order:72, era:'19세기 · 사실주의', name:'만종', by:'장 프랑수아 밀레 · 1857~1859년', place:'오르세', emoji:'🔔',
+  { id:'angelus', city:'paris', order:72, era:'19세기 · 사실주의', name:'만종', by:'장 프랑수아 밀레 · 1857~1859년', place:'오르세', emoji:'🔔', museum:'orsay', periodCat:'modern',
     sig:'농민 부부의 <b>저녁 기도</b>, 소박한 경건함 — 「19세기 사실주의」와 연결돼요.',
     kid:'해질 무렵 밭에서 일하던 농부 부부가 멀리 교회 종소리를 듣고 잠시 고개 숙여 기도하는 그림이야. 「만종」은 저녁에 울리는 종을 뜻해. 하루의 고된 일을 마치고 감사 기도를 드리는 평화로운 순간이지. 노을빛이 온 들판을 따뜻하게 물들이고 있어.',
     quiz:[{q:'부부가 저녁 종소리를 듣고 하는 것은?', opts:['달리기','기도','노래'], a:1, why:'하루를 마치고 감사 기도를 드리는 장면이야.'}] },
-  { id:'starry-rhone', city:'paris', order:75, era:'19세기 · 후기인상주의', name:'론강의 별이 빛나는 밤', by:'빈센트 반 고흐 · 1888년', place:'오르세', emoji:'🌌',
+  { id:'starry-rhone', city:'paris', order:75, era:'19세기 · 후기인상주의', name:'론강의 별이 빛나는 밤', by:'빈센트 반 고흐 · 1888년', place:'오르세', emoji:'🌌', museum:'orsay', periodCat:'modern',
     sig:'감정을 색과 붓질로 표현한 <b>후기인상주의</b> — 「19세기 미술」과 연결돼요.',
     kid:'프랑스 남부 아를의 론강 위로 별이 쏟아지는 밤을 그린 그림이야. 반 고흐는 눈에 보이는 대로가 아니라, 자기가 「느낀 감정」을 소용돌이치는 붓질과 강렬한 색으로 표현했어. 강물에 비친 도시의 불빛과 별빛이 금빛으로 반짝이지. 외로웠던 고흐가 밤하늘에서 위로를 찾은 것 같아.',
     quiz:[{q:'이 그림을 그린 화가는?', opts:['반 고흐','밀레','드가'], a:0, why:'감정을 강렬한 색과 붓질로 표현한 반 고흐의 작품이야.'}] },
-  { id:'ballet', city:'paris', order:78, era:'19세기 · 인상주의', name:'발레 수업', by:'에드가 드가 · 1870년대', place:'오르세', emoji:'🩰',
+  { id:'ballet', city:'paris', order:78, era:'19세기 · 인상주의', name:'발레 수업', by:'에드가 드가 · 1870년대', place:'오르세', emoji:'🩰', museum:'orsay', periodCat:'modern',
     sig:'무대 뒤 <b>일상의 순간</b>을 포착한 인상주의 — 「19세기 인상주의」와 연결돼요.',
     kid:'발레 공연이 아니라, 무대 뒤 「연습 시간」의 발레리나들을 그린 그림이야. 드가는 완벽한 공연 대신, 지치고 자세를 고치고 하품하는 진짜 연습 장면을 즐겨 그렸어. 마치 몰래 훔쳐본 것처럼 자연스럽지. 인상주의 화가들은 이렇게 「평범한 일상의 한순간」을 좋아했어.',
     quiz:[{q:'드가가 이 그림에서 그린 장면은?', opts:['화려한 공연','발레 연습','전쟁'], a:1, why:'무대 뒤 발레 연습의 자연스러운 순간을 그렸어.'}] },
@@ -4428,19 +4453,19 @@ const HISTORY_SITES = [
     sig:'브루넬레스키의 거대한 <b>돔</b>, 르네상스 공학 — 「르네상스 과학·건축」과 연결돼요.',
     kid:'피렌체 한가운데 우뚝 솟은 대성당이야. 가장 놀라운 건 거대한 빨간 「돔(둥근 지붕)」인데, 당시 사람들은 이렇게 큰 지붕을 어떻게 만들지 몰랐어. 건축가 브루넬레스키가 기발한 방법으로 기둥 없이 돔을 쌓아 올려 모두를 놀라게 했지. 르네상스 시대 사람들이 얼마나 똑똑하게 문제를 풀었는지 보여주는 걸작이야.',
     quiz:[{q:'두오모의 거대한 돔을 만든 건축가는?', opts:['미켈란젤로','브루넬레스키','보티첼리'], a:1, why:'브루넬레스키가 기발한 방법으로 거대한 돔을 완성했어.'}] },
-  { id:'annunciation', city:'florence', order:30, era:'르네상스', name:'수태고지', by:'레오나르도 다빈치 · 1472년경', place:'우피치', emoji:'👼',
+  { id:'annunciation', city:'florence', order:30, era:'르네상스', name:'수태고지', by:'레오나르도 다빈치 · 1472년경', place:'우피치', emoji:'👼', museum:'uffizi', periodCat:'modern',
     sig:'다빈치의 <b>초기작</b>, 정교한 관찰과 원근감 — 「르네상스 미술」과 연결돼요.',
     kid:'천사가 마리아에게 "아기 예수를 낳을 거예요"라고 알려주는 장면이야. 다빈치가 아주 젊었을 때 그린 초기 그림이지. 천사의 날개, 풀밭의 꽃 하나하나를 관찰해 정교하게 그렸어. 멀리 있는 풍경을 흐릿하게 그려 깊이감(원근감)을 준 것도 다빈치의 솜씨야.',
     quiz:[{q:'천사가 마리아에게 전한 소식은?', opts:['전쟁이 났다','아기 예수를 낳는다','비가 온다'], a:1, why:'아기 예수의 탄생을 알리는 「수태고지」 장면이야.'}] },
-  { id:'duke-urbino', city:'florence', order:35, era:'르네상스', name:'우르비노 공작 부부의 초상', by:'피에로 델라 프란체스카 · 1472년경', place:'우피치', emoji:'👤',
+  { id:'duke-urbino', city:'florence', order:35, era:'르네상스', name:'우르비노 공작 부부의 초상', by:'피에로 델라 프란체스카 · 1472년경', place:'우피치', emoji:'👤', museum:'uffizi', periodCat:'modern',
     sig:'있는 그대로의 인물을 그린 <b>르네상스 초상화</b> — 「르네상스·인간 중심」과 연결돼요.',
     kid:'우르비노를 다스린 공작과 그의 부인을 옆모습으로 그린 두 폭 그림이야. 공작의 코가 특이하게 휘어 있는데, 전쟁에서 다쳐서 그렇대. 화가는 그걸 숨기지 않고 있는 그대로 그렸어. 르네상스 시대엔 신뿐 아니라 「사람 그 자체」를 중요하게 여겨, 이렇게 진짜 인물을 자세히 그리기 시작했지.',
     quiz:[{q:'이 초상화는 인물을 어떤 각도로 그렸을까?', opts:['정면','옆모습','뒷모습'], a:1, why:'옛 동전처럼 인물의 옆모습을 그린 게 특징이야.'}] },
-  { id:'primavera', city:'florence', order:40, era:'르네상스', name:'봄(프리마베라)', by:'산드로 보티첼리 · 1477~1482년경', place:'우피치', emoji:'🌸',
+  { id:'primavera', city:'florence', order:40, era:'르네상스', name:'봄(프리마베라)', by:'산드로 보티첼리 · 1477~1482년경', place:'우피치', emoji:'🌸', museum:'uffizi', periodCat:'modern',
     sig:'고대 신화를 되살린 <b>르네상스</b> — 「르네상스·고전 부활」과 연결돼요.',
     kid:'봄을 맞은 신화 속 정원에 여신과 요정들이 모여 있는 그림이야. 오른쪽엔 봄바람이 불어오고, 꽃의 여신이 온몸에 꽃을 두르고 있어. 그림 속에 수백 종의 식물이 그려져 있대! 보티첼리는 고대 그리스·로마 신화를 되살려, 봄의 생명과 사랑을 아름답게 표현했어.',
     quiz:[{q:'이 그림이 표현한 계절은?', opts:['봄','겨울','가을'], a:0, why:'제목 「프리마베라」가 이탈리아어로 봄이라는 뜻이야.'}] },
-  { id:'birth-venus', city:'florence', order:45, era:'르네상스', name:'비너스의 탄생', by:'산드로 보티첼리 · 1485년경', place:'우피치', emoji:'🐚',
+  { id:'birth-venus', city:'florence', order:45, era:'르네상스', name:'비너스의 탄생', by:'산드로 보티첼리 · 1485년경', place:'우피치', emoji:'🐚', museum:'uffizi', periodCat:'modern',
     sig:'신화와 <b>인체의 아름다움</b>을 당당히 그린 르네상스 — 「르네상스·고전 부활」과 연결돼요.',
     kid:'사랑의 여신 비너스가 커다란 조개껍데기를 타고 바다에서 태어나 뭍으로 오는 장면이야. 고대 그리스·로마 신화 이야기를 그린 거지. 중세엔 주로 종교 그림만 그렸는데, 르네상스 시대엔 이렇게 신화 속 인물과 사람 몸의 아름다움을 당당하게 그리기 시작했어. 부드러운 곡선과 바람에 날리는 머리카락이 정말 우아하지.',
     quiz:[{q:'비너스가 바다에서 타고 온 것은?', opts:['배','조개껍데기','돌고래'], a:1, why:'커다란 조개껍데기를 타고 뭍으로 오는 장면이야.'}] },
@@ -4469,23 +4494,48 @@ const HISTORY_SITES = [
     sig:'<b>콘스탄티누스 황제</b>, 기독교를 공인한 시대의 문 — 교과서 「로마 제국·기독교 공인」과 연결돼요.',
     kid:'콜로세움 바로 옆에 서 있는 커다란 승리의 문이야. 로마 황제 콘스탄티누스가 전쟁에서 이긴 걸 기념해 세웠어. 이 황제는 그동안 박해받던 기독교를 처음으로 인정해준 사람으로 유명해(밀라노 칙령). 덕분에 기독교가 유럽 전체로 퍼지는 큰 전환점이 됐지. 나중에 파리의 개선문도 이 문을 본떠 만들었대.',
     quiz:[{q:'콘스탄티누스 황제가 처음으로 인정해준 종교는?', opts:['기독교','불교','이슬람교'], a:0, why:'밀라노 칙령으로 기독교를 인정해, 유럽에 크게 퍼지는 계기가 됐어.'}] },
-  { id:'laocoon', city:'rome', order:50, era:'헬레니즘~고대 로마', name:'라오콘 군상', by:'작자 미상(고대 그리스) · 기원전 1세기경', place:'바티칸', emoji:'🐍',
+  { id:'laocoon', city:'rome', order:50, era:'헬레니즘~고대 로마', name:'라오콘 군상', by:'작자 미상(고대 그리스) · 기원전 1세기경', place:'바티칸', emoji:'🐍', museum:'vatican', periodCat:'ancient',
     note:'만들어진 정확한 시기는 자료마다 다르게 표기돼요.',
     sig:'인간의 <b>고통과 감정</b>을 생생하게 담은 헬레니즘 조각 — 「헬레니즘 미술」과 연결돼요.',
     kid:'트로이의 사제 라오콘과 두 아들이 거대한 바다뱀에게 휘감기는 순간을 조각한 작품이야. 트로이 목마의 비밀을 알아채고 경고했다가 신의 벌을 받는 그리스 신화 이야기지. 몸을 비틀며 고통스러워하는 표정과 근육이 너무나 생생해서, 500여 년 전 발견됐을 때 미켈란젤로도 크게 감탄했대. 인간의 감정을 돌에 담은 걸작이야.',
     quiz:[{q:'라오콘과 두 아들을 휘감은 것은?', opts:['밧줄','바다뱀','사자'], a:1, why:'신화 속에서 거대한 바다뱀에게 휘감기는 장면이야.'}] },
-  { id:'school-athens', city:'rome', order:60, era:'르네상스', name:'아테네 학당', by:'라파엘로 · 1509~1511년', place:'바티칸 서명의 방', emoji:'📐',
+  { id:'school-athens', city:'rome', order:60, era:'르네상스', name:'아테네 학당', by:'라파엘로 · 1509~1511년', place:'바티칸 서명의 방', emoji:'📐', museum:'vatican', periodCat:'modern',
     sig:'고대 그리스 <b>철학자들의 총집합</b>, 인간의 지혜 찬양 — 「르네상스·고전 부활」과 연결돼요.',
     kid:'고대 그리스의 유명한 철학자와 과학자들이 한자리에 모인 상상 속 장면이야. 가운데 두 사람이 플라톤과 아리스토텔레스인데, 한 명은 하늘을, 한 명은 땅을 가리키며 서로 다른 생각을 보여줘. 피타고라스, 유클리드 같은 수학자들도 있어. 라파엘로는 「인간의 지혜」를 찬양하려 이 그림을 그렸어 — 르네상스가 고대 그리스를 얼마나 존경했는지 보여주지.',
     quiz:[{q:'그림 한가운데 서 있는 두 철학자는?', opts:['카이사르와 나폴레옹','플라톤과 아리스토텔레스','다빈치와 라파엘로'], a:1, why:'하늘과 땅을 각각 가리키는 플라톤과 아리스토텔레스야.'}] },
-  { id:'creation-adam', city:'rome', order:70, era:'르네상스', name:'천지창조', by:'미켈란젤로 · 1508~1512년', place:'시스티나 성당', emoji:'🖐',
+  { id:'creation-adam', city:'rome', order:70, era:'르네상스', name:'천지창조', by:'미켈란젤로 · 1508~1512년', place:'시스티나 성당', emoji:'🖐', museum:'vatican', periodCat:'modern',
     sig:'시스티나 <b>천장화</b>, 르네상스 전성기의 정점 — 「르네상스 전성기」와 연결돼요.',
     kid:'시스티나 성당 천장에 그려진 그림 중 가장 유명한 장면이야. 하느님이 손을 뻗어 첫 사람 아담에게 생명을 불어넣으려는 순간, 두 손가락이 막 닿을 듯 말 듯 하지. 미켈란젤로는 이 거대한 천장을 4년 동안 목을 뒤로 젖힌 채 홀로 그렸대. 손끝 사이의 작은 틈에 「생명이 시작되는 긴장감」이 담겨 있어.',
     quiz:[{q:'천지창조가 그려진 곳은?', opts:['시스티나 성당 천장','콜로세움','루브르'], a:0, why:'바티칸 시스티나 성당의 천장에 그려진 미켈란젤로의 걸작이야.'}] },
-  { id:'last-judgment', city:'rome', order:75, era:'르네상스', name:'최후의 심판', by:'미켈란젤로 · 1536~1541년', place:'시스티나 성당', emoji:'⚖️',
+  { id:'last-judgment', city:'rome', order:75, era:'르네상스', name:'최후의 심판', by:'미켈란젤로 · 1536~1541년', place:'시스티나 성당', emoji:'⚖️', museum:'vatican', periodCat:'modern',
     sig:'400여 명의 인체가 소용돌이치는 <b>제단 벽화</b> — 「르네상스 전성기」와 연결돼요.',
     kid:'시스티나 성당 제단 벽을 가득 채운 거대한 그림이야. 세상의 마지막 날, 예수가 사람들을 심판하는 장면을 그렸어. 400명이 넘는 인물이 하늘로 오르거나 아래로 떨어지며 소용돌이치지. 미켈란젤로는 사람 몸의 근육과 움직임을 완벽하게 그려, 보는 사람이 압도되게 만들었어. 천지창조를 그린 지 20여 년 뒤, 더 원숙해진 솜씨로 그린 작품이야.',
     quiz:[{q:'「최후의 심판」이 그린 장면은?', opts:['전쟁의 승리','세상 마지막 날의 심판','왕의 대관식'], a:1, why:'세상의 마지막 날 예수가 사람들을 심판하는 장면이야.'}] },
+
+  /* ════════ 🏛 박물관별 "꼭 봐야 할 작품" 보강 (WebSearch로 검증 — 각 박물관 공식/평론 하이라이트에서 확인) ════════ */
+  { id:'hammurabi', city:'paris', order:5, era:'고대 메소포타미아', name:'함무라비 법전', by:'고대 바빌로니아 · 기원전 1750년경', place:'루브르', emoji:'📜', museum:'louvre', periodCat:'ancient',
+    source:'https://louvremuseum-guide.com/what-to-see/top-20-must-see-artworks/',
+    sig:'세계에서 가장 오래된 성문법 중 하나, <b>"눈에는 눈, 이에는 이"</b> — 교과서 「고대 오리엔트·메소포타미아 문명」과 직결돼요.',
+    kid:'높이 2m가 넘는 검은 돌기둥에 법 조항이 빼곡히 새겨져 있어. 바빌로니아의 함무라비 왕이 "누구나 지켜야 할 법"을 만들어 백성들이 볼 수 있는 곳에 세워뒀대. "다른 사람의 눈을 다치게 하면 자기 눈도 다친다"는 뜻의 「눈에는 눈, 이에는 이」라는 유명한 원칙이 담겨 있지. 왕의 마음대로가 아니라 정해진 법으로 다스리려 한, 인류 최초의 시도 중 하나야.',
+    quiz:[{q:'함무라비 법전에 담긴 유명한 원칙은?', opts:['눈에는 눈, 이에는 이','뿌린 대로 거둔다','아는 것이 힘이다'], a:0, why:'죄와 벌을 같은 크기로 갚는 「눈에는 눈, 이에는 이」 원칙이 담겨 있어.'},
+          {q:'함무라비 법전을 만든 사람은?', opts:['이집트 파라오','바빌로니아의 함무라비 왕','로마 황제'], a:1, why:'메소포타미아 바빌로니아의 함무라비 왕이 만든 법이야.'}] },
+  { id:'arnolfini', city:'london', order:50, era:'북유럽 르네상스', name:'아르놀피니 부부의 초상', by:'얀 반 에이크 · 1434년', place:'내셔널 갤러리', emoji:'🪞', museum:'national', periodCat:'modern',
+    source:'https://www.theartnewspaper.com/2025/06/30/ten-essential-works-of-art-to-see-at-the-national-gallery-in-london',
+    sig:'<b>유화 기법의 혁신</b>과 상인 계급의 부 — 「북유럽 르네상스·상업의 발달」과 연결돼요.',
+    kid:'신랑 신부가 손을 맞잡고 서 있는, 세상에서 가장 자세하게 그려진 그림 중 하나야. 화가 반 에이크는 기름에 물감을 섞는 「유화」 기법을 뛰어나게 발전시켜서, 옷의 털 하나하나, 바닥의 강아지 털까지 진짜처럼 그렸어. 벽 가운데 작은 거울에는 방 안 전체와 화가 자신의 모습까지 작게 비쳐 보여! 신랑의 화려한 옷차림은 상업으로 부자가 된 상인 계급을 보여주지.',
+    quiz:[{q:'반 에이크가 이 그림에서 뛰어나게 발전시킨 기법은?', opts:['유화','수채화','프레스코'], a:0, why:'기름에 물감을 섞는 유화 기법을 정교하게 발전시켰어.'},
+          {q:'벽 가운데 작은 거울에 비친 것은?', opts:['풍경','방 안 전체와 화가 자신','또 다른 그림'], a:1, why:'거울 속에 방 안 전체와 화가 자신의 모습까지 작게 비쳐 보여.'}] },
+  { id:'sunflowers', city:'london', order:72, era:'19세기 · 후기인상주의', name:'해바라기', by:'빈센트 반 고흐 · 1888년', place:'내셔널 갤러리', emoji:'🌻', museum:'national', periodCat:'modern',
+    source:'https://www.theartnewspaper.com/2025/06/30/ten-essential-works-of-art-to-see-at-the-national-gallery-in-london',
+    sig:'고흐의 <b>강렬한 색채</b>와 화가 공동체의 꿈 — 「19세기 후기인상주의」와 연결돼요.',
+    kid:'노란 꽃병에 담긴 해바라기를 그린, 반 고흐의 그림 중 가장 사랑받는 작품이야. 고흐는 프랑스 아를에서 화가 친구 고갱을 맞이하려고 방을 노란 해바라기 그림으로 가득 채우고 싶어 했대. 노란색을 여러 톤으로 겹겹이 칠해서, 한 가지 색인데도 전혀 지루하지 않지. 내셔널 갤러리 소장품 중 가장 인기 있는 그림으로 꼽혀.',
+    quiz:[{q:'고흐가 해바라기 그림을 그린 이유는?', opts:['돈을 벌려고','화가 친구를 맞이하는 방을 꾸미려고','전시회에 내려고'], a:1, why:'친구 고갱을 맞이할 방을 노란 해바라기 그림으로 채우고 싶어 했어.'}] },
+  { id:'luncheon-grass', city:'paris', order:68, era:'19세기 · 근대 미술의 전환점', name:'풀밭 위의 점심 식사', by:'에두아르 마네 · 1863년', place:'오르세', emoji:'🧺', museum:'orsay', periodCat:'modern',
+    source:'https://www.britannica.com/list/21-notable-paintings-in-the-musee-dorsay',
+    note:'같은 소재(옷 입은 남성+벗은 여성)의 그림은 이전에도 있었지만, "평범한 현대인"으로 그린 게 파격으로 여겨졌어요.',
+    sig:'전통을 깬 <b>파격</b>으로 근대 미술의 시작을 알림 — 「19세기 근대 미술·인상주의의 전조」와 연결돼요.',
+    kid:'옷을 갖춰 입은 두 신사와 벌거벗은 여인이 숲속에서 소풍을 즐기는 그림이야. 신화 속 인물이 아니라 「평범한 파리 사람」을 이렇게 그린 게 당시엔 너무 파격적이어서 큰 소동이 났어! 공식 전시회(살롱)에서 거절당했지만, 오히려 이 그림 때문에 「낙선전」이라는 새로운 전시가 열렸고, 이후 인상주의 화가들에게 큰 영향을 줬지. 미술의 규칙을 깨는 게 얼마나 큰 사건이 될 수 있는지 보여주는 그림이야.',
+    quiz:[{q:'이 그림이 처음 발표됐을 때 있었던 일은?', opts:['큰 인기로 바로 팔렸다','파격적이라 큰 소동이 났다','아무도 관심 없었다'], a:1, why:'전통을 깬 파격적인 그림이라 공식 전시회에서 거절당하는 등 큰 소동이 났어.'}] },
 ];
 
 /* ── 진행/집계 유틸 ── */
@@ -4500,9 +4550,16 @@ function trhSite(id){ return HISTORY_SITES.find(s=>s.id===id); }
 function trhGrad(city){ const c=CITIES[city].color; return `linear-gradient(135deg, ${c} 0%, ${trhShade(c,-18)} 100%)`; }
 function trhShade(hex,pct){ const n=parseInt(hex.slice(1),16); let r=(n>>16)&255,g=(n>>8)&255,b=n&255; const f=(v)=>Math.max(0,Math.min(255,Math.round(v+(v*pct/100)))); return `rgb(${f(r)},${f(g)},${f(b)})`; }
 
+/* ── 진행/집계 유틸: 박물관 렌즈 ── */
+function trhMuseumSites(mk){ return HISTORY_SITES.filter(s=>s.museum===mk).sort((a,b)=>a.order-b.order); }
+function trhMuseumDone(mk){ return trhMuseumSites(mk).filter(s=>trhVisited[s.id]).length; }
+function trhMuseumTotal(mk){ return trhMuseumSites(mk).length; }
+function trhMuseumComplete(mk){ return trhMuseumTotal(mk)>0 && trhMuseumDone(mk)===trhMuseumTotal(mk); }
+function trhMuseumGrad(mk){ return trhGrad(MUSEUMS[mk].city); }
+
 /* ── 뷰 전환 ── */
 function trhShow(view){
-  ['trhHome','trhCity','trhPassport'].forEach(v=>{ const el=document.getElementById(v); if(el) el.style.display = (v===view)?'block':'none'; });
+  ['trhHome','trhCity','trhMuseumList','trhMuseum','trhPassport'].forEach(v=>{ const el=document.getElementById(v); if(el) el.style.display = (v===view)?'block':'none'; });
   const h=document.getElementById('history'); if(h) window.scrollTo({top: h.offsetTop-60<0?0:0, behavior:'smooth'});
   window.scrollTo({top:0, behavior:'smooth'});
 }
@@ -4546,6 +4603,7 @@ function renderHistoryHome(){
       <div class="trh-hero-actions">
         <button class="trh-btn trh-btn-gold" onclick="openHistoryPassport()">🎫 내 여권·스탬프북</button>
         <button class="trh-btn trh-btn-ghost" onclick="openHistoryCity('${CITY_ORDER[0]}')">🗺 탐험 시작하기</button>
+        <button class="trh-btn trh-btn-ghost" onclick="openMuseumList()">🏛 박물관별로 보기</button>
       </div>
     </div>
 
@@ -4596,6 +4654,76 @@ function openHistoryCity(city){
   trhShow('trhCity');
 }
 function backToHistoryHome(){ renderHistoryHome(); trhShow('trhHome'); }
+
+/* ── 렌더: 박물관별 탐험 (나라 > 박물관 > 고대~현대순) ── */
+function openMuseumList(){ renderMuseumList(); trhShow('trhMuseumList'); }
+function backToMuseumList(){ renderMuseumList(); trhShow('trhMuseumList'); }
+function renderMuseumList(){
+  const groups = MUSEUM_COUNTRY_GROUPS.map(g=>{
+    const cards = g.museums.map(mk=>{
+      const m=MUSEUMS[mk], d=trhMuseumDone(mk), t=trhMuseumTotal(mk), pct=t?Math.round(d/t*100):0, complete=trhMuseumComplete(mk);
+      return `<div class="trh-citycard" onclick="openMuseum('${mk}')">
+        <div class="trh-citycard-top" style="background:${trhMuseumGrad(mk)}">
+          <span class="trh-citycard-step">${esc(CITIES[m.city].name)}</span>
+          ${complete?'<span class="trh-citycard-done">🏅</span>':''}
+          <span>${m.icon}</span>
+        </div>
+        <div class="trh-citycard-body">
+          <div class="trh-citycard-name">${esc(m.name)}<small>${esc(m.en)}</small></div>
+          <div class="trh-citycard-era">${m.flag} ${esc(m.country)}</div>
+          <div class="trh-citycard-prog"><span>${t}점 중 ${d}점 방문</span><span>${pct}%</span></div>
+          <div class="trh-mini-bar"><div class="trh-mini-fill" style="width:${pct}%;background:${CITIES[m.city].color}"></div></div>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="trh-section-label" style="margin-top:20px">${g.flag} ${esc(g.country)}</div><div class="trh-rail" style="overflow-x:visible;flex-wrap:wrap">${cards}</div>`;
+  }).join('');
+
+  document.getElementById('trhMuseumList').innerHTML = `
+    <button class="trh-btn trh-btn-back" onclick="backToHistoryHome()">← 탐험 지도로</button>
+    <div class="trh-hero" style="padding:18px 18px 16px">
+      <div class="trh-hero-eyebrow">Museum Highlights</div>
+      <div class="trh-hero-title" style="font-size:clamp(20px,5vw,28px)">박물관별 탐험 🏛</div>
+      <div class="trh-hero-sub">세계 6대 박물관에서 "꼭 봐야 할 작품"만 모았어요. 각 박물관 안에서는 고대 → 중세 → 근대 → 현대 순서로 만나요.</div>
+    </div>
+    ${groups}
+    <p class="hint" style="margin-top:18px">🔎 이 목록은 각 박물관의 공식 하이라이트·전문 여행 기사를 인터넷에서 교차 확인해 구성했어요. (상세 카드의 📚 참고 자료 표시 참고)</p>
+  `;
+}
+function openMuseum(mk){
+  const m=MUSEUMS[mk];
+  const sites=trhMuseumSites(mk);
+  const periodsPresent = PERIOD_CAT_ORDER.filter(pc=>sites.some(s=>s.periodCat===pc));
+  const periodHtml = periodsPresent.map(pc=>{
+    const psites=sites.filter(s=>s.periodCat===pc);
+    const eraGroups=[]; const seen={};
+    psites.forEach(s=>{ if(!seen[s.era]){ seen[s.era]=1; eraGroups.push(s.era); } });
+    const eraHtml = eraGroups.map(era=>{
+      const items=psites.filter(s=>s.era===era).map(s=>trhSiteCard(s)).join('');
+      return `<div class="trh-era-group" style="margin-bottom:14px"><div class="trh-era-title" style="color:${CITIES[m.city].color};font-size:12px">${esc(era)}</div>${items}</div>`;
+    }).join('');
+    return `<div style="margin-bottom:10px"><div class="trh-section-label" style="color:${CITIES[m.city].color}">${PERIOD_CAT_LABEL[pc]}</div>${eraHtml}</div>`;
+  }).join('');
+
+  const d=trhMuseumDone(mk), t=trhMuseumTotal(mk);
+  const allVisited=trhMuseumComplete(mk);
+  const best=trhMuseumQuiz[mk];
+  const qn=Math.min(5,t);
+  const comboBtn = `<button class="trh-btn ${allVisited?'trh-btn-gold':'trh-btn-ghost'}" style="${allVisited?'':'opacity:.55'}" onclick="${allVisited?`startMuseumQuiz('${mk}')`:`toast('이 박물관의 모든 작품을 방문하면 종합 미션이 열려요!')`}">🧠 ${esc(m.name)} 종합 미션${best!==undefined?` · 최고 ${best}/${qn}`:''}</button>`;
+
+  document.getElementById('trhMuseum').innerHTML = `
+    <button class="trh-btn trh-btn-back" onclick="backToMuseumList()">← 박물관 목록으로</button>
+    <div class="trh-city-banner" style="background:${trhMuseumGrad(mk)}">
+      <h2>${m.icon} ${esc(m.name)} <span style="font-size:14px;font-weight:500;opacity:.85">${esc(m.en)}</span></h2>
+      <div class="trh-cb-sub">${m.flag} ${esc(m.country)} · ${esc(CITIES[m.city].name)}</div>
+      <div style="margin-top:10px;font-size:12.5px;font-weight:700">📍 ${t}점 중 <b>${d}점</b> 방문 완료 ${allVisited?'· 🏅 박물관 마스터!':''}</div>
+    </div>
+    <div style="margin-bottom:14px">${comboBtn}</div>
+    <p class="hint">🕰 이 박물관 안에서는 <b>고대 → 중세 → 근대 → 현대</b> 순서로 정리했어요. (소장품이 없는 시대는 생략)</p>
+    ${periodHtml}
+  `;
+  trhShow('trhMuseum');
+}
 
 function trhSiteCard(s){
   const visited=!!trhVisited[s.id];
@@ -4668,11 +4796,19 @@ function startCityQuiz(city){
   renderQuizQuestion();
   document.getElementById('trhQuizModal').classList.add('open');
 }
+function startMuseumQuiz(mk){
+  const pool=[]; trhMuseumSites(mk).forEach(s=>{ if(s.quiz) s.quiz.forEach(q=>pool.push(q)); });
+  for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  const qs=pool.slice(0,Math.min(5,pool.length));
+  trhQuizState={ mode:'museum', museum:mk, qs, i:0, correct:0 };
+  renderQuizQuestion();
+  document.getElementById('trhQuizModal').classList.add('open');
+}
 function renderQuizQuestion(){
   const st=trhQuizState; if(!st) return;
   const q=st.qs[st.i];
   const total=st.qs.length;
-  const title = st.mode==='city' ? `🧠 ${CITIES[st.city].name} 종합 퀴즈` : `🎫 도장 퀴즈`;
+  const title = st.mode==='city' ? `🧠 ${CITIES[st.city].name} 종합 퀴즈` : (st.mode==='museum' ? `🧠 ${MUSEUMS[st.museum].name} 종합 미션` : `🎫 도장 퀴즈`);
   const opts=q.opts.map((o,idx)=>`<button class="trh-opt" onclick="answerQuiz(${idx})">${esc(o)}</button>`).join('');
   document.getElementById('trhQuizBody').innerHTML = `
     <h3 style="margin-bottom:6px">${title}</h3>
@@ -4717,6 +4853,22 @@ function finishQuiz(){
           <button class="trh-btn trh-btn-ghost" style="background:#EFE6D4;color:#3A2C1A" onclick="closeModal('trhQuizModal');openSiteDetail('${st.siteId}')">📖 이야기 다시 읽기</button>
         </div>`;
     }
+  } else if(st.mode==='museum'){
+    // 박물관 종합 미션: 점수 저장
+    const prev=trhMuseumQuiz[st.museum];
+    if(prev===undefined || st.correct>prev){ trhMuseumQuiz[st.museum]=st.correct; trhSave(TRH_LS.museumquiz, trhMuseumQuiz); }
+    const mname=MUSEUMS[st.museum].name;
+    document.getElementById('trhQuizBody').innerHTML = `
+      <h3>🏁 ${esc(mname)} 종합 미션 결과</h3>
+      <div style="text-align:center;padding:14px 0">
+        <div style="font-size:44px">${st.correct>=Math.ceil(st.qs.length*0.8)?'🎉':(st.correct>=Math.ceil(st.qs.length*0.4)?'😊':'💪')}</div>
+        <div style="font-size:22px;font-weight:800;color:var(--trh-ink);margin-top:8px">${st.correct} / ${st.qs.length} 정답</div>
+        <div style="font-size:13px;color:var(--text-mid);margin-top:6px">${st.correct===st.qs.length?`완벽해요! ${esc(mname)} 큐레이터 인정! 🧠`:'잘했어요! 아쉬운 작품은 카드에서 다시 읽어봐요.'}</div>
+      </div>
+      <div class="trh-detail-actions">
+        <button class="trh-btn trh-btn-gold" onclick="closeModal('trhQuizModal')">확인</button>
+        <button class="trh-btn trh-btn-ghost" style="background:#EFE6D4;color:#3A2C1A" onclick="closeModal('trhQuizModal');startMuseumQuiz('${st.museum}')">↻ 다시 풀기</button>
+      </div>`;
   } else {
     // 도시 종합 퀴즈: 점수 저장, 완주 뱃지는 이미 방문으로 달성
     const prev=trhCityQuiz[st.city];
@@ -4740,6 +4892,7 @@ function trhAwardStamp(siteId){
   const already=!!trhVisited[siteId];
   trhVisited[siteId]=true; trhSave(TRH_LS.visited, trhVisited);
   const cityComplete = trhCityComplete(s.city);
+  const museumComplete = s.museum && trhMuseumComplete(s.museum);
   const grand = trhAllCitiesComplete();
   // 축하 오버레이
   document.getElementById('trhCelStamp').textContent = s.emoji;
@@ -4747,12 +4900,15 @@ function trhAwardStamp(siteId){
   let sub=`${CITIES[s.city].name} · ${esc(s.name)}<br>여권에 도장이 찍혔어요!`;
   if(grand){ title='🧭 세계사 탐험가 달성!'; sub='5개 도시를 모두 완주했어요!<br>진짜 대단한 탐험가예요! 🎉'; document.getElementById('trhCelStamp').textContent='🧭'; }
   else if(cityComplete){ title=`🏅 ${CITIES[s.city].name} 완주!`; sub=`${CITIES[s.city].name}의 모든 장소를 방문했어요!<br>완주 뱃지를 받았어요! 🎉`; document.getElementById('trhCelStamp').textContent=TRH_CITY_STAMP[s.city]; }
+  else if(museumComplete){ const mm=MUSEUMS[s.museum]; title=`🏅 ${esc(mm.name)} 마스터!`; sub=`${esc(mm.name)}의 "꼭 봐야 할 작품"을 모두 방문했어요!<br>박물관 마스터 뱃지를 받았어요! 🎉`; document.getElementById('trhCelStamp').textContent=mm.icon; }
   document.getElementById('trhCelTitle').textContent=title;
   document.getElementById('trhCelSub').innerHTML=sub;
   document.getElementById('trhCelebrate').classList.add('show');
   toast('🎫 스탬프를 획득했어요!');
-  // 화면 갱신(현재 도시 뷰가 열려 있으면 유지)
+  // 화면 갱신(현재 열려 있는 뷰 유지)
   if(document.getElementById('trhCity').style.display!=='none'){ openHistoryCity(s.city); }
+  if(document.getElementById('trhMuseum').style.display!=='none' && s.museum){ openMuseum(s.museum); }
+  if(document.getElementById('trhMuseumList').style.display!=='none'){ renderMuseumList(); }
   renderHistoryHome();
 }
 
