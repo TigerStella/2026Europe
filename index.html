@@ -794,6 +794,137 @@
   .emph-line{margin-top:4px;}
   .ai-badge{margin:0 0 14px;padding:9px 12px;border-radius:10px;background:linear-gradient(135deg,rgba(140,110,255,0.10),rgba(255,110,207,0.10));border:1px solid rgba(140,110,255,0.35);font-size:12.5px;line-height:1.5;}
   .dday-badge{display:inline-block;background:linear-gradient(135deg,var(--sunset-gold),var(--dusk-coral));color:#fff;font-size:12px;font-weight:700;padding:4px 12px;border-radius:16px;margin:-4px 0 12px;}
+
+  /* ══════════════ 🎫 역사 스탬프투어 (탐험 테마 · #history 스코프) ══════════════ */
+  #history{ --trh-parch:#FFFDF7; --trh-ink:#3A2C1A; --trh-line:#E7D9BE; --trh-accent:#C9803B; }
+  #history .container{ max-width:900px; }
+  .trh-hero{ position:relative; overflow:hidden; border-radius:18px; padding:22px 20px; margin-bottom:18px;
+    background:linear-gradient(135deg,#2D3F5E 0%,#3E5A7A 45%,#C9803B 130%); color:#fff; }
+  .trh-hero::after{ content:'🧭'; position:absolute; right:-8px; bottom:-14px; font-size:110px; opacity:.14; transform:rotate(-12deg); }
+  .trh-hero-eyebrow{ font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#FFD8A0; margin-bottom:6px; }
+  .trh-hero-title{ font-family:'Chewy','Playfair Display',cursive; font-size:clamp(24px,6vw,36px); line-height:1.1; color:#FFE7C2; text-shadow:0 3px 12px rgba(0,0,0,.3); }
+  .trh-hero-sub{ font-size:13px; margin-top:6px; color:rgba(255,255,255,.9); max-width:560px; }
+  .trh-hero-actions{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; position:relative; z-index:2; }
+  .trh-btn{ border:none; border-radius:20px; padding:9px 16px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; display:inline-flex; align-items:center; gap:6px; }
+  .trh-btn-gold{ background:linear-gradient(135deg,var(--sunset-gold),var(--dusk-coral)); color:#fff; }
+  .trh-btn-ghost{ background:rgba(255,255,255,.16); color:#fff; }
+  .trh-btn-back{ background:#EFE6D4; color:var(--trh-ink); border-radius:12px; margin-bottom:14px; }
+  .trh-btn:active{ transform:scale(.96); }
+
+  .trh-overall{ background:var(--trh-parch); border:1px solid var(--trh-line); border-radius:14px; padding:14px 16px; margin-bottom:18px; }
+  .trh-overall-head{ display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:700; color:var(--text-mid); margin-bottom:8px; }
+  .trh-bar{ height:12px; border-radius:8px; background:#EFE6D4; overflow:hidden; }
+  .trh-bar-fill{ height:100%; border-radius:8px; background:linear-gradient(90deg,var(--sunset-gold),var(--dusk-coral)); transition:width .5s ease; }
+
+  .trh-section-label{ font-size:12px; font-weight:800; letter-spacing:1px; color:var(--trh-accent); text-transform:uppercase; margin:6px 0 12px; display:flex; align-items:center; gap:7px; }
+
+  /* City rail (여행 동선순) */
+  .trh-rail{ display:flex; gap:14px; overflow-x:auto; padding:4px 2px 14px; -webkit-overflow-scrolling:touch; scroll-snap-type:x mandatory; }
+  .trh-citycard{ flex:0 0 200px; scroll-snap-align:start; border-radius:16px; overflow:hidden; cursor:pointer; position:relative;
+    background:var(--trh-parch); border:1px solid var(--trh-line); box-shadow:0 4px 14px rgba(60,44,26,.08); transition:transform .18s, box-shadow .18s; }
+  .trh-citycard:hover{ transform:translateY(-3px); box-shadow:0 10px 22px rgba(60,44,26,.16); }
+  .trh-citycard-top{ height:86px; display:flex; align-items:center; justify-content:center; font-size:44px; color:#fff; position:relative; }
+  .trh-citycard-step{ position:absolute; top:8px; left:8px; background:rgba(255,255,255,.85); color:#3A2C1A; font-size:11px; font-weight:800; padding:2px 8px; border-radius:10px; }
+  .trh-citycard-done{ position:absolute; top:8px; right:8px; font-size:18px; filter:drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
+  .trh-citycard-body{ padding:12px 14px 14px; }
+  .trh-citycard-name{ font-size:17px; font-weight:800; color:var(--trh-ink); }
+  .trh-citycard-name small{ font-weight:500; color:var(--text-light); font-size:11px; margin-left:5px; }
+  .trh-citycard-era{ font-size:11px; color:var(--text-light); margin:3px 0 9px; min-height:15px; }
+  .trh-citycard-prog{ font-size:12px; font-weight:700; color:var(--trh-accent); display:flex; justify-content:space-between; align-items:center; }
+  .trh-mini-bar{ height:7px; border-radius:5px; background:#EFE6D4; overflow:hidden; margin-top:7px; }
+  .trh-mini-fill{ height:100%; border-radius:5px; }
+
+  /* Badge showcase */
+  .trh-badges{ display:grid; grid-template-columns:repeat(auto-fill,minmax(78px,1fr)); gap:12px; }
+  .trh-badge{ text-align:center; }
+  .trh-badge-medal{ width:64px; height:64px; margin:0 auto 6px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:30px;
+    background:radial-gradient(circle at 35% 30%,#FFF2D6,#E7D9BE); border:2px solid #D9C49A; filter:grayscale(1) opacity(.45); }
+  .trh-badge.earned .trh-badge-medal{ filter:none; background:radial-gradient(circle at 35% 30%,#FFE9A8,#E8A245); border-color:#C9803B; box-shadow:0 4px 12px rgba(201,128,59,.4); }
+  .trh-badge-cap{ font-size:11px; color:var(--text-mid); font-weight:600; line-height:1.3; }
+
+  /* City view */
+  .trh-city-banner{ border-radius:16px; padding:18px 18px 16px; color:#fff; margin-bottom:16px; position:relative; overflow:hidden; }
+  .trh-city-banner::after{ position:absolute; right:6px; bottom:-10px; font-size:82px; opacity:.16; }
+  .trh-city-banner h2{ font-size:24px; font-weight:800; margin-bottom:2px; }
+  .trh-city-banner .trh-cb-sub{ font-size:12.5px; opacity:.92; }
+  .trh-era-group{ margin-bottom:22px; }
+  .trh-era-title{ font-size:13px; font-weight:800; color:var(--trh-accent); display:flex; align-items:center; gap:8px; margin:0 0 12px; }
+  .trh-era-title::before{ content:''; width:9px; height:9px; border-radius:50%; background:currentColor; }
+  .trh-era-title span{ font-weight:500; color:var(--text-light); font-size:11px; }
+
+  /* Site card */
+  .trh-site{ display:flex; gap:14px; background:var(--trh-parch); border:1px solid var(--trh-line); border-radius:14px; padding:12px; margin-bottom:12px; cursor:pointer; transition:box-shadow .18s, transform .18s; }
+  .trh-site:hover{ box-shadow:0 8px 20px rgba(60,44,26,.12); transform:translateY(-2px); }
+  .trh-site.visited{ border-color:#C9803B; background:linear-gradient(180deg,#FFFBF0,#FFF6E4); }
+  .trh-thumb{ flex:0 0 92px; width:92px; height:92px; border-radius:11px; overflow:hidden; display:flex; align-items:center; justify-content:center; text-align:center; color:#fff; position:relative; }
+  .trh-thumb-emoji{ font-size:38px; filter:drop-shadow(0 2px 4px rgba(0,0,0,.25)); }
+  .trh-thumb-ph{ position:absolute; bottom:0; left:0; right:0; font-size:8px; line-height:1.2; padding:2px 3px; background:rgba(0,0,0,.32); color:#fff; }
+  .trh-site-body{ flex:1; min-width:0; }
+  .trh-site-name{ font-size:15px; font-weight:800; color:var(--trh-ink); line-height:1.25; }
+  .trh-site-meta{ font-size:11px; color:var(--text-light); margin:2px 0 6px; }
+  .trh-site-desc{ font-size:12.5px; color:var(--text-mid); line-height:1.55; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .trh-site-foot{ display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap; }
+  .trh-chip{ font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:10px; }
+  .trh-chip-stamp{ background:#EDF6EE; color:#3B7A47; }
+  .trh-chip-todo{ background:#F3ECDD; color:#9A7B3B; }
+  .trh-chip-quiz{ background:#EEF0FA; color:#5560A8; }
+
+  /* Site detail modal */
+  .trh-detail-hero{ height:150px; border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; margin-bottom:14px; text-align:center; position:relative; }
+  .trh-detail-hero .e{ font-size:64px; filter:drop-shadow(0 3px 6px rgba(0,0,0,.3)); }
+  .trh-detail-ph{ font-size:11px; margin-top:6px; background:rgba(0,0,0,.28); padding:3px 10px; border-radius:10px; }
+  .trh-detail h3{ font-size:20px; color:var(--trh-ink); margin-bottom:2px; }
+  .trh-detail-meta{ font-size:12px; color:var(--text-light); margin-bottom:12px; }
+  .trh-detail-block{ margin-bottom:14px; }
+  .trh-detail-block h4{ font-size:12px; font-weight:800; color:var(--trh-accent); text-transform:uppercase; letter-spacing:.5px; margin-bottom:5px; display:flex; align-items:center; gap:6px; }
+  .trh-detail-block p{ font-size:13.5px; line-height:1.7; color:var(--text-dark); }
+  .trh-connect{ background:#FBF3E4; border-left:3px solid var(--sunset-gold); border-radius:0 8px 8px 0; padding:10px 12px; font-size:13px; line-height:1.65; color:var(--text-dark); }
+  .trh-note{ font-size:11.5px; color:#9A7B3B; background:#FBF1DA; border-radius:8px; padding:7px 10px; margin-top:8px; }
+  .trh-source{ font-size:11px; color:var(--text-light); margin-top:10px; word-break:break-all; }
+  .trh-source a{ color:var(--london); }
+  .trh-detail-actions{ display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+
+  /* Quiz */
+  .trh-quiz-q{ font-size:15px; font-weight:700; color:var(--trh-ink); line-height:1.5; margin-bottom:14px; }
+  .trh-quiz-progress{ font-size:11px; color:var(--text-light); margin-bottom:6px; letter-spacing:1px; }
+  .trh-opt{ display:block; width:100%; text-align:left; border:1.5px solid var(--trh-line); background:#fff; border-radius:11px; padding:12px 14px; margin-bottom:9px; font-size:13.5px; font-family:inherit; cursor:pointer; color:var(--text-dark); transition:all .15s; }
+  .trh-opt:hover{ border-color:var(--sunset-gold); background:#FFFCF4; }
+  .trh-opt.correct{ border-color:#3B7A47; background:#EDF6EE; color:#2E6238; font-weight:700; }
+  .trh-opt.wrong{ border-color:#D9605F; background:#FBEDED; color:#B23B3A; }
+  .trh-opt:disabled{ cursor:default; }
+  .trh-quiz-feedback{ font-size:13px; line-height:1.6; padding:11px 13px; border-radius:10px; margin-top:4px; }
+  .trh-quiz-feedback.ok{ background:#EDF6EE; color:#2E6238; }
+  .trh-quiz-feedback.no{ background:#FBF1DA; color:#9A7B3B; }
+
+  /* Passport / stampbook */
+  .trh-pp{ background:#243350; border-radius:16px; padding:20px 18px; color:#fff; margin-bottom:16px; position:relative; overflow:hidden; }
+  .trh-pp::before{ content:''; position:absolute; inset:8px; border:1.5px dashed rgba(255,215,160,.35); border-radius:12px; pointer-events:none; }
+  .trh-pp-title{ font-family:'Chewy',cursive; font-size:22px; color:#FFD8A0; text-align:center; letter-spacing:1px; }
+  .trh-pp-sub{ text-align:center; font-size:11px; color:rgba(255,255,255,.7); margin-top:2px; }
+  .trh-pp-city{ margin-top:16px; }
+  .trh-pp-cityname{ font-size:12px; font-weight:700; color:rgba(255,255,255,.85); margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+  .trh-stamp-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(70px,1fr)); gap:10px; }
+  .trh-stamp{ aspect-ratio:1; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:4px; position:relative;
+    border:2.5px solid rgba(255,255,255,.18); color:rgba(255,255,255,.28); }
+  .trh-stamp.got{ transform:rotate(-7deg); }
+  .trh-stamp-emoji{ font-size:22px; }
+  .trh-stamp-lbl{ font-size:7.5px; line-height:1.15; margin-top:2px; font-weight:700; }
+  .trh-empty{ text-align:center; padding:34px 16px; color:var(--text-light); font-size:13px; }
+  .trh-empty .e{ font-size:40px; display:block; margin-bottom:8px; }
+
+  /* Stamp earn celebration */
+  .trh-celebrate{ position:fixed; inset:0; z-index:800; display:none; align-items:center; justify-content:center; background:rgba(20,25,40,.55); }
+  .trh-celebrate.show{ display:flex; }
+  .trh-celebrate-card{ background:#fff; border-radius:20px; padding:28px 26px; text-align:center; max-width:300px; animation:trhPop .4s cubic-bezier(.2,1.3,.5,1); }
+  @keyframes trhPop{ 0%{ transform:scale(.6); opacity:0; } 100%{ transform:scale(1); opacity:1; } }
+  .trh-celebrate-stamp{ font-size:64px; animation:trhStampIn .5s ease; }
+  @keyframes trhStampIn{ 0%{ transform:scale(2.4) rotate(18deg); opacity:0; } 60%{ transform:scale(.9) rotate(-8deg); opacity:1; } 100%{ transform:scale(1) rotate(-7deg); } }
+  .trh-celebrate-t{ font-size:19px; font-weight:800; color:var(--trh-ink); margin:12px 0 4px; }
+  .trh-celebrate-s{ font-size:13px; color:var(--text-mid); line-height:1.5; }
+  @media (max-width:600px){
+    .trh-thumb{ flex-basis:76px; width:76px; height:76px; }
+    .trh-citycard{ flex-basis:170px; }
+  }
 </style>
 </head>
 <body>
@@ -830,6 +961,7 @@
 <!-- NAV TABS -->
 <nav class="nav-tabs">
   <button class="nav-tab active" onclick="showTab('schedule', this)">📅 일정</button>
+  <button class="nav-tab" onclick="showTab('history', this)">🎫 역사 스탬프투어</button>
   <button class="nav-tab" onclick="showTab('hotels', this)">🏨 숙소</button>
   <button class="nav-tab" onclick="showTab('transport', this)">🚄 교통</button>
   <button class="nav-tab" onclick="showTab('cost', this)">💰 비용</button>
@@ -867,6 +999,15 @@
     </div>
     <div class="subtabs" id="citySubtabs"></div>
     <div id="cityPanels"></div>
+  </div>
+</div>
+
+<!-- ── TAB: 🎫 역사 스탬프투어 ── -->
+<div id="history" class="tab-section">
+  <div class="container">
+    <div id="trhHome"></div>
+    <div id="trhCity" style="display:none"></div>
+    <div id="trhPassport" style="display:none"></div>
   </div>
 </div>
 
@@ -4115,10 +4256,537 @@ function init(){
   renderContacts();
   renderRelated();
   renderDiary();
+  try{ renderHistory(); }catch(e){ console.error(e); }
   initToTop();
   loadFx();
   loadWeather();
 }
+/* ══════════════════════════════════════════════════════════════════
+   🎫 역사 스탬프투어 (History Stamp Tour)
+   - 트랩블 통합 새 탭. 별도 앱 아님. 공통 헤더/탭바는 트랩블 기존 유지.
+   - localStorage 네임스페이스: trapble_history_*  (기존 noleu_* 와 완전 분리)
+   - 데이터: 기초 조사 28개 + 신규 리서치(런던 근대·파리 정치·뮌헨 전량·고대 로마)
+   - 신규 항목은 확립된 사실 기반 + 검증용 위키피디아 URL(source) 병기
+     (※ 본 환경은 위키피디아/위키미디어 실시간 접근이 네트워크 정책상 차단됨)
+   ══════════════════════════════════════════════════════════════════ */
+const TRH_LS = {
+  visited:  'trapble_history_visited_v1',   // { siteId: true }  ← 방문 도장(퀴즈 통과) 완료
+  cityquiz: 'trapble_history_cityquiz_v1',   // { city: bestScore } ← 도시 종합퀴즈 최고점
+};
+function trhLoad(key, def){ try{ const v=JSON.parse(localStorage.getItem(key)); return (v===null||v===undefined)?def:v; }catch(e){ return def; } }
+function trhSave(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){ toast('저장 공간이 부족해요'); } }
+let trhVisited  = trhLoad(TRH_LS.visited, {});
+let trhCityQuiz = trhLoad(TRH_LS.cityquiz, {});
+
+// 도시별 부제(시대 흐름) — 홈/배너 표기용. 탭 진행 순서는 여행 동선(CITY_ORDER) 그대로.
+const TRH_CITY_ERA = {
+  london:   '고대 문명 컬렉션 · 산업혁명 · 대영제국',
+  paris:    '르네상스 · 절대왕정 · 프랑스혁명 · 나폴레옹',
+  munich:   '바이에른 왕국 · 중세 도시 · 20세기의 기억',
+  florence: '르네상스의 요람',
+  rome:     '고대 로마 제국 · 르네상스의 정점',
+};
+// 도시별 스탬프 모티프(여권 도장 느낌)
+const TRH_CITY_STAMP = { london:'🎡', paris:'🗼', munich:'🍺', florence:'🌸', rome:'🏛' };
+
+// ── 사이트 데이터 (city → order=시대순) ──
+// fields: id, city, order(시대순), era, name, by(작가/건립), place, sig(교과서 연결·HTML), kid(11세 설명),
+//         emoji, source(신규만), note(불확실성 안내·선택), quiz:[{q,opts,a,why}]
+const HISTORY_SITES = [
+  /* ════════ 런던 (동선 1) ════════ */
+  { id:'lamassu', city:'london', order:10, era:'고대 오리엔트', name:'라마수(날개 달린 황소상)', by:'고대 아시리아 · 기원전 9~7세기경', place:'영국박물관', emoji:'🐂',
+    sig:'메소포타미아 <b>아시리아 제국</b>의 궁전을 지키던 수호상 — 교과서 「고대 오리엔트·메소포타미아 문명」과 연결돼요.',
+    kid:'사람 얼굴에 황소 몸, 독수리 날개를 가진 거대한 석상이야. 아시리아 왕궁 대문을 지키던 수호신인데, 나쁜 기운이 궁전에 들어오지 못하게 막는 역할이었대. 앞에서 보면 서 있고 옆에서 보면 걷는 것처럼 보이도록 다리를 5개로 조각한 옛 사람들의 아이디어가 재미있어. 3천 년 전 메소포타미아 사람들의 웅장한 상상력을 느껴봐!',
+    quiz:[{q:'라마수는 어느 문명이 만든 수호상일까?', opts:['이집트','아시리아','로마'], a:1, why:'라마수는 메소포타미아의 아시리아 제국이 궁전을 지키려고 만든 수호상이야.'}] },
+  { id:'rosetta', city:'london', order:20, era:'고대 이집트', name:'로제타석', by:'고대 이집트 · 기원전 196년', place:'영국박물관', emoji:'🪨',
+    sig:'이집트 <b>상형문자 해독의 열쇠</b> — 교과서 「고대 이집트 문명·문자」와 연결돼요.',
+    kid:'검은 돌 하나에 똑같은 내용이 세 가지 문자(이집트 그림문자·이집트 흘림문자·그리스어)로 적혀 있어. 아무도 못 읽던 이집트 상형문자를, 학자 샹폴리옹이 이 돌의 그리스어와 비교해 마침내 해독했지. 덕분에 3천 년 전 이집트의 비밀이 풀렸어. 그래서 「고대 문자를 푸는 열쇠」라고 불려!',
+    quiz:[{q:'로제타석에는 몇 가지 문자가 적혀 있을까?', opts:['한 가지','두 가지','세 가지'], a:2, why:'그림문자·흘림문자·그리스어, 이렇게 세 가지가 적혀 있어서 비교로 해독할 수 있었어.'},
+          {q:'로제타석은 무엇을 푸는 열쇠가 되었을까?', opts:['이집트 상형문자','로마 숫자','한자'], a:0, why:'그리스어와 비교해 이집트 상형문자를 해독했어.'}] },
+  { id:'mummy', city:'london', order:25, era:'고대 이집트', name:'이집트 미라', by:'고대 이집트', place:'영국박물관', emoji:'⚱️',
+    sig:'고대 이집트인의 <b>내세관(죽음 이후의 믿음)</b> — 교과서 「고대 이집트 종교」와 연결돼요.',
+    kid:'고대 이집트 사람들은 죽은 뒤에도 영혼이 다시 몸으로 돌아온다고 믿었어. 그래서 몸이 썩지 않게 특별한 방법으로 보존한 게 바로 미라야. 붕대로 칭칭 감고, 관 속에 부적과 보물을 함께 넣었지. 3천 년이 지난 지금도 그 모습이 남아 있다는 게 정말 신기하지?',
+    quiz:[{q:'이집트 사람들이 미라를 만든 이유는?', opts:['벌을 주려고','죽은 뒤 영혼이 돌아온다고 믿어서','장난으로'], a:1, why:'영혼이 다시 몸으로 돌아온다고 믿어서 몸을 보존했어.'}] },
+  { id:'parthenon', city:'london', order:30, era:'고대 그리스', name:'파르테논 조각(엘긴 마블)', by:'고대 그리스 · 기원전 447~438년경', place:'영국박물관', emoji:'🏛',
+    sig:'아테네 <b>파르테논 신전</b> 조각 · <b>반환 논쟁</b>의 주인공 — 교과서 「고대 그리스·아테네」와 연결돼요.',
+    kid:'그리스 아테네의 파르테논 신전을 장식하던 대리석 조각이야. 약 200년 전 영국의 엘긴 경이 그리스에서 뜯어 영국으로 가져와서 「엘긴 마블」이라고도 불러. 지금 그리스는 "우리 것이니 돌려달라"고 하고, 영국은 "우리가 잘 보관한다"며 맞서고 있어. 유물은 원래 있던 곳에 있어야 할까? 너도 한번 생각해봐.',
+    quiz:[{q:'이 조각은 원래 어느 나라 신전의 것일까?', opts:['영국','그리스','이탈리아'], a:1, why:'그리스 아테네의 파르테논 신전 조각이야. 그래서 반환 논쟁이 있어.'}] },
+  { id:'haywain', city:'london', order:60, era:'19세기 영국 · 낭만주의', name:'건초 마차', by:'존 컨스터블 · 1821년', place:'내셔널 갤러리', emoji:'🌳',
+    sig:'영국 <b>낭만주의 풍경화</b>, 평범한 시골의 아름다움 — 「근대 유럽 문화」와 연결돼요.',
+    kid:'영국 시골의 평화로운 강가 풍경을 그린 그림이야. 말이 끄는 건초 마차가 강을 건너고, 하늘엔 구름이 흘러가지. 컨스터블은 화려한 사건 대신 「아무 일 없는 평범한 시골」의 아름다움을 그렸어. 산업혁명으로 도시가 시끄러워지던 시절, 사람들이 그리워한 고향 같은 풍경이야.',
+    quiz:[{q:'컨스터블이 이 그림에서 그린 것은?', opts:['전쟁 장면','평화로운 시골 풍경','왕의 초상화'], a:1, why:'평범한 시골의 아름다움을 담은 낭만주의 풍경화야.'}] },
+  { id:'temeraire', city:'london', order:65, era:'19세기 영국 · 산업혁명', name:'전함 테메레르', by:'윌리엄 터너 · 1839년', place:'내셔널 갤러리', emoji:'🚢',
+    sig:'낡은 <b>범선을 증기선</b>이 끌고 감 — 「산업혁명·기술의 변화」와 연결돼요.',
+    kid:'노을 지는 강 위에서, 늙은 나무 범선을 작은 증기선이 끌고 가는 장면이야. 이 범선 테메레르호는 나폴레옹과 싸운 영웅이었지만, 이제 낡아서 해체되러 가는 길이지. 바람으로 가던 범선의 시대가 끝나고 증기기관의 시대가 온다는 걸 보여줘. 터너는 「시대가 바뀌는 순간」을 노을에 담았어.',
+    quiz:[{q:'낡은 범선을 끌고 가는 것은 무엇일까?', opts:['증기선','바람','또 다른 범선'], a:0, why:'작은 증기선이 끌고 가지 — 산업혁명으로 증기기관 시대가 왔다는 뜻이야.'}] },
+  { id:'bathers', city:'london', order:70, era:'19세기 · 후기인상주의', name:'아스니에르에서의 물놀이', by:'조르주 쇠라 · 1884년', place:'내셔널 갤러리', emoji:'🏊',
+    sig:'작은 점을 찍어 그리는 <b>점묘법</b> — 「19세기 미술」과 연결돼요.',
+    kid:'파리 근교 강가에서 사람들이 물놀이하며 쉬는 장면이야. 가까이 보면 그림이 수많은 작은 점으로 이루어져 있어 — 이걸 「점묘법」이라고 해. 쇠라는 물감을 섞는 대신 작은 색점을 촘촘히 찍어, 멀리서 보면 색이 섞여 보이게 했지. 과학처럼 치밀하게 그린 그림이야.',
+    quiz:[{q:'쇠라가 사용한, 작은 점으로 그리는 기법은?', opts:['점묘법','수채화','판화'], a:0, why:'작은 색점을 촘촘히 찍는 점묘법이야.'}] },
+  { id:'umbrellas', city:'london', order:75, era:'19세기 · 인상주의', name:'우산들', by:'오귀스트 르누아르 · 1881~1886년', place:'내셔널 갤러리', emoji:'☂️',
+    sig:'빛과 순간을 그린 <b>인상주의</b> — 「19세기 인상주의」와 연결돼요.',
+    kid:'비 오는 파리 거리에서 사람들이 우산을 펼친 순간을 그린 그림이야. 르누아르는 인상주의 화가로, 사진처럼 정확하게가 아니라 「그 순간의 느낌과 빛」을 부드럽게 그렸어. 자세히 보면 우산의 파란빛과 사람들의 표정이 생생하지. 비 오는 날의 북적임이 그대로 느껴져.',
+    quiz:[{q:'르누아르가 속한 미술 사조는?', opts:['인상주의','사실주의','고전주의'], a:0, why:'빛과 순간의 느낌을 그린 인상주의 화가야.'}] },
+  { id:'tower-london', city:'london', order:40, era:'중세~근대 영국', name:'런던탑', by:'1078년경 착공(정복왕 윌리엄)', place:'런던 (장소)', emoji:'🏰',
+    source:'https://ko.wikipedia.org/wiki/런던탑',
+    sig:'<b>노르만 정복</b> 이후의 요새·왕권의 상징, <b>왕관 보석</b> 보관 — 「중세 유럽·영국 왕권」과 연결돼요.',
+    kid:'900년 넘게 런던을 지켜온 돌로 지은 성이야. 1066년 노르만족이 잉글랜드를 정복한 뒤, 정복왕 윌리엄이 런던을 지키려고 세웠지. 요새이자 감옥이었고, 지금도 반짝이는 「왕관 보석」을 보관하는 곳이야. 전설로는 이 탑에 사는 까마귀가 사라지면 영국이 무너진다고 해서, 지금도 까마귀를 정성껏 돌본대!',
+    quiz:[{q:'런던탑을 세우게 된 사건은?', opts:['프랑스 혁명','노르만 정복','산업혁명'], a:1, why:'1066년 노르만 정복 뒤 정복왕 윌리엄이 런던을 지키려 세웠어.'},
+          {q:'런던탑이 보관하는 반짝이는 보물은?', opts:['왕관 보석','로제타석','미라'], a:0, why:'영국 왕실의 왕관 보석을 이곳에 보관해.'}] },
+  { id:'westminster', city:'london', order:45, era:'중세~근대 영국', name:'웨스트민스터 사원', by:'1245년~ 재건(헨리 3세)', place:'런던 (장소)', emoji:'⛪',
+    source:'https://ko.wikipedia.org/wiki/웨스트민스터_사원',
+    note:'처음 지어진 시기는 자료마다 다르게 표기돼요(11세기 이전 기원설도 있어요).',
+    sig:'영국 왕 <b>대관식</b>이 열리는 곳, 위인들이 잠든 곳 — 「중세 유럽·영국 왕실」과 연결돼요.',
+    kid:'영국 왕과 여왕이 왕관을 쓰는 「대관식」이 열리는 거대한 교회야. 거의 1000년 동안 영국 왕실의 가장 중요한 행사가 여기서 열렸어. 뉴턴, 다윈 같은 위대한 과학자들도 이곳에 묻혀 있지. 뾰족한 고딕 양식 지붕이 하늘 높이 솟아 있어 정말 웅장해.',
+    quiz:[{q:'웨스트민스터 사원에서 열리는 영국 왕실의 행사는?', opts:['운동회','대관식','시장'], a:1, why:'영국 왕이 왕관을 쓰는 대관식이 이곳에서 열려.'}] },
+
+  /* ════════ 파리 (동선 2) ════════ */
+  { id:'venus-milo', city:'paris', order:10, era:'고대 그리스 · 헬레니즘', name:'밀로의 비너스', by:'작자 미상(고대 그리스) · 기원전 130~100년경', place:'루브르', emoji:'🗿',
+    note:'두 팔이 원래 어떤 모습이었는지는 아직 밝혀지지 않았어요.',
+    sig:'<b>헬레니즘</b> 조각의 아름다움 — 「헬레니즘 문화」와 연결돼요.',
+    kid:'두 팔이 없는 채로 발견된 대리석 여신상이야. 사랑의 여신 아프로디테(로마 이름 비너스)를 조각한 것으로 보여. 팔이 어떤 모습이었는지 아무도 몰라서 지금도 미스터리야. 팔이 없는데도 몸의 곡선과 흘러내리는 옷 주름이 너무 아름다워, 세계에서 가장 유명한 조각 중 하나가 됐어.',
+    quiz:[{q:'밀로의 비너스에게 없는 것은?', opts:['머리','두 팔','다리'], a:1, why:'두 팔이 없는 채로 발견됐고, 원래 모습은 아직 미스터리야.'}] },
+  { id:'nike', city:'paris', order:15, era:'고대 그리스 · 헬레니즘', name:'사모트라케의 니케', by:'작자 미상(고대 그리스) · 기원전 190년경', place:'루브르', emoji:'🕊',
+    sig:'<b>승리의 여신</b>, 헬레니즘의 역동성 — 「헬레니즘 미술」과 연결돼요.',
+    kid:'뱃머리에 막 내려앉은, 날개 달린 승리의 여신 조각이야. 머리와 팔은 없지만, 바닷바람에 옷이 펄럭이고 날개가 활짝 펼쳐져 금방이라도 날아오를 것 같지. 전쟁에서 이긴 걸 기념해 만든 조각이래. 참, 운동화 브랜드 「나이키」의 이름과 로고가 바로 이 여신에서 왔어!',
+    quiz:[{q:'니케는 무엇의 여신일까?', opts:['사랑','승리','바다'], a:1, why:'승리의 여신 니케야. 스포츠 브랜드 나이키 이름의 유래이기도 해.'}] },
+  { id:'mona-lisa', city:'paris', order:30, era:'르네상스', name:'모나리자', by:'레오나르도 다빈치 · 1503~1519년경', place:'루브르', emoji:'🖼',
+    sig:'<b>르네상스</b> 대표작, 신비한 미소와 스푸마토 기법 — 「르네상스」와 연결돼요.',
+    kid:'세계에서 가장 유명한 그림, 신비한 미소의 여인이야. 다빈치는 「스푸마토」라는 기법으로 윤곽선을 안개처럼 부드럽게 흐려, 볼 때마다 미소가 달라 보이게 그렸어. 생각보다 그림이 작아서(가로 53cm) 처음 보면 놀랄지도 몰라. 방탄유리 안에서 전 세계 사람들의 사랑을 받고 있지.',
+    quiz:[{q:'모나리자를 그린 화가는?', opts:['미켈란젤로','레오나르도 다빈치','라파엘로'], a:1, why:'르네상스의 천재 레오나르도 다빈치가 그렸어.'},
+          {q:'미소를 부드럽게 흐리는 다빈치의 기법은?', opts:['스푸마토','점묘법','모자이크'], a:0, why:'윤곽을 안개처럼 흐리는 스푸마토 기법이야.'}] },
+  { id:'versailles', city:'paris', order:40, era:'17세기 · 절대왕정', name:'베르사유 궁전', by:'루이 14세 · 1682년 이주', place:'베르사유(파리 근교) · 장소', emoji:'👑',
+    source:'https://ko.wikipedia.org/wiki/베르사유_궁전',
+    sig:'<b>태양왕 루이 14세</b>와 <b>절대왕정</b>의 상징 — 「절대왕정·유럽 근대」와 연결돼요.',
+    kid:'프랑스 왕 루이 14세가 지은 어마어마하게 크고 화려한 궁전이야. 그는 "내가 곧 국가다"라고 할 만큼 강한 왕이어서 「태양왕」이라 불렸지. 온통 금빛에 거울로 뒤덮인 「거울의 방」이 특히 유명해. 나중에 이 화려함이 백성들을 화나게 해, 프랑스 혁명이 일어나는 배경이 되기도 했어.',
+    quiz:[{q:'베르사유 궁전을 지은 왕은?', opts:['루이 14세','나폴레옹','헨리 3세'], a:0, why:'절대왕정의 상징 「태양왕」 루이 14세가 지었어.'},
+          {q:'루이 14세의 별명은?', opts:['달의 왕','태양왕','바다왕'], a:1, why:'스스로를 태양에 빗대 「태양왕」이라 불렸어.'}] },
+  { id:'liberty', city:'paris', order:55, era:'19세기 · 프랑스 혁명기', name:'민중을 이끄는 자유의 여신', by:'외젠 들라크루아 · 1830년', place:'루브르 (7월 혁명)', emoji:'🚩',
+    sig:'1830년 <b>7월 혁명</b>, 자유와 시민 — 「프랑스 혁명·시민혁명」과 연결돼요.',
+    kid:'프랑스 국기를 든 여신이 총과 깃발을 들고 시민들을 이끄는 그림이야. 1830년 「7월 혁명」 때 왕의 억압에 맞서 일어난 시민들을 그렸어. 여신은 「자유」를 상징하고, 그 뒤에는 노동자·소년·신사가 함께 싸우고 있지. 신분이 달라도 자유를 위해 하나가 된 모습이야.',
+    quiz:[{q:'여신이 상징하는 것은?', opts:['전쟁','자유','부자'], a:1, why:'억압에 맞선 시민들을 이끄는 「자유」를 상징해.'}] },
+  { id:'concorde', city:'paris', order:50, era:'18세기 · 프랑스 혁명', name:'콩코르드 광장', by:'1772년경 완공 · 혁명기 처형장', place:'파리 (장소)', emoji:'⚜️',
+    source:'https://ko.wikipedia.org/wiki/콩코르드_광장',
+    sig:'프랑스 혁명 때 <b>단두대</b>가 놓여 루이 16세·마리 앙투아네트가 처형된 곳 — 「프랑스 혁명」과 연결돼요.',
+    kid:'파리에서 가장 넓은 광장이야. 지금은 이집트에서 온 3천 년 된 오벨리스크(뾰족한 돌기둥)가 가운데 서 있어 아름답지만, 프랑스 혁명 때는 무서운 곳이었어. 이곳에 「단두대」가 설치돼 왕 루이 16세와 왕비 마리 앙투아네트가 처형됐거든. 화려한 궁전에 살던 왕이 여기서 최후를 맞았다는 건 역사의 큰 전환점이었어.',
+    quiz:[{q:'프랑스 혁명 때 이 광장에 설치된 것은?', opts:['분수','단두대','시장'], a:1, why:'혁명 때 단두대가 놓여 루이 16세와 왕비가 처형됐어.'}] },
+  { id:'arc-triomphe', city:'paris', order:60, era:'19세기 · 나폴레옹', name:'개선문', by:'1806년 착공~1836년 완공(나폴레옹)', place:'파리 (장소)', emoji:'🏛',
+    source:'https://ko.wikipedia.org/wiki/개선문_(파리)',
+    sig:'<b>나폴레옹</b>이 승리를 기념해 세운 문 — 「나폴레옹 시대」와 연결돼요.',
+    kid:'파리 한복판, 열두 갈래 길이 만나는 곳에 서 있는 거대한 문이야. 나폴레옹이 전쟁에서 이긴 군대를 기념하려고 짓기 시작했어. 정작 완성됐을 땐 나폴레옹은 이미 세상을 떠난 뒤였지. 문 아래에는 「무명용사의 묘」가 있어, 나라를 위해 싸운 이름 없는 병사들을 기려. 꼭대기에 오르면 파리 시내가 한눈에 보여!',
+    quiz:[{q:'개선문을 짓게 한 인물은?', opts:['루이 14세','나폴레옹','다빈치'], a:1, why:'나폴레옹이 전쟁 승리를 기념해 짓기 시작했어.'}] },
+  { id:'gleaners', city:'paris', order:70, era:'19세기 · 사실주의', name:'이삭 줍는 여인들', by:'장 프랑수아 밀레 · 1857년', place:'오르세', emoji:'🌾',
+    sig:'가난한 농민의 삶을 진지하게 그린 <b>사실주의</b> — 「19세기 사실주의」와 연결돼요.',
+    kid:'추수가 끝난 밭에서 세 여인이 허리를 굽혀 떨어진 이삭을 줍고 있어. 가장 가난한 사람들이 남은 곡식을 주워 살아가던 모습이야. 밀레는 화려한 왕이나 신화 대신, 평범하고 고단한 농민의 삶을 진지하게 그렸어 — 이걸 「사실주의」라고 해. 성실한 사람들에게 보내는 존경이 담겨 있지.',
+    quiz:[{q:'밀레가 이 그림에서 그린 사람들은?', opts:['왕과 귀족','평범한 농민','군인'], a:1, why:'가난한 농민의 삶을 진지하게 그린 사실주의 작품이야.'}] },
+  { id:'angelus', city:'paris', order:72, era:'19세기 · 사실주의', name:'만종', by:'장 프랑수아 밀레 · 1857~1859년', place:'오르세', emoji:'🔔',
+    sig:'농민 부부의 <b>저녁 기도</b>, 소박한 경건함 — 「19세기 사실주의」와 연결돼요.',
+    kid:'해질 무렵 밭에서 일하던 농부 부부가 멀리 교회 종소리를 듣고 잠시 고개 숙여 기도하는 그림이야. 「만종」은 저녁에 울리는 종을 뜻해. 하루의 고된 일을 마치고 감사 기도를 드리는 평화로운 순간이지. 노을빛이 온 들판을 따뜻하게 물들이고 있어.',
+    quiz:[{q:'부부가 저녁 종소리를 듣고 하는 것은?', opts:['달리기','기도','노래'], a:1, why:'하루를 마치고 감사 기도를 드리는 장면이야.'}] },
+  { id:'starry-rhone', city:'paris', order:75, era:'19세기 · 후기인상주의', name:'론강의 별이 빛나는 밤', by:'빈센트 반 고흐 · 1888년', place:'오르세', emoji:'🌌',
+    sig:'감정을 색과 붓질로 표현한 <b>후기인상주의</b> — 「19세기 미술」과 연결돼요.',
+    kid:'프랑스 남부 아를의 론강 위로 별이 쏟아지는 밤을 그린 그림이야. 반 고흐는 눈에 보이는 대로가 아니라, 자기가 「느낀 감정」을 소용돌이치는 붓질과 강렬한 색으로 표현했어. 강물에 비친 도시의 불빛과 별빛이 금빛으로 반짝이지. 외로웠던 고흐가 밤하늘에서 위로를 찾은 것 같아.',
+    quiz:[{q:'이 그림을 그린 화가는?', opts:['반 고흐','밀레','드가'], a:0, why:'감정을 강렬한 색과 붓질로 표현한 반 고흐의 작품이야.'}] },
+  { id:'ballet', city:'paris', order:78, era:'19세기 · 인상주의', name:'발레 수업', by:'에드가 드가 · 1870년대', place:'오르세', emoji:'🩰',
+    sig:'무대 뒤 <b>일상의 순간</b>을 포착한 인상주의 — 「19세기 인상주의」와 연결돼요.',
+    kid:'발레 공연이 아니라, 무대 뒤 「연습 시간」의 발레리나들을 그린 그림이야. 드가는 완벽한 공연 대신, 지치고 자세를 고치고 하품하는 진짜 연습 장면을 즐겨 그렸어. 마치 몰래 훔쳐본 것처럼 자연스럽지. 인상주의 화가들은 이렇게 「평범한 일상의 한순간」을 좋아했어.',
+    quiz:[{q:'드가가 이 그림에서 그린 장면은?', opts:['화려한 공연','발레 연습','전쟁'], a:1, why:'무대 뒤 발레 연습의 자연스러운 순간을 그렸어.'}] },
+
+  /* ════════ 뮌헨 (동선 3) · 전량 신규 리서치 ════════ */
+  { id:'marienplatz', city:'munich', order:10, era:'중세~근대 독일 도시', name:'마리엔플라츠 & 신 시청사', by:'광장 1158년 · 신 시청사 1867~1908년', place:'뮌헨 (장소)', emoji:'🏙',
+    source:'https://ko.wikipedia.org/wiki/마리엔_광장',
+    note:'광장·시청사의 건립 연도는 자료마다 다르게 표기돼요.',
+    sig:'뮌헨의 중심 광장, <b>중세 도시</b>의 발전과 글로켄슈필 — 「중세 유럽 도시·상업」과 연결돼요.',
+    kid:'뮌헨의 심장 같은 중앙 광장이야. 800여 년 전 중세 때부터 시장과 축제가 열리던 곳이지. 광장에 우뚝 선 「신 시청사」는 뾰족뾰족한 고딕 양식으로 지어졌는데, 매일 정해진 시간에 시계탑의 인형들이 음악에 맞춰 빙글빙글 도는 「글로켄슈필」 공연을 해. 중세 도시가 어떻게 사람들이 모이는 중심이 됐는지 느낄 수 있어.',
+    quiz:[{q:'신 시청사 시계탑에서 매일 열리는 인형 공연의 이름은?', opts:['글로켄슈필','카니발','올림픽'], a:0, why:'시계탑 인형들이 음악에 맞춰 도는 글로켄슈필 공연이야.'}] },
+  { id:'residenz', city:'munich', order:20, era:'중세~근대 바이에른', name:'뮌헨 레지덴츠', by:'1385년~ · 비텔스바흐 왕가', place:'뮌헨 (장소)', emoji:'👑',
+    source:'https://ko.wikipedia.org/wiki/뮌헨_레지덴츠',
+    sig:'바이에른을 다스린 <b>비텔스바흐 가문</b>의 궁전 — 「중세~근대 독일·제후국」과 연결돼요.',
+    kid:'뮌헨 시내 한복판에 있는, 바이에른을 다스린 「비텔스바흐」 가문의 거대한 궁전이야. 600년 넘게 왕과 제후들이 여기서 살며 나라를 다스렸어. 방이 어찌나 많고 화려한지, 금과 보석으로 꾸민 「보물의 방」도 있어. 독일이 하나의 나라가 되기 전, 바이에른이 독립된 왕국이었다는 걸 보여주는 곳이야.',
+    quiz:[{q:'레지덴츠에 살며 바이에른을 다스린 가문은?', opts:['합스부르크','비텔스바흐','메디치'], a:1, why:'바이에른의 비텔스바흐 가문이 600년 넘게 이곳에서 다스렸어.'}] },
+  { id:'nymphenburg', city:'munich', order:30, era:'17~18세기 바이에른', name:'님펜부르크 궁전', by:'1675년~ · 여름 별궁', place:'뮌헨 (장소)', emoji:'🏰',
+    source:'https://ko.wikipedia.org/wiki/님펜부르크_궁전',
+    sig:'바이에른 통치자의 <b>여름 궁전</b>, 바로크 양식 — 「근대 유럽·궁정 문화」와 연결돼요.',
+    kid:'뮌헨 서쪽에 있는 새하얀 여름 별궁이야. 바이에른 통치자 부부가 아들이 태어난 걸 기뻐하며 짓기 시작했대. 넓은 정원과 호수, 분수가 어우러진 아름다운 곳이지. 화려한 바로크 양식으로 지어져, 왕족들이 여름에 쉬며 잔치를 벌이던 모습을 상상할 수 있어.',
+    quiz:[{q:'님펜부르크 궁전은 어떤 용도로 지어졌을까?', opts:['감옥','여름 별궁','시장'], a:1, why:'왕족이 여름에 쉬던 여름 별궁이야.'}] },
+  { id:'dachau', city:'munich', order:40, era:'20세기 · 기억의 장소', name:'다하우 강제수용소 기념관', by:'1933년 설립 · 1965년 기념관', place:'뮌헨 근교 다하우 (장소)', emoji:'🕯',
+    source:'https://ko.wikipedia.org/wiki/다하우_강제_수용소',
+    note:'이곳의 역사는 무겁고 슬퍼요. 어른과 함께 이야기 나누며 「왜 기억해야 하는지」 생각해보면 좋아요.',
+    sig:'20세기 나치 시대의 아픈 역사, <b>인권과 평화를 기억하는 장소</b> — 「제2차 세계대전·전체주의」와 연결돼요.',
+    kid:'여기는 즐거운 관광지가 아니라, 조용히 기억하기 위한 장소야. 지금으로부터 약 90년 전, 독일을 지배한 나치 정권은 생각이 다르거나 특정 민족이라는 이유만으로 수많은 사람들을 이곳에 가두고 큰 고통을 주었어. 다하우는 그런 수용소 중 처음 세워진 곳이야. 지금은 기념관이 되어, "다시는 이런 일이 일어나선 안 된다"는 걸 온 세계가 기억하도록 지키고 있어. 슬픈 역사지만, 잊지 않는 것이 바로 그분들을 기리는 방법이란다.',
+    quiz:[{q:'이곳을 지금 기념관으로 남겨둔 가장 큰 이유는?', opts:['재미로','다시는 이런 일이 없도록 기억하려고','관광 수입 때문에'], a:1, why:'같은 비극이 되풀이되지 않도록 기억하고 배우기 위해서야.'}] },
+
+  /* ════════ 피렌체 (+피사) (동선 4) ════════ */
+  { id:'pisa-tower', city:'florence', order:10, era:'중세 · 로마네스크', name:'피사의 사탑', by:'1173년 착공~1372년 완공', place:'피사 (장소)', emoji:'🗼',
+    source:'https://ko.wikipedia.org/wiki/피사의_사탑',
+    note:'갈릴레이의 실험 이야기는 전설로 전해지는 것으로, 실제로 했는지는 확실하지 않아요.',
+    sig:'기울어진 <b>종탑</b>, 갈릴레이 실험의 전설 — 「중세 건축·근대 과학」과 연결돼요.',
+    kid:'세계에서 가장 유명한 「기울어진 탑」이야. 원래는 성당의 종탑으로 똑바로 지으려 했는데, 땅이 물러서 짓는 도중부터 한쪽으로 기울어 버렸어! 무너지지 않고 800년 넘게 버티고 있는 게 신기하지. 전설에 따르면 과학자 갈릴레이가 이 탑에서 무거운 공과 가벼운 공을 떨어뜨려 「무게가 달라도 함께 떨어진다」는 걸 실험했다고 해.',
+    quiz:[{q:'피사의 사탑의 가장 큰 특징은?', opts:['한쪽으로 기울어져 있다','물속에 있다','움직인다'], a:0, why:'땅이 물러 짓는 도중부터 기울어졌고, 그대로 유명해졌어.'}] },
+  { id:'duomo-firenze', city:'florence', order:20, era:'르네상스 · 건축', name:'피렌체 두오모(산타 마리아 델 피오레)', by:'브루넬레스키 · 돔 1436년 완공', place:'피렌체 (장소)', emoji:'⛪',
+    source:'https://ko.wikipedia.org/wiki/산타_마리아_델_피오레_대성당',
+    sig:'브루넬레스키의 거대한 <b>돔</b>, 르네상스 공학 — 「르네상스 과학·건축」과 연결돼요.',
+    kid:'피렌체 한가운데 우뚝 솟은 대성당이야. 가장 놀라운 건 거대한 빨간 「돔(둥근 지붕)」인데, 당시 사람들은 이렇게 큰 지붕을 어떻게 만들지 몰랐어. 건축가 브루넬레스키가 기발한 방법으로 기둥 없이 돔을 쌓아 올려 모두를 놀라게 했지. 르네상스 시대 사람들이 얼마나 똑똑하게 문제를 풀었는지 보여주는 걸작이야.',
+    quiz:[{q:'두오모의 거대한 돔을 만든 건축가는?', opts:['미켈란젤로','브루넬레스키','보티첼리'], a:1, why:'브루넬레스키가 기발한 방법으로 거대한 돔을 완성했어.'}] },
+  { id:'annunciation', city:'florence', order:30, era:'르네상스', name:'수태고지', by:'레오나르도 다빈치 · 1472년경', place:'우피치', emoji:'👼',
+    sig:'다빈치의 <b>초기작</b>, 정교한 관찰과 원근감 — 「르네상스 미술」과 연결돼요.',
+    kid:'천사가 마리아에게 "아기 예수를 낳을 거예요"라고 알려주는 장면이야. 다빈치가 아주 젊었을 때 그린 초기 그림이지. 천사의 날개, 풀밭의 꽃 하나하나를 관찰해 정교하게 그렸어. 멀리 있는 풍경을 흐릿하게 그려 깊이감(원근감)을 준 것도 다빈치의 솜씨야.',
+    quiz:[{q:'천사가 마리아에게 전한 소식은?', opts:['전쟁이 났다','아기 예수를 낳는다','비가 온다'], a:1, why:'아기 예수의 탄생을 알리는 「수태고지」 장면이야.'}] },
+  { id:'duke-urbino', city:'florence', order:35, era:'르네상스', name:'우르비노 공작 부부의 초상', by:'피에로 델라 프란체스카 · 1472년경', place:'우피치', emoji:'👤',
+    sig:'있는 그대로의 인물을 그린 <b>르네상스 초상화</b> — 「르네상스·인간 중심」과 연결돼요.',
+    kid:'우르비노를 다스린 공작과 그의 부인을 옆모습으로 그린 두 폭 그림이야. 공작의 코가 특이하게 휘어 있는데, 전쟁에서 다쳐서 그렇대. 화가는 그걸 숨기지 않고 있는 그대로 그렸어. 르네상스 시대엔 신뿐 아니라 「사람 그 자체」를 중요하게 여겨, 이렇게 진짜 인물을 자세히 그리기 시작했지.',
+    quiz:[{q:'이 초상화는 인물을 어떤 각도로 그렸을까?', opts:['정면','옆모습','뒷모습'], a:1, why:'옛 동전처럼 인물의 옆모습을 그린 게 특징이야.'}] },
+  { id:'primavera', city:'florence', order:40, era:'르네상스', name:'봄(프리마베라)', by:'산드로 보티첼리 · 1477~1482년경', place:'우피치', emoji:'🌸',
+    sig:'고대 신화를 되살린 <b>르네상스</b> — 「르네상스·고전 부활」과 연결돼요.',
+    kid:'봄을 맞은 신화 속 정원에 여신과 요정들이 모여 있는 그림이야. 오른쪽엔 봄바람이 불어오고, 꽃의 여신이 온몸에 꽃을 두르고 있어. 그림 속에 수백 종의 식물이 그려져 있대! 보티첼리는 고대 그리스·로마 신화를 되살려, 봄의 생명과 사랑을 아름답게 표현했어.',
+    quiz:[{q:'이 그림이 표현한 계절은?', opts:['봄','겨울','가을'], a:0, why:'제목 「프리마베라」가 이탈리아어로 봄이라는 뜻이야.'}] },
+  { id:'birth-venus', city:'florence', order:45, era:'르네상스', name:'비너스의 탄생', by:'산드로 보티첼리 · 1485년경', place:'우피치', emoji:'🐚',
+    sig:'신화와 <b>인체의 아름다움</b>을 당당히 그린 르네상스 — 「르네상스·고전 부활」과 연결돼요.',
+    kid:'사랑의 여신 비너스가 커다란 조개껍데기를 타고 바다에서 태어나 뭍으로 오는 장면이야. 고대 그리스·로마 신화 이야기를 그린 거지. 중세엔 주로 종교 그림만 그렸는데, 르네상스 시대엔 이렇게 신화 속 인물과 사람 몸의 아름다움을 당당하게 그리기 시작했어. 부드러운 곡선과 바람에 날리는 머리카락이 정말 우아하지.',
+    quiz:[{q:'비너스가 바다에서 타고 온 것은?', opts:['배','조개껍데기','돌고래'], a:1, why:'커다란 조개껍데기를 타고 뭍으로 오는 장면이야.'}] },
+
+  /* ════════ 로마 (+바티칸) (동선 5) ════════ */
+  { id:'roman-forum', city:'rome', order:10, era:'고대 로마', name:'포로 로마노', by:'공화정~제국 시대', place:'로마 (장소)', emoji:'🏛',
+    source:'https://ko.wikipedia.org/wiki/포룸_로마눔',
+    sig:'고대 로마의 <b>정치·경제·종교 중심지</b> — 교과서 「고대 로마 공화정·제국」과 직결돼요.',
+    kid:'지금은 무너진 기둥과 돌만 남았지만, 2천 년 전 이곳은 로마 제국의 「심장」이었어. 시민들이 모여 나랏일을 의논하고, 재판을 하고, 물건을 사고팔던 광장이지. 카이사르 같은 유명한 지도자들이 여기서 연설했어. 돌기둥 사이를 걸으면 고대 로마 사람들의 하루가 상상돼 — 작은 도시 로마가 거대한 제국으로 커진 무대야.',
+    quiz:[{q:'포로 로마노는 고대 로마의 무엇이었을까?', opts:['경기장','나라의 중심 광장','무덤'], a:1, why:'정치·재판·시장이 열리던 로마의 중심 광장이었어.'}] },
+  { id:'colosseum', city:'rome', order:20, era:'고대 로마', name:'콜로세움', by:'서기 80년 완공', place:'로마 (장소)', emoji:'🏟',
+    source:'https://ko.wikipedia.org/wiki/콜로세움',
+    sig:'로마 제국의 <b>원형경기장</b>, 검투사와 아치 건축 — 교과서 「고대 로마 제국·문화」와 직결돼요.',
+    kid:'5만 명이 들어갈 수 있던 거대한 원형 경기장이야. 약 2천 년 전, 로마 사람들은 여기서 검투사들의 경기나 동물 사냥 같은 구경거리를 봤어. 지하에는 검투사와 맹수를 무대로 올려보내는 엘리베이터 같은 장치도 있었대. 콘크리트와 아치를 활용한 로마의 놀라운 건축 기술이 담겨 있어. 지금도 로마의 상징이지.',
+    quiz:[{q:'콜로세움에서 열리던 대표적인 구경거리는?', opts:['영화','검투사 경기','축구'], a:1, why:'검투사 경기와 동물 사냥 같은 구경거리가 열렸어.'},
+          {q:'콜로세움에 쓰인 로마의 뛰어난 건축 구조는?', opts:['아치','유리','철근'], a:0, why:'아치 구조로 튼튼하고 거대한 경기장을 지었어.'}] },
+  { id:'pantheon', city:'rome', order:30, era:'고대 로마', name:'판테온', by:'서기 126년경 재건(하드리아누스)', place:'로마 (장소)', emoji:'🏛',
+    source:'https://ko.wikipedia.org/wiki/판테온_(로마)',
+    note:'처음 지어진 뒤 불타서 다시 지어졌기 때문에, 완공 연도는 자료마다 조금씩 다르게 표기돼요.',
+    sig:'「모든 신의 신전」, <b>완벽한 콘크리트 돔</b> — 교과서 「고대 로마 건축·종교」와 직결돼요.',
+    kid:'「모든 신들의 신전」이라는 뜻을 가진, 2천 년 전 지어진 둥근 신전이야. 놀랍게도 지금도 지붕이 그대로 남아 있어! 천장 한가운데엔 「오쿨루스」라는 둥근 구멍이 뚫려 있어 하늘과 햇빛이 들어와. 콘크리트로 만든 이 거대한 돔은 오랫동안 세계에서 가장 큰 돔이었어. 로마의 건축 실력이 얼마나 대단했는지 알 수 있지.',
+    quiz:[{q:'판테온 천장 한가운데 뚫린 둥근 구멍의 이름은?', opts:['오쿨루스','아치','돔'], a:0, why:'하늘이 보이는 둥근 구멍 「오쿨루스」로 빛이 들어와.'},
+          {q:'「판테온」이라는 이름의 뜻은?', opts:['왕의 무덤','모든 신의 신전','경기장'], a:1, why:'모든 신을 위한 신전이라는 뜻이야.'}] },
+  { id:'arch-constantine', city:'rome', order:40, era:'고대 로마 · 후기', name:'콘스탄티누스 개선문', by:'서기 315년', place:'로마 (장소)', emoji:'🏛',
+    source:'https://ko.wikipedia.org/wiki/콘스탄티누스_개선문',
+    sig:'<b>콘스탄티누스 황제</b>, 기독교를 공인한 시대의 문 — 교과서 「로마 제국·기독교 공인」과 연결돼요.',
+    kid:'콜로세움 바로 옆에 서 있는 커다란 승리의 문이야. 로마 황제 콘스탄티누스가 전쟁에서 이긴 걸 기념해 세웠어. 이 황제는 그동안 박해받던 기독교를 처음으로 인정해준 사람으로 유명해(밀라노 칙령). 덕분에 기독교가 유럽 전체로 퍼지는 큰 전환점이 됐지. 나중에 파리의 개선문도 이 문을 본떠 만들었대.',
+    quiz:[{q:'콘스탄티누스 황제가 처음으로 인정해준 종교는?', opts:['기독교','불교','이슬람교'], a:0, why:'밀라노 칙령으로 기독교를 인정해, 유럽에 크게 퍼지는 계기가 됐어.'}] },
+  { id:'laocoon', city:'rome', order:50, era:'헬레니즘~고대 로마', name:'라오콘 군상', by:'작자 미상(고대 그리스) · 기원전 1세기경', place:'바티칸', emoji:'🐍',
+    note:'만들어진 정확한 시기는 자료마다 다르게 표기돼요.',
+    sig:'인간의 <b>고통과 감정</b>을 생생하게 담은 헬레니즘 조각 — 「헬레니즘 미술」과 연결돼요.',
+    kid:'트로이의 사제 라오콘과 두 아들이 거대한 바다뱀에게 휘감기는 순간을 조각한 작품이야. 트로이 목마의 비밀을 알아채고 경고했다가 신의 벌을 받는 그리스 신화 이야기지. 몸을 비틀며 고통스러워하는 표정과 근육이 너무나 생생해서, 500여 년 전 발견됐을 때 미켈란젤로도 크게 감탄했대. 인간의 감정을 돌에 담은 걸작이야.',
+    quiz:[{q:'라오콘과 두 아들을 휘감은 것은?', opts:['밧줄','바다뱀','사자'], a:1, why:'신화 속에서 거대한 바다뱀에게 휘감기는 장면이야.'}] },
+  { id:'school-athens', city:'rome', order:60, era:'르네상스', name:'아테네 학당', by:'라파엘로 · 1509~1511년', place:'바티칸 서명의 방', emoji:'📐',
+    sig:'고대 그리스 <b>철학자들의 총집합</b>, 인간의 지혜 찬양 — 「르네상스·고전 부활」과 연결돼요.',
+    kid:'고대 그리스의 유명한 철학자와 과학자들이 한자리에 모인 상상 속 장면이야. 가운데 두 사람이 플라톤과 아리스토텔레스인데, 한 명은 하늘을, 한 명은 땅을 가리키며 서로 다른 생각을 보여줘. 피타고라스, 유클리드 같은 수학자들도 있어. 라파엘로는 「인간의 지혜」를 찬양하려 이 그림을 그렸어 — 르네상스가 고대 그리스를 얼마나 존경했는지 보여주지.',
+    quiz:[{q:'그림 한가운데 서 있는 두 철학자는?', opts:['카이사르와 나폴레옹','플라톤과 아리스토텔레스','다빈치와 라파엘로'], a:1, why:'하늘과 땅을 각각 가리키는 플라톤과 아리스토텔레스야.'}] },
+  { id:'creation-adam', city:'rome', order:70, era:'르네상스', name:'천지창조', by:'미켈란젤로 · 1508~1512년', place:'시스티나 성당', emoji:'🖐',
+    sig:'시스티나 <b>천장화</b>, 르네상스 전성기의 정점 — 「르네상스 전성기」와 연결돼요.',
+    kid:'시스티나 성당 천장에 그려진 그림 중 가장 유명한 장면이야. 하느님이 손을 뻗어 첫 사람 아담에게 생명을 불어넣으려는 순간, 두 손가락이 막 닿을 듯 말 듯 하지. 미켈란젤로는 이 거대한 천장을 4년 동안 목을 뒤로 젖힌 채 홀로 그렸대. 손끝 사이의 작은 틈에 「생명이 시작되는 긴장감」이 담겨 있어.',
+    quiz:[{q:'천지창조가 그려진 곳은?', opts:['시스티나 성당 천장','콜로세움','루브르'], a:0, why:'바티칸 시스티나 성당의 천장에 그려진 미켈란젤로의 걸작이야.'}] },
+  { id:'last-judgment', city:'rome', order:75, era:'르네상스', name:'최후의 심판', by:'미켈란젤로 · 1536~1541년', place:'시스티나 성당', emoji:'⚖️',
+    sig:'400여 명의 인체가 소용돌이치는 <b>제단 벽화</b> — 「르네상스 전성기」와 연결돼요.',
+    kid:'시스티나 성당 제단 벽을 가득 채운 거대한 그림이야. 세상의 마지막 날, 예수가 사람들을 심판하는 장면을 그렸어. 400명이 넘는 인물이 하늘로 오르거나 아래로 떨어지며 소용돌이치지. 미켈란젤로는 사람 몸의 근육과 움직임을 완벽하게 그려, 보는 사람이 압도되게 만들었어. 천지창조를 그린 지 20여 년 뒤, 더 원숙해진 솜씨로 그린 작품이야.',
+    quiz:[{q:'「최후의 심판」이 그린 장면은?', opts:['전쟁의 승리','세상 마지막 날의 심판','왕의 대관식'], a:1, why:'세상의 마지막 날 예수가 사람들을 심판하는 장면이야.'}] },
+];
+
+/* ── 진행/집계 유틸 ── */
+function trhCitySites(city){ return HISTORY_SITES.filter(s=>s.city===city).sort((a,b)=>a.order-b.order); }
+function trhCityDone(city){ return trhCitySites(city).filter(s=>trhVisited[s.id]).length; }
+function trhCityTotal(city){ return trhCitySites(city).length; }
+function trhCityComplete(city){ return trhCityTotal(city)>0 && trhCityDone(city)===trhCityTotal(city); }
+function trhAllDone(){ return HISTORY_SITES.filter(s=>trhVisited[s.id]).length; }
+function trhAllTotal(){ return HISTORY_SITES.length; }
+function trhAllCitiesComplete(){ return CITY_ORDER.every(c=>trhCityComplete(c)); }
+function trhSite(id){ return HISTORY_SITES.find(s=>s.id===id); }
+function trhGrad(city){ const c=CITIES[city].color; return `linear-gradient(135deg, ${c} 0%, ${trhShade(c,-18)} 100%)`; }
+function trhShade(hex,pct){ const n=parseInt(hex.slice(1),16); let r=(n>>16)&255,g=(n>>8)&255,b=n&255; const f=(v)=>Math.max(0,Math.min(255,Math.round(v+(v*pct/100)))); return `rgb(${f(r)},${f(g)},${f(b)})`; }
+
+/* ── 뷰 전환 ── */
+function trhShow(view){
+  ['trhHome','trhCity','trhPassport'].forEach(v=>{ const el=document.getElementById(v); if(el) el.style.display = (v===view)?'block':'none'; });
+  const h=document.getElementById('history'); if(h) window.scrollTo({top: h.offsetTop-60<0?0:0, behavior:'smooth'});
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ── 렌더: 홈(여행 동선순) ── */
+function renderHistory(){
+  renderHistoryHome();
+}
+function renderHistoryHome(){
+  const done=trhAllDone(), total=trhAllTotal();
+  const pct = total? Math.round(done/total*100) : 0;
+  const rail = CITY_ORDER.map((c,i)=>{
+    const ci=CITIES[c], d=trhCityDone(c), t=trhCityTotal(c), cp=t?Math.round(d/t*100):0, complete=trhCityComplete(c);
+    return `<div class="trh-citycard" onclick="openHistoryCity('${c}')">
+      <div class="trh-citycard-top" style="background:${trhGrad(c)}">
+        <span class="trh-citycard-step">${i+1}번째 도시</span>
+        ${complete?'<span class="trh-citycard-done">🏅</span>':''}
+        <span>${ci.flag}</span>
+      </div>
+      <div class="trh-citycard-body">
+        <div class="trh-citycard-name">${ci.name}<small>${esc(ci.en)}</small></div>
+        <div class="trh-citycard-era">${esc(TRH_CITY_ERA[c]||'')}</div>
+        <div class="trh-citycard-prog"><span>${t}곳 중 ${d}곳 방문</span><span>${cp}%</span></div>
+        <div class="trh-mini-bar"><div class="trh-mini-fill" style="width:${cp}%;background:${ci.color}"></div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const grand = trhAllCitiesComplete();
+  const badges = CITY_ORDER.map(c=>{
+    const ci=CITIES[c], complete=trhCityComplete(c);
+    return `<div class="trh-badge ${complete?'earned':''}"><div class="trh-badge-medal">${TRH_CITY_STAMP[c]}</div><div class="trh-badge-cap">${ci.name} 완주</div></div>`;
+  }).join('') +
+  `<div class="trh-badge ${grand?'earned':''}"><div class="trh-badge-medal">🧭</div><div class="trh-badge-cap">세계사 탐험가</div></div>`;
+
+  document.getElementById('trhHome').innerHTML = `
+    <div class="trh-hero">
+      <div class="trh-hero-eyebrow">World History Stamp Tour</div>
+      <div class="trh-hero-title">역사 스탬프투어 🧭</div>
+      <div class="trh-hero-sub">런던부터 로마까지, 교과서 속 세계사 현장을 직접 찾아가 도장을 모으는 탐험! 각 장소의 퀴즈를 맞히면 나만의 여권에 스탬프가 찍혀요.</div>
+      <div class="trh-hero-actions">
+        <button class="trh-btn trh-btn-gold" onclick="openHistoryPassport()">🎫 내 여권·스탬프북</button>
+        <button class="trh-btn trh-btn-ghost" onclick="openHistoryCity('${CITY_ORDER[0]}')">🗺 탐험 시작하기</button>
+      </div>
+    </div>
+
+    <div class="trh-overall">
+      <div class="trh-overall-head"><span>🏆 전체 탐험 진행률</span><span>${done} / ${total}곳 · ${pct}%</span></div>
+      <div class="trh-bar"><div class="trh-bar-fill" style="width:${pct}%"></div></div>
+      ${grand?'<div style="margin-top:10px;font-size:12.5px;color:#B5832A;font-weight:700">🎉 축하해요! 5개 도시를 모두 완주한 「세계사 탐험가」예요!</div>':''}
+    </div>
+
+    <div class="trh-section-label">🗺 여행 순서대로 떠나요 <span style="font-weight:400;color:var(--text-light);text-transform:none;letter-spacing:0">(런던 → 파리 → 뮌헨 → 피렌체·피사 → 로마)</span></div>
+    <div class="trh-rail">${rail}</div>
+
+    <div class="trh-section-label" style="margin-top:20px">🏅 획득한 뱃지</div>
+    <div class="trh-badges">${badges}</div>
+
+    <p class="hint" style="margin-top:18px">🕰 <b>안내</b> — 각 도시 안의 장소는 <b>시대(연대)순</b>으로 정리돼 있어 「시간의 흐름」을 느낄 수 있어요. 탭 홈의 도시 순서는 <b>실제 여행 동선</b>을 따라요.</p>
+  `;
+}
+
+/* ── 렌더: 도시 상세(시대순) ── */
+function openHistoryCity(city){
+  const ci=CITIES[city];
+  const sites=trhCitySites(city);
+  // 시대(era)별 그룹핑 — order 순서 유지
+  const groups=[]; const seen={};
+  sites.forEach(s=>{ if(!seen[s.era]){ seen[s.era]=1; groups.push(s.era); } });
+  const groupHtml = groups.map(era=>{
+    const items = sites.filter(s=>s.era===era).map(s=>trhSiteCard(s)).join('');
+    return `<div class="trh-era-group"><div class="trh-era-title" style="color:${ci.color}">${esc(era)} <span>· ${sites.filter(s=>s.era===era).length}곳</span></div>${items}</div>`;
+  }).join('');
+
+  const d=trhCityDone(city), t=trhCityTotal(city);
+  const allVisited = trhCityComplete(city);
+  const best = trhCityQuiz[city];
+  const comboBtn = `<button class="trh-btn ${allVisited?'trh-btn-gold':'trh-btn-ghost'}" style="${allVisited?'':'opacity:.55'}" onclick="${allVisited?`startCityQuiz('${city}')`:`toast('이 도시의 모든 장소를 방문하면 종합 퀴즈가 열려요!')`}">🧠 ${ci.name} 종합 퀴즈${best!==undefined?` · 최고 ${best}/5`:''}</button>`;
+
+  document.getElementById('trhCity').innerHTML = `
+    <button class="trh-btn trh-btn-back" onclick="backToHistoryHome()">← 탐험 지도로</button>
+    <div class="trh-city-banner" style="background:${trhGrad(city)}">
+      <h2>${ci.flag} ${ci.name} <span style="font-size:14px;font-weight:500;opacity:.85">${esc(ci.en)}</span></h2>
+      <div class="trh-cb-sub">${esc(TRH_CITY_ERA[city]||'')}</div>
+      <div style="margin-top:10px;font-size:12.5px;font-weight:700">📍 ${t}곳 중 <b>${d}곳</b> 방문 완료 ${allVisited?'· 🏅 완주!':''}</div>
+    </div>
+    <div style="margin-bottom:14px">${comboBtn}</div>
+    <p class="hint">🕰 아래는 <b>시대(연대)순</b>이에요. 장소를 눌러 이야기를 읽고, 퀴즈를 맞혀 도장을 찍어요!</p>
+    ${groupHtml}
+  `;
+  trhShow('trhCity');
+}
+function backToHistoryHome(){ renderHistoryHome(); trhShow('trhHome'); }
+
+function trhSiteCard(s){
+  const visited=!!trhVisited[s.id];
+  const badge = visited ? `<span class="trh-chip trh-chip-stamp">✓ 방문 완료</span>` : `<span class="trh-chip trh-chip-todo">🎫 도장 미획득</span>`;
+  const qchip = (s.quiz&&s.quiz.length)?`<span class="trh-chip trh-chip-quiz">❓ 퀴즈 ${s.quiz.length}문제</span>`:'';
+  return `<div class="trh-site ${visited?'visited':''}" onclick="openSiteDetail('${s.id}')">
+    <div class="trh-thumb" style="background:${trhGrad(s.city)}">
+      <span class="trh-thumb-emoji">${s.emoji}</span>
+      <span class="trh-thumb-ph">🖼 현지에서 실제로 확인!</span>
+    </div>
+    <div class="trh-site-body">
+      <div class="trh-site-name">${esc(s.name)}</div>
+      <div class="trh-site-meta">${esc(s.by)} · ${esc(s.place)}</div>
+      <div class="trh-site-desc">${esc(s.kid)}</div>
+      <div class="trh-site-foot">${badge}${qchip}</div>
+    </div>
+  </div>`;
+}
+
+/* ── 사이트 상세 모달 ── */
+function openSiteDetail(id){
+  const s=trhSite(id); if(!s) return;
+  const visited=!!trhVisited[s.id];
+  const sourceHtml = s.source ? `<div class="trh-source">📚 참고 자료(위키피디아): <a href="${esc(s.source)}" target="_blank" rel="noopener">${esc(s.source)}</a></div>` : `<div class="trh-source">📚 기초 조사 자료 기반 카드예요.</div>`;
+  const noteHtml = s.note ? `<div class="trh-note">※ ${esc(s.note)}</div>` : '';
+  const actionBtn = visited
+    ? `<button class="trh-btn trh-btn-ghost" style="background:#EDF6EE;color:#3B7A47" disabled>✓ 이미 도장을 받았어요</button>`
+    : `<button class="trh-btn trh-btn-gold" onclick="startSiteQuiz('${s.id}')">🎫 도장 찍기 (퀴즈 풀기)</button>`;
+  document.getElementById('trhSiteBody').innerHTML = `
+    <div class="trh-detail">
+      <div class="trh-detail-hero" style="background:${trhGrad(s.city)}">
+        <span class="e">${s.emoji}</span>
+        <span class="trh-detail-ph">🖼 실제 작품·현장은 여행지에서 직접 확인해요!</span>
+      </div>
+      <h3>${esc(s.name)}</h3>
+      <div class="trh-detail-meta">${CITIES[s.city].flag} ${CITIES[s.city].name} · ${esc(s.era)} · ${esc(s.by)}<br>📍 ${esc(s.place)}</div>
+      <div class="trh-detail-block">
+        <h4>🧭 11살 눈높이 이야기</h4>
+        <p>${esc(s.kid)}</p>
+      </div>
+      <div class="trh-detail-block">
+        <h4>📖 세계사 연결 포인트</h4>
+        <div class="trh-connect">${s.sig}</div>
+      </div>
+      ${noteHtml}
+      ${sourceHtml}
+      <div class="trh-detail-actions">
+        ${actionBtn}
+        <button class="trh-btn trh-btn-ghost" style="background:#EFE6D4;color:#3A2C1A" onclick="closeModal('trhSiteModal')">닫기</button>
+      </div>
+    </div>`;
+  document.getElementById('trhSiteModal').classList.add('open');
+}
+
+/* ── 사이트 퀴즈 (통과 시 스탬프) ── */
+let trhQuizState=null;
+function startSiteQuiz(siteId){
+  const s=trhSite(siteId); if(!s||!s.quiz||!s.quiz.length){ trhAwardStamp(siteId); return; }
+  closeModal('trhSiteModal');
+  trhQuizState={ mode:'site', siteId, city:s.city, qs:s.quiz, i:0, correct:0 };
+  renderQuizQuestion();
+  document.getElementById('trhQuizModal').classList.add('open');
+}
+function startCityQuiz(city){
+  const pool=[]; trhCitySites(city).forEach(s=>{ if(s.quiz) s.quiz.forEach(q=>pool.push(q)); });
+  // 셔플 후 5문제
+  for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  const qs=pool.slice(0,5);
+  trhQuizState={ mode:'city', city, qs, i:0, correct:0 };
+  renderQuizQuestion();
+  document.getElementById('trhQuizModal').classList.add('open');
+}
+function renderQuizQuestion(){
+  const st=trhQuizState; if(!st) return;
+  const q=st.qs[st.i];
+  const total=st.qs.length;
+  const title = st.mode==='city' ? `🧠 ${CITIES[st.city].name} 종합 퀴즈` : `🎫 도장 퀴즈`;
+  const opts=q.opts.map((o,idx)=>`<button class="trh-opt" onclick="answerQuiz(${idx})">${esc(o)}</button>`).join('');
+  document.getElementById('trhQuizBody').innerHTML = `
+    <h3 style="margin-bottom:6px">${title}</h3>
+    <div class="trh-quiz-progress">문제 ${st.i+1} / ${total}${st.mode==='site'?' · 맞히면 도장을 받아요! (틀려도 다시 도전 OK)':''}</div>
+    <div class="trh-quiz-q">${esc(q.q)}</div>
+    <div id="trhOpts">${opts}</div>
+    <div id="trhQuizFb"></div>`;
+}
+function answerQuiz(idx){
+  const st=trhQuizState; if(!st) return;
+  const q=st.qs[st.i];
+  const btns=document.querySelectorAll('#trhOpts .trh-opt');
+  btns.forEach((b,i)=>{ b.disabled=true; if(i===q.a) b.classList.add('correct'); });
+  const ok = idx===q.a;
+  if(ok) st.correct++; else btns[idx].classList.add('wrong');
+  const fb=document.getElementById('trhQuizFb');
+  const last = st.i >= st.qs.length-1;
+  fb.innerHTML = `<div class="trh-quiz-feedback ${ok?'ok':'no'}">${ok?'⭐ 정답이에요!':'아쉬워요! 정답은 위에 초록색으로 표시했어요.'}<br>${esc(q.why)}</div>
+    <div class="trh-detail-actions" style="margin-top:12px">
+      ${ last
+        ? `<button class="trh-btn trh-btn-gold" onclick="finishQuiz()">${st.mode==='site'?'🎫 결과 보기':'🏁 결과 보기'}</button>`
+        : `<button class="trh-btn trh-btn-gold" onclick="nextQuiz()">다음 문제 →</button>` }
+      ${ st.mode==='site' && !ok && last ? `<button class="trh-btn trh-btn-ghost" style="background:#EFE6D4;color:#3A2C1A" onclick="retrySiteQuiz()">↻ 다시 도전</button>` : '' }
+    </div>`;
+}
+function nextQuiz(){ trhQuizState.i++; renderQuizQuestion(); }
+function retrySiteQuiz(){ const sid=trhQuizState.siteId; startSiteQuiz(sid); }
+function finishQuiz(){
+  const st=trhQuizState; if(!st) return;
+  if(st.mode==='site'){
+    const allCorrect = st.correct===st.qs.length;
+    if(allCorrect){
+      closeModal('trhQuizModal');
+      trhAwardStamp(st.siteId);
+    } else {
+      // 하나라도 틀리면 재도전 안내(벌점 없음)
+      document.getElementById('trhQuizBody').innerHTML = `
+        <h3>아깝다! 🎯</h3>
+        <p style="font-size:13.5px;color:var(--text-mid);line-height:1.6;margin-bottom:14px">${st.qs.length}문제를 모두 맞히면 도장을 받을 수 있어요. 벌점은 전혀 없으니 이야기를 다시 읽고 도전해봐요!</p>
+        <div class="trh-detail-actions">
+          <button class="trh-btn trh-btn-gold" onclick="retrySiteQuiz()">↻ 다시 도전</button>
+          <button class="trh-btn trh-btn-ghost" style="background:#EFE6D4;color:#3A2C1A" onclick="closeModal('trhQuizModal');openSiteDetail('${st.siteId}')">📖 이야기 다시 읽기</button>
+        </div>`;
+    }
+  } else {
+    // 도시 종합 퀴즈: 점수 저장, 완주 뱃지는 이미 방문으로 달성
+    const prev=trhCityQuiz[st.city];
+    if(prev===undefined || st.correct>prev){ trhCityQuiz[st.city]=st.correct; trhSave(TRH_LS.cityquiz, trhCityQuiz); }
+    document.getElementById('trhQuizBody').innerHTML = `
+      <h3>🏁 ${CITIES[st.city].name} 종합 퀴즈 결과</h3>
+      <div style="text-align:center;padding:14px 0">
+        <div style="font-size:44px">${st.correct>=4?'🎉':(st.correct>=2?'😊':'💪')}</div>
+        <div style="font-size:22px;font-weight:800;color:var(--trh-ink);margin-top:8px">${st.correct} / ${st.qs.length} 정답</div>
+        <div style="font-size:13px;color:var(--text-mid);margin-top:6px">${st.correct===st.qs.length?'완벽해요! 진짜 세계사 박사님! 🧠':'잘했어요! 아쉬운 문제는 카드에서 다시 읽어봐요.'}</div>
+      </div>
+      <div class="trh-detail-actions">
+        <button class="trh-btn trh-btn-gold" onclick="closeModal('trhQuizModal')">확인</button>
+        <button class="trh-btn trh-btn-ghost" style="background:#EFE6D4;color:#3A2C1A" onclick="closeModal('trhQuizModal');startCityQuiz('${st.city}')">↻ 다시 풀기</button>
+      </div>`;
+  }
+}
+/* ── 스탬프 획득 ── */
+function trhAwardStamp(siteId){
+  const s=trhSite(siteId); if(!s) return;
+  const already=!!trhVisited[siteId];
+  trhVisited[siteId]=true; trhSave(TRH_LS.visited, trhVisited);
+  const cityComplete = trhCityComplete(s.city);
+  const grand = trhAllCitiesComplete();
+  // 축하 오버레이
+  document.getElementById('trhCelStamp').textContent = s.emoji;
+  let title='🎫 스탬프 획득!';
+  let sub=`${CITIES[s.city].name} · ${esc(s.name)}<br>여권에 도장이 찍혔어요!`;
+  if(grand){ title='🧭 세계사 탐험가 달성!'; sub='5개 도시를 모두 완주했어요!<br>진짜 대단한 탐험가예요! 🎉'; document.getElementById('trhCelStamp').textContent='🧭'; }
+  else if(cityComplete){ title=`🏅 ${CITIES[s.city].name} 완주!`; sub=`${CITIES[s.city].name}의 모든 장소를 방문했어요!<br>완주 뱃지를 받았어요! 🎉`; document.getElementById('trhCelStamp').textContent=TRH_CITY_STAMP[s.city]; }
+  document.getElementById('trhCelTitle').textContent=title;
+  document.getElementById('trhCelSub').innerHTML=sub;
+  document.getElementById('trhCelebrate').classList.add('show');
+  toast('🎫 스탬프를 획득했어요!');
+  // 화면 갱신(현재 도시 뷰가 열려 있으면 유지)
+  if(document.getElementById('trhCity').style.display!=='none'){ openHistoryCity(s.city); }
+  renderHistoryHome();
+}
+
+/* ── 여권 / 스탬프북 ── */
+function openHistoryPassport(){ renderPassport(); trhShow('trhPassport'); }
+function renderPassport(){
+  const cityBlocks = CITY_ORDER.map(c=>{
+    const ci=CITIES[c], sites=trhCitySites(c);
+    const stamps = sites.map(s=>{
+      const got=!!trhVisited[s.id];
+      return `<div class="trh-stamp ${got?'got':''}" style="${got?`border-color:${ci.color};color:${ci.color}`:''}" title="${esc(s.name)}">
+        <span class="trh-stamp-emoji">${got?s.emoji:'❔'}</span>
+        <span class="trh-stamp-lbl">${got?esc(s.name.slice(0,7)):'미방문'}</span>
+      </div>`;
+    }).join('');
+    const d=trhCityDone(c), t=trhCityTotal(c);
+    return `<div class="trh-pp-city">
+      <div class="trh-pp-cityname">${ci.flag} ${ci.name} <span style="opacity:.6;font-weight:500">${d}/${t}${trhCityComplete(c)?' · 🏅완주':''}</span></div>
+      <div class="trh-stamp-grid">${stamps}</div>
+    </div>`;
+  }).join('');
+  const done=trhAllDone(), total=trhAllTotal(), grand=trhAllCitiesComplete();
+  document.getElementById('trhPassport').innerHTML = `
+    <button class="trh-btn trh-btn-back" onclick="backToHistoryHome()">← 탐험 지도로</button>
+    <div class="trh-pp">
+      <div class="trh-pp-title">🎫 세계사 여권</div>
+      <div class="trh-pp-sub">PASSPORT · 타이거의 유럽 역사 탐험 · ${done}/${total} 스탬프</div>
+      ${grand?'<div style="text-align:center;margin-top:12px;background:rgba(255,215,160,.18);border-radius:10px;padding:8px;font-size:12.5px;color:#FFE7C2;font-weight:700">🧭 세계사 탐험가 — 5개 도시 완주!</div>':''}
+      ${cityBlocks}
+    </div>
+    <p class="hint">🎫 장소의 퀴즈를 맞히면 이 여권에 도장이 찍혀요. 도시별로 도장 색과 모양이 달라요!</p>
+  `;
+}
+
 init();
 try{ gdriveInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
@@ -4129,6 +4797,26 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
     <button class="story-x" onclick="closeModal('storyModal')" aria-label="닫기">✕</button>
     <h3 id="storyTitle">🪄 흥미로운 이야기</h3>
     <div id="storyBody" class="story-body"></div>
+  </div>
+</div>
+
+<!-- 🎫 역사 사이트 상세 MODAL -->
+<div class="modal-back" id="trhSiteModal">
+  <div class="modal"><div id="trhSiteBody"></div></div>
+</div>
+
+<!-- 🎫 퀴즈 MODAL -->
+<div class="modal-back" id="trhQuizModal">
+  <div class="modal"><div id="trhQuizBody"></div></div>
+</div>
+
+<!-- 🎫 스탬프 획득 축하 오버레이 -->
+<div class="trh-celebrate" id="trhCelebrate" onclick="this.classList.remove('show')">
+  <div class="trh-celebrate-card">
+    <div class="trh-celebrate-stamp" id="trhCelStamp">🎫</div>
+    <div class="trh-celebrate-t" id="trhCelTitle">스탬프 획득!</div>
+    <div class="trh-celebrate-s" id="trhCelSub"></div>
+    <button class="trh-btn trh-btn-gold" style="margin-top:16px" onclick="event.stopPropagation();document.getElementById('trhCelebrate').classList.remove('show')">좋아! 👍</button>
   </div>
 </div>
 
