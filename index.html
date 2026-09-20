@@ -1622,11 +1622,12 @@ const DAYS = [
   { d:6, date:'9/30', wd:'수', city:'paris', badges:['파리'],
     title:'루브르·오르세 투어 · 노트르담 종탑·생트샤펠',
     story:'루브르는 원래 <b>성(요새)이자 왕이 살던 궁전</b>이었어 — 그래서 이렇게 어마어마하게 크지! 가장 유명한 그림 다빈치의 <b>모나리자</b>는 1911년에 <b>도둑맞은 사건</b> 덕분에 전 세계에 더 유명해졌대. 2년 뒤 되찾았고, 지금은 방탄유리 안에서 은은하게 웃고 있단다.<br><br>오르세 미술관은 원래 1900년에 지어진 <b>기차역</b>이었어! 지금도 커다란 유리 시계가 남아있어서, 시계 뒤에서 파리 시내를 내다보는 게 인기 포토스팟이야. 반 고흐의 "론 강의 별이 빛나는 밤"과 모네·르누아르 같은 인상파 화가들의 그림으로 가득한데, <b>"인상파"</b>라는 이름은 원래 비평가들이 "그림을 대충 인상만 그렸다"고 놀리던 말이었대!<br><br>노트르담 대성당은 약 850년 전에 짓기 시작한 거대한 성당이야. 소설 "노트르담의 꼽추"에서 종지기 콰지모도가 살던 곳이지. 2019년 큰 불로 지붕이 무너졌지만 전 세계가 힘을 모아 복원해 2024년 다시 문을 열었어. 종탑에 올라가면 그 유명한 가고일 석상을 코앞에서 볼 수 있어!',
-    foot:'🎟️ <b>루브르 투어</b> 09:20 미팅(카페 마를리) · 입장권 별도 예약 필수 <a href="https://www.ticket.louvre.fr" target="_blank" rel="noopener">ticket.louvre.fr</a>(€22·18세 미만 무료) · 🎨 <b>오르세 투어</b> 13:30 미팅(정문 코끼리상 앞) · 입장권 개별 준비 <a href="https://billetterie.musee-orsay.fr" target="_blank" rel="noopener">billetterie.musee-orsay.fr</a> · ⛪ <b>노트르담 종탑</b> 16:15 · <b>생트샤펠</b> 18:00<br>✅ <b>오늘 할 일</b> ☐ 루브르·오르세 입장권 각각 예약(투어와 별도) ☐ 타이거 여권 지참 ☐ 노트르담 종탑·생트샤펠 티켓 확인',
+    foot:'🎟️ <b>루브르(수키 투어)</b> 09:20 미팅(카페 마를리) · 입장권 별도 예약 필수 <a href="https://www.ticket.louvre.fr" target="_blank" rel="noopener">ticket.louvre.fr</a>(€22·18세 미만 무료) · 🎨 <b>오르세</b> 13:30~15:00 개인관람(입장권 필요) <a href="https://billetterie.musee-orsay.fr" target="_blank" rel="noopener">billetterie.musee-orsay.fr</a> · ⛪ <b>노트르담 종탑</b> 16:45 · <b>생트샤펠</b> 18:00<br>✅ <b>오늘 할 일</b> ☐ 루브르·오르세 입장권 각각 예약 ☐ 타이거 여권 지참 ☐ 노트르담 종탑·생트샤펠 티켓 확인',
     acts:[
       {ic:'🚶', t:'숙소 출발 · La Motte-Picquet–Grenelle역까지 도보', time:'08:40'},
-      {ic:'🖼️', t:'★루브르 박물관 투어 — 공인가이드 해설', time:'09:20', endTime:'13:00', status:'need_ticket',
+      {ic:'🖼️', t:'★루브르 박물관 (수키 투어)', time:'09:20', endTime:'13:00', status:'need_ticket',
         tourBooking:{
+          provider:'수키 투어',
           meetingTime:'09:20',
           meetingPlace:'카페 마를리(Le Café Marly), 루브르 피라미드 광장 왼쪽 작은 피라미드 옆',
           price:'58,001원',
@@ -1634,24 +1635,19 @@ const DAYS = [
           extraCosts:['입장권 €22 (현장/온라인 별도 구매 필요)'],
           cautions:['17세 이하 무료입장이나 시간예약 필수, 여권 지참']
         } },
-      {ic:'🍽️', t:'점심 (간단히)', time:'13:00', endTime:'13:30'},
-      {ic:'🎨', t:'★오르세 미술관 투어 — 전문 공인가이드 해설', time:'13:30', endTime:'15:30', status:'need_ticket',
-        tourBooking:{
-          meetingTime:'13:30',
-          meetingPlace:'오르세 미술관 정문 코끼리상 앞',
-          price:'65,000원',
-          includes:'미술관 전문 공인가이드 해설 · 송수신기 대여',
-          extraCosts:['입장권 개별 준비 (뮤지엄패스 사용 가능)']
-        } },
-      {ic:'🚶', t:'오르세 → 노트르담 이동 ⚠️시간 추정 — 확인 필요', time:'15:30', endTime:'16:15'},
-      {ic:'🗼', t:'★노트르담 종탑 등정 (424계단)', time:'16:15', endTime:'17:15'},
-      {ic:'🚶', t:'종탑 → 생트샤펠 이동·대기 ⚠️시간 추정 — 확인 필요', time:'17:15', endTime:'18:00'},
+      {ic:'🚶', t:'오르세 도보 이동', time:'13:00', endTime:'13:20'},
+      {ic:'☕', t:'오르세 카페 휴식', time:'13:20', endTime:'13:30'},
+      {ic:'🎨', t:'오르세 미술관 개인관람 (컴팩트)', time:'13:30', endTime:'15:00'},
+      {ic:'🚆', t:'RER C로 노트르담 이동', time:'15:00', endTime:'15:15'},
+      {ic:'⛪', t:'노트르담 내부', time:'15:15', endTime:'15:45', status:'later',
+        bookingRequired:{ label:'노트르담 예약 (방문 2~3일 전 오픈)', url:'https://resa.notredamedeparis.fr' } },
+      {ic:'😌', t:'자유 시간/휴식', time:'15:45', endTime:'16:45'},
+      {ic:'🗼', t:'★노트르담 종탑', time:'16:45', endTime:'17:45'},
       {ic:'⛪', t:'★생트샤펠', time:'18:00', endTime:'18:45'},
-      {ic:'🚕', t:'★숙소 귀가 (택시)', time:'18:45', endTime:'19:15', status:'confirmed',
+      {ic:'🚕', t:'★택시로 숙소 귀가', time:'18:45', endTime:'19:15', status:'confirmed',
         tourBooking:{
-          price:'약 €13~18 · 15~25분 소요',
-          includes:'Uber 또는 G7 앱 미리 설치 권장',
-          cautions:['루브르+종탑 424계단+생트샤펠 소화 후 저녁 — 지하철 환승보다 택시 우선', '저녁 식사는 귀가 후(약 19:15 이후)']
+          price:'✅ 확정 — 약 €13~18 (2만~2.7만원) · 15~25분',
+          includes:'Uber 또는 G7 앱 미리 설치 권장'
         } }
     ] },
   { d:7, date:'10/1', wd:'목', city:'munich', badges:['파리','→','뮌헨'],
@@ -1908,8 +1904,8 @@ const PREP_TODO = {
   ],
   paris:[
     {t:'루브르 투어 (9/30 09:20 미팅)', a:'카페 마를리 · 입장권은 별도 예약 필요(ticket.louvre.fr, €22·18세 미만 무료)'},
-    {t:'오르세 투어 (9/30 13:30 미팅)', a:'정문 코끼리상 앞 · 입장권 개별 준비(뮤지엄패스 가능)'},
-    {t:'노트르담 종탑 (9/30 16:15)', a:'424계단 등정 티켓 확인'},
+    {t:'오르세 개인관람 (9/30 13:30~15:00)', a:'입장권 개별 준비(뮤지엄패스 가능)'},
+    {t:'노트르담 종탑 (9/30 16:45)', a:'424계단 등정 티켓 확인'},
     {t:'생트샤펠 (9/30 18:00)', a:'티켓 확인'},
     {t:'오랑주리 미술관 (10/1 12:00)', a:'musee-orangerie.fr · 모네 수련 연작'},
     {t:'TGV 9577 e티켓 오프라인', a:'DB 앱에서 미리 다운로드'},
@@ -5006,6 +5002,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-32</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-33</div>
 </body>
 </html>
