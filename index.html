@@ -1620,9 +1620,9 @@ const DAYS = [
       {ic:'📞', t:'숙소 연락처는 팁 탭 › 긴급 연락처 참고 (비공개)'}
     ] },
   { d:6, date:'9/30', wd:'수', city:'paris', badges:['파리'],
-    title:'루브르 투어 · 노트르담',
-    story:'루브르는 원래 <b>성(요새)이자 왕이 살던 궁전</b>이었어 — 그래서 이렇게 어마어마하게 크지! 가장 유명한 그림 다빈치의 <b>모나리자</b>는 1911년에 <b>도둑맞은 사건</b> 덕분에 전 세계에 더 유명해졌대. 2년 뒤 되찾았고, 지금은 방탄유리 안에서 은은하게 웃고 있단다.<br><br>노트르담 대성당은 약 850년 전에 짓기 시작한 거대한 성당이야. 소설 "노트르담의 꼽추"에서 종지기 콰지모도가 살던 곳이지. 2019년 큰 불로 지붕이 무너졌지만 전 세계가 힘을 모아 복원해 2024년 다시 문을 열었어. 뾰족한 첨탑과 무서운 얼굴의 <b>가고일 석상</b>을 찾아보렴!',
-    foot:'🎟️ <b>루브르 투어</b> 09:20 미팅(카페 마를리) · 입장권 별도 예약 필수 <a href="https://www.ticket.louvre.fr" target="_blank" rel="noopener">ticket.louvre.fr</a>(€22·18세 미만 무료·시간예약 필수) · ⛪ <b>노트르담(무료)</b> 예약 <a href="https://resa.notredamedeparis.fr" target="_blank" rel="noopener">resa.notredamedeparis.fr</a>(방문 2~3일 전 오픈)<br>✅ <b>오늘 할 일</b> ☐ 루브르 입장권 예약(투어와 별도) ☐ 타이거 여권 지참(무료입장 확인용) ☐ 노트르담 슬롯 오픈 재확인(자정 파리시간)',
+    title:'루브르·오르세 투어 · 노트르담 종탑·생트샤펠',
+    story:'루브르는 원래 <b>성(요새)이자 왕이 살던 궁전</b>이었어 — 그래서 이렇게 어마어마하게 크지! 가장 유명한 그림 다빈치의 <b>모나리자</b>는 1911년에 <b>도둑맞은 사건</b> 덕분에 전 세계에 더 유명해졌대. 2년 뒤 되찾았고, 지금은 방탄유리 안에서 은은하게 웃고 있단다.<br><br>오르세 미술관은 원래 1900년에 지어진 <b>기차역</b>이었어! 지금도 커다란 유리 시계가 남아있어서, 시계 뒤에서 파리 시내를 내다보는 게 인기 포토스팟이야. 반 고흐의 "론 강의 별이 빛나는 밤"과 모네·르누아르 같은 인상파 화가들의 그림으로 가득한데, <b>"인상파"</b>라는 이름은 원래 비평가들이 "그림을 대충 인상만 그렸다"고 놀리던 말이었대!<br><br>노트르담 대성당은 약 850년 전에 짓기 시작한 거대한 성당이야. 소설 "노트르담의 꼽추"에서 종지기 콰지모도가 살던 곳이지. 2019년 큰 불로 지붕이 무너졌지만 전 세계가 힘을 모아 복원해 2024년 다시 문을 열었어. 종탑에 올라가면 그 유명한 가고일 석상을 코앞에서 볼 수 있어!',
+    foot:'🎟️ <b>루브르 투어</b> 09:20 미팅(카페 마를리) · 입장권 별도 예약 필수 <a href="https://www.ticket.louvre.fr" target="_blank" rel="noopener">ticket.louvre.fr</a>(€22·18세 미만 무료) · 🎨 <b>오르세 투어</b> 13:30 미팅(정문 코끼리상 앞) · 입장권 개별 준비 <a href="https://billetterie.musee-orsay.fr" target="_blank" rel="noopener">billetterie.musee-orsay.fr</a> · ⛪ <b>노트르담 종탑</b> 16:15 · <b>생트샤펠</b> 18:00<br>✅ <b>오늘 할 일</b> ☐ 루브르·오르세 입장권 각각 예약(투어와 별도) ☐ 타이거 여권 지참 ☐ 노트르담 종탑·생트샤펠 티켓 확인',
     acts:[
       {ic:'🚶', t:'숙소 출발 · La Motte-Picquet–Grenelle역까지 도보', time:'08:40'},
       {ic:'🖼️', t:'★루브르 박물관 투어 — 공인가이드 해설', time:'09:20', endTime:'13:00', status:'need_ticket',
@@ -1634,38 +1634,37 @@ const DAYS = [
           extraCosts:['입장권 €22 (현장/온라인 별도 구매 필요)'],
           cautions:['17세 이하 무료입장이나 시간예약 필수, 여권 지참']
         } },
-      {ic:'🍽️', t:'점심', time:'13:00', endTime:'14:00'},
-      {ic:'⛪', t:'노트르담 대성당 내부 관람', time:'14:00', endTime:'14:45', status:'later',
-        bookingRequired:{ label:'노트르담 예약 (방문 2~3일 전 오픈)', url:'https://resa.notredamedeparis.fr' } },
-      {ic:'🗼', t:'노트르담 종탑 등정 (424계단) ⚠️시간 추정 — 확인 필요', time:'14:45', endTime:'15:45'},
-      {ic:'⛪', t:'생트샤펠 (도보 이동 포함) ⚠️시간 추정 — 확인 필요', time:'16:00', endTime:'17:15'},
-      {ic:'🍽️', t:'저녁 ⚠️시간 추정 — 확인 필요', time:'17:15', endTime:'18:30'},
-      {ic:'🚕', t:'★숙소 귀가 (택시)', time:'18:45', endTime:'19:15', status:'confirmed',
+      {ic:'🍽️', t:'점심 (간단히)', time:'13:00', endTime:'13:30'},
+      {ic:'🎨', t:'★오르세 미술관 투어 — 전문 공인가이드 해설', time:'13:30', endTime:'15:30', status:'need_ticket',
         tourBooking:{
-          price:'약 €13~18 · 15~25분 소요',
-          includes:'Uber 또는 G7 앱 미리 설치 권장',
-          cautions:['루브르+종탑 424계단+생트샤펠 소화 후 저녁 — 지하철 환승보다 택시 우선']
-        } }
-    ] },
-  { d:7, date:'10/1', wd:'목', city:'munich', badges:['파리','→','뮌헨'],
-    title:'오르세 미술관 투어 · 뮌헨행 (TGV)',
-    story:'오르세 미술관은 원래 1900년에 지어진 <b>기차역</b>이었어! 지금도 커다란 유리 시계가 남아있어서, 시계 뒤에서 파리 시내를 내다보는 게 인기 포토스팟이야. 반 고흐의 "론 강의 별이 빛나는 밤"과 모네·르누아르 같은 인상파 화가들의 그림으로 가득한데, <b>"인상파"</b>라는 이름은 원래 비평가들이 "그림을 대충 인상만 그렸다"고 놀리던 말이었대 — 지금은 세계에서 가장 사랑받는 화풍이 됐지!',
-    transport:{ icon:'🚄', time:'15:55', end:'21:36', text:'<strong>TGV 9577</strong> · 15:55 파리 동역 출발 → 21:36 뮌헨 중앙역 · 앱: DB' },
-    hotel:{ time:'21:36', text:'뮌헨 도착 → Aparthotel Adagio Access München City 체크인' },
-    foot:'🎟️ <b>오르세 투어</b> 09:20 미팅(정문 코끼리상 앞) · 입장권 개별 준비(뮤지엄패스 사용 가능) <a href="https://billetterie.musee-orsay.fr" target="_blank" rel="noopener">billetterie.musee-orsay.fr</a><br>🚄 TGV 9577 <b>DB 앱에서 e티켓 오프라인 저장</b> (시내 와이파이 불안정 대비)<br>✅ <b>오늘 할 일</b> ☐ 오르세 입장권/뮤지엄패스 준비 ☐ 체크아웃 전 짐 정리 ☐ TGV e티켓 오프라인 ☐ 여권 소지',
-    acts:[
-      {ic:'🚶', t:"숙소 출발 · Javel역(RER C)까지 도보 10분", time:'08:50'},
-      {ic:'🚆', t:"RER C 이동 (Javel→Musée d'Orsay, 환승 없음)", time:'09:05', endTime:'09:15'},
-      {ic:'🎨', t:'★오르세 미술관 투어 — 전문 공인가이드 해설', time:'09:20', endTime:'12:40', status:'need_ticket',
-        tourBooking:{
-          meetingTime:'09:20',
+          meetingTime:'13:30',
           meetingPlace:'오르세 미술관 정문 코끼리상 앞',
           price:'65,000원',
           includes:'미술관 전문 공인가이드 해설 · 송수신기 대여',
           extraCosts:['입장권 개별 준비 (뮤지엄패스 사용 가능)']
         } },
-      {ic:'🚆', t:'RER C로 숙소 복귀', time:'12:40', endTime:'13:10'},
-      {ic:'🍽️', t:'점심 · 체크아웃 마무리 · 짐 챙기기', time:'13:10', endTime:'14:00'},
+      {ic:'🚶', t:'오르세 → 노트르담 이동 ⚠️시간 추정 — 확인 필요', time:'15:30', endTime:'16:15'},
+      {ic:'🗼', t:'★노트르담 종탑 등정 (424계단)', time:'16:15', endTime:'17:15'},
+      {ic:'🚶', t:'종탑 → 생트샤펠 이동·대기 ⚠️시간 추정 — 확인 필요', time:'17:15', endTime:'18:00'},
+      {ic:'⛪', t:'★생트샤펠', time:'18:00', endTime:'18:45'},
+      {ic:'🚕', t:'★숙소 귀가 (택시)', time:'18:45', endTime:'19:15', status:'confirmed',
+        tourBooking:{
+          price:'약 €13~18 · 15~25분 소요',
+          includes:'Uber 또는 G7 앱 미리 설치 권장',
+          cautions:['루브르+종탑 424계단+생트샤펠 소화 후 저녁 — 지하철 환승보다 택시 우선', '저녁 식사는 귀가 후(약 19:15 이후)']
+        } }
+    ] },
+  { d:7, date:'10/1', wd:'목', city:'munich', badges:['파리','→','뮌헨'],
+    title:'오랑주리 미술관 · 뮌헨행 (TGV)',
+    story:'"오랑주리(Orangerie)"는 원래 <b>오렌지 나무를 겨울에 보관하던 온실</b>이었대! 지금은 모네 할아버지가 인생 마지막 12년을 바쳐 그린 거대한 "수련" 연작이 <b>타원형 방 두 개를 통째로</b> 둘러싸고 있어. 모네는 이 그림을 "폭풍 같은 시대 지친 사람들 마음이 쉬는 방"으로 만들고 싶다고 했다는데, 방 한가운데 서면 마치 연못 속에 들어간 기분이 든단다.',
+    transport:{ icon:'🚄', time:'15:55', end:'21:36', text:'<strong>TGV 9577</strong> · 15:55 파리 동역 출발 → 21:36 뮌헨 중앙역 · 앱: DB' },
+    hotel:{ time:'21:36', text:'뮌헨 도착 → Aparthotel Adagio Access München City 체크인' },
+    foot:'🎟️ <b>오랑주리 미술관</b> 12:00 <a href="https://www.musee-orangerie.fr" target="_blank" rel="noopener">musee-orangerie.fr</a> — 튈르리 정원 안, 모네 수련 연작<br>🚄 TGV 9577 <b>DB 앱에서 e티켓 오프라인 저장</b> (시내 와이파이 불안정 대비)<br>✅ <b>오늘 할 일</b> ☐ 오랑주리 티켓 준비 ☐ 체크아웃 전 짐 정리 ☐ TGV e티켓 오프라인 ☐ 여권 소지',
+    acts:[
+      {ic:'🍳', t:'조식·여유로운 아침', time:'09:00', endTime:'11:00'},
+      {ic:'🚶', t:'숙소 → 오랑주리 미술관 이동 (지하철) ⚠️시간 추정 — 확인 필요', time:'11:00', endTime:'11:45'},
+      {ic:'🖼️', t:'★오랑주리 미술관 — 모네 수련 연작', time:'12:00', endTime:'13:15'},
+      {ic:'🚕', t:'오랑주리 → 숙소 복귀·체크아웃 마무리·짐 챙기기 (점심은 간단히)', time:'13:15', endTime:'14:00'},
       {ic:'🚕', t:"택시로 동역(Gare de l'Est) 이동", time:'14:00', endTime:'14:35'},
       {ic:'🚉', t:'동역 도착', time:'14:35'}
     ] },
@@ -1909,8 +1908,10 @@ const PREP_TODO = {
   ],
   paris:[
     {t:'루브르 투어 (9/30 09:20 미팅)', a:'카페 마를리 · 입장권은 별도 예약 필요(ticket.louvre.fr, €22·18세 미만 무료)'},
-    {t:'노트르담 예약 (9/30 오후)', a:'resa.notredamedeparis.fr · 방문 2~3일 전 슬롯 오픈'},
-    {t:'오르세 투어 (10/1 09:20 미팅)', a:'정문 코끼리상 앞 · 입장권 개별 준비(뮤지엄패스 가능)'},
+    {t:'오르세 투어 (9/30 13:30 미팅)', a:'정문 코끼리상 앞 · 입장권 개별 준비(뮤지엄패스 가능)'},
+    {t:'노트르담 종탑 (9/30 16:15)', a:'424계단 등정 티켓 확인'},
+    {t:'생트샤펠 (9/30 18:00)', a:'티켓 확인'},
+    {t:'오랑주리 미술관 (10/1 12:00)', a:'musee-orangerie.fr · 모네 수련 연작'},
     {t:'TGV 9577 e티켓 오프라인', a:'DB 앱에서 미리 다운로드'},
     {t:'여권 소지', a:'프랑스→독일 솅겐 내 이동 (신분증 원칙)'},
   ],
@@ -5005,6 +5006,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-31</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-32</div>
 </body>
 </html>
