@@ -1,0 +1,66 @@
+# 도슨트 음성 생성 — data/docent_*.json 의 대본을 edge-tts(ko-KR-InJoonNeural, -5%)로 mp3 생성 후 커밋
+# - 배포 브랜치에 도슨트 JSON/스크립트가 바뀌면 자동 실행
+# - Actions 탭 → "도슨트 음성 생성" → Run workflow 로 수동 실행 가능(force: 기존 파일도 다시 생성)
+name: 도슨트 음성 생성
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: '기존 음성 파일도 다시 생성(--force)'
+        type: boolean
+        default: false
+  push:
+    branches: [claude/travel-dashboard-mvp-thsi52]
+    paths:
+      - 'data/docent_*.json'
+      - 'scripts/generate_audio.py'
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: docent-audio-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: edge-tts 설치
+        run: pip install edge-tts
+
+      - name: 음성 생성
+        run: python scripts/generate_audio.py 'data/docent_*.json' ${{ inputs.force && '--force' || '' }}
+
+      - name: 음성 파일 커밋
+        id: commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add audio
+          if git diff --cached --quiet; then
+            echo "변경 없음"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git commit -m "chore(audio): 도슨트 음성 생성 (edge-tts ko-KR-InJoonNeural)"
+          for i in 1 2 3; do
+            git pull --rebase origin "$GITHUB_REF_NAME" && git push origin "HEAD:$GITHUB_REF_NAME" && break
+            sleep 5
+          done
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: GitHub Pages 재배포 요청
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" || echo "Pages 재배포 요청 실패(푸시로 자동 배포될 수 있음)"
