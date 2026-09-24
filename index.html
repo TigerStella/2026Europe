@@ -4275,6 +4275,16 @@ const TRH_LS = {
   visited:    'trapble_history_visited_v1',    // { siteId: true }  ← 방문 도장(퀴즈 통과) 완료
   cityquiz:   'trapble_history_cityquiz_v1',   // { city: bestScore } ← 도시 종합퀴즈 최고점
   museumquiz: 'trapble_history_museumquiz_v1', // { museumKey: bestScore } ← 박물관 종합미션 최고점
+  // ── 🎧 도슨트 모드 (전부 신규 키 — 위 3개 키는 그대로) ──
+  hints:       'trapble_history_hints_v1',       // { siteId: 사용한 힌트 수 }
+  grade:       'trapble_history_grade_v1',       // { siteId: 'gold'|'silver'|'bronze' } ← 도장 받을 때 확정
+  checklist:   'trapble_history_checklist_v1',   // { siteId: [bool,bool,bool] } ← 감상법 체크
+  checkresult: 'trapble_history_checkresult_v1', // { siteId: 'present'|'absent' } ← 현장 확인 결과
+  memory:      'trapble_history_memory_v1',      // { siteId: '기억 미션 기록' } ← 촬영 금지 구역용
+  best:        'trapble_history_best_v1',        // { museumKey: {siteId, note, ts} } ← 오늘의 베스트 1
+  audiorate:   'trapble_history_audiorate_v1',   // 0.9 | 1.0 | 1.2
+  mom:         'trapble_history_mommode_v1',     // true → 엄마 확인용(factCheck·statusNote) 표시
+  offline:     'trapble_history_offline_v1',     // { audioMuseumId: {n,total,ts} }
 };
 function trhLoad(key, def){ try{ const v=JSON.parse(localStorage.getItem(key)); return (v===null||v===undefined)?def:v; }catch(e){ return def; } }
 function trhSave(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){ toast('저장 공간이 부족해요'); } }
@@ -4289,19 +4299,20 @@ const MUSEUMS = {
   national: { key:'national', name:'내셔널 갤러리', en:'National Gallery',   city:'london',   country:'영국',   flag:'🇬🇧', icon:'🖼' },
   louvre:   { key:'louvre',   name:'루브르박물관',  en:'Musée du Louvre',    city:'paris',    country:'프랑스', flag:'🇫🇷', icon:'🔺' },
   orsay:    { key:'orsay',    name:'오르세미술관',  en:"Musée d'Orsay",      city:'paris',    country:'프랑스', flag:'🇫🇷', icon:'🕰' },
+  orangerie:{ key:'orangerie',name:'오랑주리미술관', en:"Musée de l'Orangerie", city:'paris', country:'프랑스', flag:'🇫🇷', icon:'🪷' },
   uffizi:   { key:'uffizi',   name:'우피치미술관',  en:'Uffizi Gallery',     city:'florence', country:'이탈리아', flag:'🇮🇹', icon:'🎨' },
   vatican:  { key:'vatican',  name:'바티칸미술관',  en:'Vatican Museums',    city:'rome',     country:'바티칸(세계에서 가장 작은 나라)', flag:'🇻🇦', icon:'⛪' },
 };
-const MUSEUM_ORDER = ['british','national','louvre','orsay','uffizi','vatican'];
+const MUSEUM_ORDER = ['british','national','louvre','orsay','orangerie','uffizi','vatican'];
 // 나라별 그룹(여행 동선 순서)
 const MUSEUM_COUNTRY_GROUPS = [
   { country:'영국',   flag:'🇬🇧', museums:['british','national'] },
-  { country:'프랑스', flag:'🇫🇷', museums:['louvre','orsay'] },
+  { country:'프랑스', flag:'🇫🇷', museums:['louvre','orsay','orangerie'] },
   { country:'이탈리아', flag:'🇮🇹', museums:['uffizi'] },
   { country:'바티칸',  flag:'🇻🇦', museums:['vatican'] },
 ];
 const PERIOD_CAT_ORDER = ['ancient','medieval','modern','contemporary'];
-const PERIOD_CAT_LABEL = { ancient:'🏺 고대', medieval:'🏰 중세', modern:'🖼 근대 (르네상스~19세기)', contemporary:'🌆 현대' };
+const PERIOD_CAT_LABEL = { ancient:'🏺 고대', medieval:'🏰 중세', modern:'🖼 근대 (르네상스~20세기 초)', contemporary:'🌆 현대' };
 
 // 도시별 부제(시대 흐름) — 홈/배너 표기용. 탭 진행 순서는 여행 동선(CITY_ORDER) 그대로.
 const TRH_CITY_ERA = {
@@ -4557,6 +4568,113 @@ function trhMuseumTotal(mk){ return trhMuseumSites(mk).length; }
 function trhMuseumComplete(mk){ return trhMuseumTotal(mk)>0 && trhMuseumDone(mk)===trhMuseumTotal(mk); }
 function trhMuseumGrad(mk){ return trhGrad(MUSEUMS[mk].city); }
 
+/* ══════════════════ 🎧 도슨트 모드 — 데이터 로드·병합 ══════════════════
+   data/docent_*.json(외부 파일)을 런타임에 불러와 HISTORY_SITES·MUSEUMS에 병합한다.
+   - 같은 작품이 이미 있으면(TRH_DC_MERGE_ID) 기존 필드는 그대로 두고 s.docent만 추가
+   - 새 작품은 카드로 추가(JSON에 없는 요약·이모지·시대·퀴즈 해설은 TRH_DC_SUPPLEMENT)
+   - 실패해도 기존 카드·도장·퀴즈는 그대로 동작 */
+const TRH_DC_FILES = ['data/docent_paris_orsay_orangerie.json'];   // 새 박물관 JSON은 여기에 추가
+const TRH_DC_MANIFEST = 'audio/manifest.json';
+const TRH_AUDIO_CACHE = 'trapble-history-audio-v1';                 // sw.js가 버전업 때 지우지 않는 버킷
+const TRH_DC_MERGE_ID = { 'orsay-dejeuner':'luncheon-grass', 'orsay-starry-rhone':'starry-rhone' };
+const TRH_DC_MUSEUM_ALIAS = { 'national-gallery':'national' };
+let TRH_DC_TRACKS = { '1':'작가·배경 이야기', '2':'그림 속 비밀' };
+const TRH_DC_SUPPLEMENT = {
+  'orsay-clock': { emoji:'🕰', era:'19세기 말 · 기차의 시대',
+    kid:'오르세 미술관은 원래 1900년에 지은 기차역이었어. 맨 위층 커다란 시계 뒤로 가면, 유리 시계판 너머로 파리 시내가 보여. 기차역 시절엔 승객들에게 시간을 알려주던 시계였지. 기차가 생기면서 사람들은 처음으로 분 단위까지 시간을 맞추기 시작했대.',
+    sig:'<b>기차와 표준 시간</b> — 산업혁명이 바꾼 생활. 같은 해 조선에서도 <b>경인선</b>이 서울까지 이어졌어요.',
+    why:['이 건물은 1900년 파리 박람회 때 기차역으로 지어졌다가 1986년 미술관이 됐어.'] },
+  'orsay-saint-lazare': { emoji:'🚂', era:'19세기 · 인상주의',
+    kid:'모네가 파리의 생라자르 기차역을 그린 그림이야. 모네가 그리고 싶었던 건 기차 모양이 아니라, 증기 연기 사이로 새어 드는 빛이었어. 딱딱한 선 대신 뭉개진 붓자국으로 그 순간의 느낌을 그렸지 — 이게 바로 인상파야.',
+    sig:'<b>증기기관과 산업혁명</b>, 빛을 그린 <b>인상주의</b> — 「19세기 인상주의」와 연결돼요.',
+    why:['모네는 기차 부품이 아니라 연기 사이로 비치는 빛, 그 순간의 인상을 그리고 싶었어.'] },
+  'orsay-little-dancer': { emoji:'🎀', era:'19세기 · 인상주의',
+    kid:'파리 오페라 발레 학교의 14살 학생 마리를 모델로 한 조각이야. 처음 전시됐을 땐 밀랍으로 만들고 진짜 머리카락과 천 치마를 달아서 사람들이 깜짝 놀랐대. 지금 보는 건 드가가 세상을 떠난 뒤 청동으로 떠낸 작품이야.',
+    sig:'<b>가난한 발레 학생</b>의 현실을 담은 드가의 조각 — 「19세기 도시 생활과 인상주의」와 연결돼요.',
+    why:['1881년 처음 전시된 원본은 밀랍으로 만들었어. 청동은 드가가 세상을 떠난 뒤 떠낸 거야.'] },
+  'orsay-vangogh-selfportrait': { emoji:'🧑‍🎨', era:'19세기 · 후기인상주의',
+    kid:'반 고흐가 1889년, 몸과 마음이 아파 병원에 머물던 때 그린 자화상이야. 배경은 파란 물결처럼 빙글빙글 소용돌이치는데, 얼굴만은 또렷하지. 살아 있을 때 그림이 거의 안 팔렸던 고흐를 동생 테오가 끝까지 도와줬어.',
+    sig:'감정을 붓질로 표현한 <b>후기인상주의</b> — 같은 해 파리엔 <b>에펠탑</b>이 완공됐어요.',
+    why:['동생 테오가 형에게 돈을 보내고 편지를 주고받으며 끝까지 도왔어.'] },
+  'orsay-pompon-bear': { emoji:'🐻‍❄️', era:'20세기 초 · 새로운 조각',
+    kid:'털 한 올 없이 매끈한 하얀 곰 조각이야. 조각가 퐁퐁은 오랫동안 로댕 밑에서 남의 작품을 대신 깎는 일을 하다가, 67살에 이 흰곰으로 드디어 유명해졌어. 자잘한 털은 다 지우고 걸어가는 움직임만 남긴 게 비밀이야.',
+    sig:'복잡한 것을 덜어낸 <b>단순한 형태</b>의 조각 — 비슷한 때 조선에선 <b>첫 어린이날</b>(1923)이 생겼어요.',
+    why:['퐁퐁은 1922년, 67살에 흰곰 조각으로 크게 성공했어. 늦게 핀 꽃이지!'] },
+  'orsay-renoir-absent': { emoji:'🧳', era:'19세기 · 인상주의',
+    kid:'원래 오르세에 있어야 할 르누아르의 「물랭 드 라 갈레트의 무도회」는 지금 출장 중이야! 런던 내셔널 갤러리의 르누아르 특별전에 빌려줬거든. 우리가 런던에서 파리로 올 때, 이 그림은 파리에서 런던으로 간 거지. 대신 다음 날 오랑주리에서 르누아르를 만나.',
+    sig:'미술관끼리 그림을 빌려주는 <b>특별전</b> — 명작도 여행을 해요.',
+    why:['런던 내셔널 갤러리의 르누아르 특별전(2026.10.3~)에 빌려줬어.'] },
+  'orangerie-nympheas-1': { emoji:'🪷', era:'20세기 초 · 모네의 수련',
+    kid:'벽 전체가 연못인 타원형 방이야. 모네는 지베르니 집 앞에 연못을 직접 만들고 30년 가까이 수련만 그렸어. 제1차 세계대전이 끝난 다음 날, 모네는 이 수련 그림을 나라에 선물하겠다고 편지를 썼지. 전쟁으로 지친 사람들이 쉬어 가는 평화의 방이야.',
+    sig:'<b>제1차 세계대전</b>이 끝난 뒤 평화를 위한 선물 — 다음 해 조선에서는 <b>3·1 운동</b>이 일어났어요.',
+    why:['1918년 11월 11일 제1차 세계대전이 끝나고, 바로 다음 날 모네가 선물 편지를 썼어.'] },
+  'orangerie-nympheas-2': { emoji:'🌿', era:'20세기 초 · 모네의 수련',
+    kid:'첫 번째 방보다 조금 더 어둡고 깊은 느낌의 두 번째 수련 방이야. 버드나무 가지가 커튼처럼 드리워져 있지. 이 무렵 모네는 눈병 때문에 세상이 누렇고 흐릿하게 보였지만 붓을 놓지 않았어.',
+    sig:'1944년 <b>파리 해방</b> 전투 때 포탄에 상처를 입었다가 복원된 그림 — 평화의 선물이 전쟁을 겪은 이야기예요.',
+    why:['모네는 말년에 백내장 때문에 색이 흐릿하게 보였고, 1923년에 수술을 받았어.'] },
+  'orangerie-renoir-piano': { emoji:'🎹', era:'19세기 말 · 인상주의',
+    kid:'두 소녀가 피아노 앞에서 악보를 들여다보는 그림이야. 르누아르는 13살 때 도자기 공장에서 접시에 그림을 그리던 소년이었어. 어제 오르세에서 못 본 르누아르를 여기서 만나는 거야 — 사라진 단서 해결!',
+    sig:'파리의 <b>벨 에포크(아름다운 시절)</b> — 2년 뒤 조선에서는 <b>동학 농민 운동</b>이 일어났어요.',
+    why:['르누아르는 열세 살 때부터 도자기 공장에서 접시에 그림을 그렸어.'] },
+  'orangerie-rousseau-carriole': { emoji:'🐕', era:'20세기 초 · 독학 화가',
+    kid:'가족이 마차를 타고 나들이 가는 모습을 기념사진처럼 그린 그림이야. 화가 루소는 세관에서 일하며 혼자 그림을 배웠어. 사람들은 어린애 그림 같다고 비웃었지만, 젊은 피카소는 루소에게 반해 파티까지 열어줬대. 마차 밑의 강아지를 찾아봐!',
+    sig:'학교 없이 독학한 화가가 새 미술의 길을 연 이야기 — 같은 해 조선에서는 최남선이 잡지 <b>『소년』</b>을 만들었어요.',
+    why:['루소는 파리 세관에서 일해서 「세관원」이라는 별명이 붙었어.'] },
+};
+let trhDcManifest = {};          // { audioMuseumId: [path,…] }
+let trhDcAudioSet = new Set();   // 실제로 생성된 음성 파일 경로
+let trhDcPromise = null, trhDcLoaded = false;
+function trhDcMuseumKey(id){ return TRH_DC_MUSEUM_ALIAS[id] || id; }
+function trhDocentLoad(){
+  if(trhDcPromise) return trhDcPromise;
+  trhDcPromise = (async ()=>{
+    try{
+      const r = await fetch(TRH_DC_MANIFEST, {cache:'no-cache'});
+      if(r.ok) trhDcManifest = await r.json() || {};
+    }catch(e){}
+    Object.values(trhDcManifest).forEach(a=>(a||[]).forEach(p=>trhDcAudioSet.add(p)));
+    for(const f of TRH_DC_FILES){
+      try{
+        const r = await fetch(f, {cache:'no-cache'});
+        if(!r.ok) continue;
+        trhDcMerge(await r.json());
+      }catch(e){ console.warn('[도슨트] 불러오기 실패', f, e); }
+    }
+    trhDcLoaded = true;
+  })();
+  return trhDcPromise;
+}
+function trhDcMerge(data){
+  if(data && data.meta && data.meta.tracks) TRH_DC_TRACKS = Object.assign({}, TRH_DC_TRACKS, data.meta.tracks);
+  ((data && data.museums) || []).forEach((m, mi)=>{
+    const mk = trhDcMuseumKey(m.id);
+    if(!MUSEUMS[mk]){  // 아직 등록 안 된 박물관(향후 JSON) — 최소 정보로 등록
+      MUSEUMS[mk] = { key:mk, name:m.name, en:m.nameOriginal||'', city:m.city||'paris', country:m.country||'', flag:m.flag||'', icon:m.icon||'🏛' };
+      MUSEUM_ORDER.push(mk);
+    }
+    MUSEUMS[mk].docent = { audioMuseumId:m.id, visit:m.visit||null, caseTitle:m.caseTitle||'', caseBrief:m.caseBrief||'',
+      rules:m.rules||[], routeNote:m.routeNote||'', intro:m.intro||null };
+    const city = MUSEUMS[mk].city;
+    (m.works || []).forEach(w=>{
+      const dc = { workId:w.id, audioMuseumId:m.id, order:w.order||0, title:w.title||'', titleOriginal:w.titleOriginal||'',
+        status:w.status||'on_display', statusNote:w.statusNote||'', location:w.location||'',
+        hints:(w.hints||[]).filter(h=>h && String(h).trim()), howToSee:w.howToSee||[], audioScripts:w.audioScripts||{},
+        photoMission:w.photoMission||'', memoryMission:w.memoryMission||'',
+        joseon:w.joseon||'', world:w.world||'', links:w.links||[], factCheck:w.factCheck||'' };
+      const existing = trhSite(TRH_DC_MERGE_ID[w.id] || w.id);
+      if(existing){ existing.docent = dc; return; }   // 기존 필드 유지 + 신규 필드만 추가
+      const sup = TRH_DC_SUPPLEMENT[w.id] || {};
+      const quiz = (w.quiz||[]).filter(q=>q && Array.isArray(q.options) && typeof q.answer==='number')
+        .map((q,i)=>({ q:q.q, opts:q.options, a:q.answer, why:(sup.why && sup.why[i]) || '' }));
+      HISTORY_SITES.push({ id:w.id, city, order:200 + mi*20 + (w.order||0), era:sup.era || '근대 미술',
+        name:w.title, by:[w.artist, w.year].filter(Boolean).join(' · '), place:MUSEUMS[mk].name,
+        emoji:sup.emoji || '🖼', museum:mk, periodCat:sup.periodCat || 'modern',
+        sig:sup.sig || '', kid:sup.kid || '', quiz, docent:dc });
+    });
+  });
+}
+function trhMuseumHasDocent(mk){ return !!(MUSEUMS[mk] && MUSEUMS[mk].docent) && trhMuseumSites(mk).some(s=>s.docent); }
+
 /* ── 뷰 전환 ── */
 function trhShow(view){
   ['trhHome','trhCity','trhMuseumList','trhMuseum','trhPassport'].forEach(v=>{ const el=document.getElementById(v); if(el) el.style.display = (v===view)?'block':'none'; });
@@ -4567,6 +4685,17 @@ function trhShow(view){
 /* ── 렌더: 홈(여행 동선순) ── */
 function renderHistory(){
   renderHistoryHome();
+  trhDocentLoad().then(trhRerenderCurrent);
+}
+let trhCurCity=null, trhCurMuseum=null, trhCurSite=null;
+function trhVisible(id){ const el=document.getElementById(id); return !!el && el.style.display!=='none'; }
+// 현재 열린 화면만 다시 그림(스크롤 유지)
+function trhRerenderCurrent(){
+  if(trhVisible('trhHome')) renderHistoryHome();
+  if(trhVisible('trhCity') && trhCurCity) openHistoryCity(trhCurCity, {keep:true});
+  if(trhVisible('trhMuseumList')) renderMuseumList();
+  if(trhVisible('trhMuseum') && trhCurMuseum) openMuseum(trhCurMuseum, {keep:true});
+  if(trhVisible('trhPassport')) renderPassport();
 }
 function renderHistoryHome(){
   const done=trhAllDone(), total=trhAllTotal();
@@ -4624,7 +4753,8 @@ function renderHistoryHome(){
 }
 
 /* ── 렌더: 도시 상세(시대순) ── */
-function openHistoryCity(city){
+function openHistoryCity(city, opt){
+  opt=opt||{}; trhCurCity=city;
   const ci=CITIES[city];
   const sites=trhCitySites(city);
   // 시대(era)별 그룹핑 — order 순서 유지
@@ -4651,7 +4781,7 @@ function openHistoryCity(city){
     <p class="hint">🕰 아래는 <b>시대(연대)순</b>이에요. 장소를 눌러 이야기를 읽고, 퀴즈를 맞혀 도장을 찍어요!</p>
     ${groupHtml}
   `;
-  trhShow('trhCity');
+  if(!opt.keep) trhShow('trhCity');
 }
 function backToHistoryHome(){ renderHistoryHome(); trhShow('trhHome'); }
 
@@ -4659,6 +4789,7 @@ function backToHistoryHome(){ renderHistoryHome(); trhShow('trhHome'); }
 function openMuseumList(){ renderMuseumList(); trhShow('trhMuseumList'); }
 function backToMuseumList(){ renderMuseumList(); trhShow('trhMuseumList'); }
 function renderMuseumList(){
+  if(!trhDcLoaded) trhDocentLoad().then(()=>{ if(trhVisible('trhMuseumList')) renderMuseumList(); });
   const groups = MUSEUM_COUNTRY_GROUPS.map(g=>{
     const cards = g.museums.map(mk=>{
       const m=MUSEUMS[mk], d=trhMuseumDone(mk), t=trhMuseumTotal(mk), pct=t?Math.round(d/t*100):0, complete=trhMuseumComplete(mk);
@@ -4670,7 +4801,7 @@ function renderMuseumList(){
         </div>
         <div class="trh-citycard-body">
           <div class="trh-citycard-name">${esc(m.name)}<small>${esc(m.en)}</small></div>
-          <div class="trh-citycard-era">${m.flag} ${esc(m.country)}</div>
+          <div class="trh-citycard-era">${m.flag} ${esc(m.country)}${m.docent?' · <b style="color:#C9803B">🎧 도슨트</b>':''}</div>
           <div class="trh-citycard-prog"><span>${t}점 중 ${d}점 방문</span><span>${pct}%</span></div>
           <div class="trh-mini-bar"><div class="trh-mini-fill" style="width:${pct}%;background:${CITIES[m.city].color}"></div></div>
         </div>
@@ -4684,13 +4815,14 @@ function renderMuseumList(){
     <div class="trh-hero" style="padding:18px 18px 16px">
       <div class="trh-hero-eyebrow">Museum Highlights</div>
       <div class="trh-hero-title" style="font-size:clamp(20px,5vw,28px)">박물관별 탐험 🏛</div>
-      <div class="trh-hero-sub">세계 6대 박물관에서 "꼭 봐야 할 작품"만 모았어요. 각 박물관 안에서는 고대 → 중세 → 근대 → 현대 순서로 만나요.</div>
+      <div class="trh-hero-sub">우리가 가는 박물관·미술관에서 "꼭 봐야 할 작품"만 모았어요. 🎧 표시가 있는 곳은 도슨트 형이 동선대로 안내해 줘요!</div>
     </div>
     ${groups}
     <p class="hint" style="margin-top:18px">🔎 이 목록은 각 박물관의 공식 하이라이트·전문 여행 기사를 인터넷에서 교차 확인해 구성했어요. (상세 카드의 📚 참고 자료 표시 참고)</p>
   `;
 }
-function openMuseum(mk){
+function openMuseum(mk, opt){
+  opt=opt||{}; trhCurMuseum=mk;
   const m=MUSEUMS[mk];
   const sites=trhMuseumSites(mk);
   const periodsPresent = PERIOD_CAT_ORDER.filter(pc=>sites.some(s=>s.periodCat===pc));
@@ -4722,7 +4854,7 @@ function openMuseum(mk){
     <p class="hint">🕰 이 박물관 안에서는 <b>고대 → 중세 → 근대 → 현대</b> 순서로 정리했어요. (소장품이 없는 시대는 생략)</p>
     ${periodHtml}
   `;
-  trhShow('trhMuseum');
+  if(!opt.keep) trhShow('trhMuseum');
 }
 
 function trhSiteCard(s){
