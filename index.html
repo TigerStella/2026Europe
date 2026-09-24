@@ -4814,6 +4814,8 @@ function renderHistoryHome(){
       </div>
     </div>
 
+    ${trhPhotoBarHtml()}
+
     <div class="trh-overall">
       <div class="trh-overall-head"><span>🏆 전체 탐험 진행률</span><span>${done} / ${total}곳 · ${pct}%</span></div>
       <div class="trh-bar"><div class="trh-bar-fill" style="width:${pct}%"></div></div>
@@ -4828,6 +4830,7 @@ function renderHistoryHome(){
 
     <p class="hint" style="margin-top:18px">🕰 <b>안내</b> — 각 도시 안의 장소는 <b>시대(연대)순</b>으로 정리돼 있어 「시간의 흐름」을 느낄 수 있어요. 탭 홈의 도시 순서는 <b>실제 여행 동선</b>을 따라요.</p>
   `;
+  trhFillPhotoCount();
 }
 
 /* ── 렌더: 도시 상세(시대순) ── */
@@ -4940,7 +4943,7 @@ function openMuseum(mk, opt){
     ${trhDcBestHtml(mk)}
   `;
   if(!opt.keep) trhShow('trhMuseum');
-  trhAudioUi(); trhFillCardThumbs();
+  trhAudioUi(); trhFillCardThumbs(); trhFillPhotoCount();
 }
 
 function trhSiteCard(s){
@@ -5319,6 +5322,37 @@ function trhGoLink(type, mk, id){
   if(type==='site') setTimeout(()=>openSiteDetail(id), 60);
 }
 
+/* ── 사진 백업: IndexedDB 사진을 파일로(공유 시트 우선, 안 되면 다운로드) ── */
+const TRH_PHOTO_WARN = '브라우저 데이터를 지우면 사진이 사라져요. 매일 저녁 내보내기 권장.';
+function trhPhotoBarHtml(){
+  return `<div class="trh-photobar"><button class="trh-dc-btn trh-btn-ghost2" onclick="trhExportPhotos()">📤 사진 내보내기 <span class="trh-photo-count"></span></button><span>⚠️ ${TRH_PHOTO_WARN}</span></div>`;
+}
+async function trhFillPhotoCount(){
+  const els=document.querySelectorAll('.trh-photo-count'); if(!els.length) return;
+  let n=0; try{ n=(await trhPhotoList(null)).length; }catch(e){}
+  els.forEach(el=>el.textContent = n ? `(${n}장)` : '');
+}
+async function trhExportPhotos(){
+  let all=[]; try{ all=await trhPhotoList(null); }catch(e){ toast('사진 저장소를 열 수 없어요'); return; }
+  if(!all.length){ toast('아직 인증 사진이 없어요'); return; }
+  const pad=n=>String(n).padStart(2,'0');
+  const files = all.sort((a,b)=>a.ts-b.ts).map((p,i)=>{
+    const d=new Date(p.ts);
+    return new File([p.blob], `stamptour_${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}_${p.siteId}_${i+1}.jpg`, {type:'image/jpeg', lastModified:p.ts});
+  });
+  if(navigator.canShare && navigator.share){
+    try{
+      if(navigator.canShare({files})){ await navigator.share({files, title:'역사 스탬프투어 사진', text:`인증 사진 ${files.length}장`}); toast('📤 공유 창을 열었어요'); return; }
+    }catch(e){ if(e && e.name==='AbortError') return; }
+  }
+  for(const f of files){
+    const a=document.createElement('a'); a.href=URL.createObjectURL(f); a.download=f.name; document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+    await new Promise(r=>setTimeout(r, 400));
+  }
+  toast(`📤 사진 ${files.length}장을 내려받았어요`);
+}
+
 /* ── 오프라인 저장: manifest의 음성 + 도슨트 JSON을 별도 캐시 버킷에 저장 ── */
 let trhOfflineBusy = false;
 function trhOfflineLabel(amid){
@@ -5368,6 +5402,7 @@ function trhDcMuseumHeader(mk){
     ${trhMom && d.intro && d.intro.factCheck ? `<div class="trh-fact">🔍 인트로 사실 확인: ${esc(d.intro.factCheck)}</div>` : ''}
     <div class="trh-dc-tools">
       <button class="trh-dc-btn trh-btn-ghost2" id="trhOffBtn" onclick="trhOfflineSave('${mk}')">${trhOfflineLabel(d.audioMuseumId)}</button>
+      <button class="trh-dc-btn trh-btn-ghost2" onclick="trhExportPhotos()">📤 사진 내보내기 <span class="trh-photo-count"></span></button>
       <button class="trh-dc-btn trh-btn-ghost2" onclick="trhToggleMom()">${trhMom ? '🙈 엄마 메모 숨기기' : '👩 엄마 확인용'}</button>
     </div>`;
 }
@@ -5506,8 +5541,10 @@ function renderPassport(){
       ${grand?'<div style="text-align:center;margin-top:12px;background:rgba(255,215,160,.18);border-radius:10px;padding:8px;font-size:12.5px;color:#FFE7C2;font-weight:700">🧭 세계사 탐험가 — 5개 도시 완주!</div>':''}
       ${cityBlocks}
     </div>
-    <p class="hint">🎫 장소의 퀴즈를 맞히면 이 여권에 도장이 찍혀요. 도시별로 도장 색과 모양이 달라요!</p>
+    <p class="hint">🎫 장소의 퀴즈를 맞히면(🎧 도슨트 작품은 사진 인증으로도) 이 여권에 도장이 찍혀요. 도시별로 도장 색과 모양이 달라요! 도슨트 작품은 힌트를 적게 쓸수록 🥇금·🥈은·🥉동 도장이에요.</p>
+    ${trhPhotoBarHtml()}
   `;
+  trhFillPhotoCount();
 }
 
 init();
