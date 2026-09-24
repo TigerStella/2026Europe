@@ -5319,6 +5319,38 @@ function trhGoLink(type, mk, id){
   if(type==='site') setTimeout(()=>openSiteDetail(id), 60);
 }
 
+/* ── 오프라인 저장: manifest의 음성 + 도슨트 JSON을 별도 캐시 버킷에 저장 ── */
+let trhOfflineBusy = false;
+function trhOfflineLabel(amid){
+  const o=trhOffline[amid], total=(trhDcManifest[amid]||[]).length;
+  if(o && total && o.n>=total) return `✅ 오프라인 저장됨 (${o.n}개)`;
+  return '📥 이 미술관 오프라인 저장';
+}
+async function trhOfflineSave(mk){
+  const d=MUSEUMS[mk] && MUSEUMS[mk].docent; if(!d || trhOfflineBusy) return;
+  if(!('caches' in window)){ toast('이 브라우저는 오프라인 저장을 지원하지 않아요'); return; }
+  const list=(trhDcManifest[d.audioMuseumId]||[]).slice();
+  if(!list.length){ toast('아직 음성 파일이 없어요 — 음성 생성이 끝나면 다시 눌러 주세요'); return; }
+  trhOfflineBusy=true;
+  const btn=()=>document.getElementById('trhOffBtn');
+  let done=0, fail=0;
+  try{
+    const cache=await caches.open(TRH_AUDIO_CACHE);
+    for(const p of list){
+      try{
+        if(!(await cache.match(p))){ const r=await fetch(p, {cache:'no-cache'}); if(!r.ok) throw new Error(r.status); await cache.put(p, r); }
+        done++;
+      }catch(e){ fail++; }
+      const b=btn(); if(b) b.textContent=`📥 저장 중… ${done+fail}/${list.length}`;
+    }
+    for(const f of [...TRH_DC_FILES, TRH_DC_MANIFEST]){ try{ const r=await fetch(f, {cache:'no-cache'}); if(r.ok) await cache.put(f, r); }catch(e){} }
+  }finally{ trhOfflineBusy=false; }
+  trhOffline[d.audioMuseumId]={ n:done, total:list.length, ts:Date.now() }; trhSave(TRH_LS.offline, trhOffline);
+  const b=btn();
+  if(fail){ if(b) b.textContent=`⚠️ ${done}/${list.length} 저장 — 다시 누르면 이어서 저장`; toast('일부 파일을 저장하지 못했어요. 와이파이에서 다시 눌러 주세요'); }
+  else { if(b) b.textContent=`✅ 오프라인 저장됨 (${done}개)`; toast('✅ 비행기 모드에서도 음성을 들을 수 있어요!'); }
+}
+
 /* ── 렌더: 박물관 헤더(사건 파일) ── */
 function trhDcMuseumHeader(mk){
   const m=MUSEUMS[mk], d=m && m.docent; if(!d) return '';
@@ -5335,6 +5367,7 @@ function trhDcMuseumHeader(mk){
     ${(d.routeNote || d.rules.length) ? `<div class="trh-dc-note">${d.routeNote?`<div>🧭 <b>동선</b> ${esc(d.routeNote)}</div>`:''}${d.rules.map(r=>`<div>⚠️ ${esc(r)}</div>`).join('')}</div>` : ''}
     ${trhMom && d.intro && d.intro.factCheck ? `<div class="trh-fact">🔍 인트로 사실 확인: ${esc(d.intro.factCheck)}</div>` : ''}
     <div class="trh-dc-tools">
+      <button class="trh-dc-btn trh-btn-ghost2" id="trhOffBtn" onclick="trhOfflineSave('${mk}')">${trhOfflineLabel(d.audioMuseumId)}</button>
       <button class="trh-dc-btn trh-btn-ghost2" onclick="trhToggleMom()">${trhMom ? '🙈 엄마 메모 숨기기' : '👩 엄마 확인용'}</button>
     </div>`;
 }
@@ -5530,6 +5563,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-30</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 09-24 · 도슨트</div>
 </body>
 </html>
