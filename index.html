@@ -5546,7 +5546,7 @@ function trhDcHints(s){
   let h=`<div class="trh-dc-sec"><h4>💡 단서 찾기 힌트</h4>`;
   h += dc.hints.slice(0, used).map((t,i)=>`<div class="trh-hint-text"><b>${labels[i]||'💡 힌트'}</b> ${esc(t)}</div>`).join('');
   if(used < dc.hints.length) h += `<button class="trh-dc-btn trh-hint-btn" onclick="trhUseHint('${s.id}')">💡 힌트 ${used+1} 보기 · ${labels[used]||''}</button>`;
-  if(!visited){ const g=TRH_GRADE[trhGradeFor(used)]; h += `<p class="trh-small">힌트 없이 찾으면 🥇 금 도장! 지금 도장을 받으면 <b>${g.icon} ${g.label}</b>이에요.</p>`; }
+  if(!visited){ const g=TRH_GRADE[trhGradeFor(used)]; h += used===0 ? `<p class="trh-small">힌트 없이 찾으면 🥇 <b>금 도장</b>! 힌트 1개면 🥈 은, 2개 이상이면 🥉 동이에요.</p>` : `<p class="trh-small">지금 도장을 받으면 <b>${g.icon} ${g.label}</b>이에요.</p>`; }
   else if(trhGrade[s.id]){ const g=TRH_GRADE[trhGrade[s.id]]; h += `<p class="trh-small">받은 도장: <b>${g.icon} ${g.label}</b></p>`; }
   return h+'</div>';
 }
