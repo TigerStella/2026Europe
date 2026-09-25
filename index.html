@@ -1654,7 +1654,7 @@ const DAYS = [
         nav:{from:'London Euston Station', to:'Watford Junction Station'} },
       {ic:'🚉', t:'Watford Junction 도착 · 역 나와 좌측 셔틀 정류장 직행', time:'10:30', endTime:'10:50'},
       {ic:'🚌', t:'★10:50 해리포터 셔틀 (15분) · 바우처 제시', time:'10:50', endTime:'11:05',
-        nav:{from:'Watford Junction Station', to:'Warner Bros. Studio Tour London, Leavesden'} },
+        nav:{from:'Watford Junction Station', to:'Warner Bros. Studio Tour London, Leavesden', mode:'walking'} },
       {ic:'🏰', t:'스튜디오 도착 · 보안검색·락커', time:'11:05', endTime:'11:15'},
       {ic:'⭐', t:'로비 여유 대기(약 45분) · 액티비티 패스포트 수령 + 완드 컴뱃 세션 시간 확인', time:'11:15', endTime:'12:00'},
       {ic:'🪄', t:'입장!', time:'12:00'},
@@ -1666,7 +1666,7 @@ const DAYS = [
       {ic:'🛍️', t:'기념품 숍 · 30~45분', time:'17:30', endTime:'18:15'},
       {ic:'✨', t:'관람 종료 = 6시간 15분 · 폐관 22:00 — 더 있어도 OK', time:'18:15'},
       {ic:'🚌', t:'셔틀 → 왓포드 정션', time:'18:20', endTime:'18:30',
-        nav:{from:'Warner Bros. Studio Tour London, Leavesden', to:'Watford Junction Station'} },
+        nav:{from:'Warner Bros. Studio Tour London, Leavesden', to:'Watford Junction Station', mode:'walking'} },
       {ic:'🚂', t:'Watford Junction 출발 · ⚡빠른 열차만(16~22분) · 🐢Slower(50분) 금지 — 특이사항 시간표 참고', time:'18:36', endTime:'18:58',
         nav:{from:'Watford Junction Station', to:'London Euston Station'} },
       {ic:'🚉', t:'London Euston 도착', time:'18:58', endTime:'19:15'},
@@ -1680,11 +1680,11 @@ const DAYS = [
     foot:'🎟️ <b>내셔널갤러리 도슨트투어</b> 월 <b>14:10 미팅</b>(정면 맨 오른쪽 George Washington 동상 앞) · 자연사박물관 사전예약 시간슬롯 확인 필요<br>🧳 <b>준비할 것</b> ☐ 자연사박물관 시간슬롯 예약 ☐ 모임 10분 전 도착 ☐ 컨택리스 카드(현금 불가) ☐ 취소규정 사전 확인',
     acts:[
       {ic:'🚇', t:'숙소 출발→Russell Square역→Piccadilly line (South Kensington역, 약 15분)', time:'09:50', endTime:'10:05',
-        nav:{from:'Russell Square Underground Station, London', to:'South Kensington Underground Station, London'} },
+        nav:{from:'Russell Square Underground Station, London', to:'South Kensington Underground Station, London', mode:'walking'} },
       {ic:'🦕', t:'자연사박물관 관람 · 사전예약 시간슬롯 확인 필요', time:'10:30', endTime:'12:30'},
       {ic:'🍽️', t:'점심', time:'12:30', endTime:'13:15'},
       {ic:'🚇', t:'Piccadilly line 탑승 (South Kensington→Piccadilly Circus)', time:'13:15', endTime:'13:50',
-        nav:{from:'South Kensington Underground Station, London', to:'Piccadilly Circus Underground Station, London'} },
+        nav:{from:'South Kensington Underground Station, London', to:'Piccadilly Circus Underground Station, London', mode:'walking'} },
       {ic:'🖼️', t:'내셔널갤러리 앞 도착·대기 (모임시간 10분 전 도착 필수)', time:'14:00', endTime:'14:10'},
       {ic:'🖼️', t:'★내셔널갤러리 도슨트투어 — 전문가 명화해설', time:'14:10', endTime:'15:00', status:'booked',
         tourBooking:{
@@ -1699,7 +1699,7 @@ const DAYS = [
           cancellationPolicy:'국외여행 표준약관 제6조 특약 적용 — 일반 소비자분쟁해결기준과 다름, 예약 전 취소규정 반드시 재확인'
         } },
       {ic:'🚇', t:'Piccadilly line 탑승 (Piccadilly Circus→Russell Square) · 숙소 복귀', time:'15:00',
-        nav:{from:'Piccadilly Circus Underground Station, London', to:'Russell Square Underground Station, London'} }
+        nav:{from:'Piccadilly Circus Underground Station, London', to:'Russell Square Underground Station, London', mode:'walking'} }
     ] },
   { d:5, date:'9/29', wd:'화', city:'paris', badges:['런던','→','파리'],
     title:'런던 출발 → 파리 · 바토무슈 센강 유람선',
@@ -1743,7 +1743,7 @@ const DAYS = [
       {ic:'☕', t:'오르세 카페 휴식', time:'13:20', endTime:'13:30'},
       {ic:'🎨', t:'오르세 미술관 개인관람 (컴팩트, 뮤지엄패스)', time:'13:30', endTime:'15:00', status:'confirmed'},
       {ic:'🚆', t:'RER C로 노트르담 이동 (환승 없음)', time:'15:00', endTime:'15:15',
-        nav:{from:"Musée d'Orsay, Paris", to:'Cathédrale Notre-Dame de Paris'} },
+        nav:{from:"Musée d'Orsay, Paris", to:'Cathédrale Notre-Dame de Paris', mode:'walking'} },
       {ic:'⛪', t:'노트르담 대성당 내부 관람', time:'15:15', endTime:'15:45', status:'later',
         bookingRequired:{ label:'노트르담 예약 (방문 2~3일 전 오픈)', url:'https://resa.notredamedeparis.fr' } },
       {ic:'😌', t:'자유 시간 / 휴식', time:'15:45', endTime:'16:45'},
@@ -1769,20 +1769,20 @@ const DAYS = [
     acts:[
       {ic:'🚶', t:'숙소 출발', time:'09:15'},
       {ic:'🚇', t:'6호선 이동 (환승 없음)', time:'09:15', endTime:'09:45',
-        nav:{from:'La Motte-Picquet–Grenelle, Paris', to:'Charles de Gaulle–Étoile, Paris'} },
+        nav:{from:'La Motte-Picquet–Grenelle, Paris', to:'Charles de Gaulle–Étoile, Paris', mode:'walking'} },
       {ic:'🗼', t:'개선문', time:'10:00', endTime:'10:45', status:'need_confirm',
         tourBooking:{
           extraCosts:['입장권: Paris Museum Pass 사용'],
           cautions:['입장 방식·예약 필요 여부 확인']
         } },
       {ic:'🚇', t:'1호선으로 콩코드 이동', time:'10:45', endTime:'11:00',
-        nav:{from:'Charles de Gaulle–Étoile, Paris', to:'Concorde, Paris'} },
+        nav:{from:'Charles de Gaulle–Étoile, Paris', to:'Concorde, Paris', mode:'walking'} },
       {ic:'🌳', t:'튈르리 정원 산책', time:'11:00', endTime:'11:55'},
       {ic:'🖼️', t:'★오랑주리 미술관 — 모네 특별전 "Peindre le temps" 포함', time:'12:00', endTime:'12:45', status:'confirmed'},
       {ic:'🚶', t:'도보 이동 (오르세역 방향)', time:'12:45', endTime:'13:05',
         nav:{from:"Musée de l'Orangerie, Paris", to:"Gare d'Orsay, Paris", mode:'walking'} },
       {ic:'🚆', t:'RER C로 숙소 복귀', time:'13:05', endTime:'13:20',
-        nav:{from:"Gare d'Orsay, Paris", to:'La Motte-Picquet–Grenelle, Paris'} },
+        nav:{from:"Gare d'Orsay, Paris", to:'La Motte-Picquet–Grenelle, Paris', mode:'walking'} },
       {ic:'🍽️', t:'점심 + 체크아웃 + 짐 정리', time:'13:20', endTime:'14:00'},
       {ic:'🚕', t:"택시로 동역(Gare de l'Est) 이동", time:'14:00', endTime:'14:35',
         nav:{from:'4 Rue Robert de Flers, 75015 Paris', to:"Gare de l'Est, Paris", mode:'driving'} },
@@ -1795,17 +1795,17 @@ const DAYS = [
     acts:[
       {ic:'🍳', t:'기상·조식 (옥토버페스트 대비 여유 기상)', time:'09:30', endTime:'10:30'},
       {ic:'🚇', t:'숙소 출발 → 테레지엔비제 (U3 환승1회→U4/5·약 25~30분)', time:'10:30', endTime:'11:00',
-        nav:{from:'Am Oberwiesenfeld 20, München', to:'Theresienwiese, München'} },
+        nav:{from:'Am Oberwiesenfeld 20, München', to:'Theresienwiese, München', mode:'walking'} },
       {ic:'🎡', t:'테레지엔비제 도착', time:'11:00', endTime:'11:30'},
       {ic:'🍺', t:'옥토버페스트 관람 (평일 낮=한산·놀이기구·전통음식 위주)', time:'11:30', endTime:'14:00'},
       {ic:'🚇', t:'테레지엔비제 → 올림픽공원 (U4/5→U3·약 25~30분)', time:'14:00', endTime:'14:30',
-        nav:{from:'Theresienwiese, München', to:'Olympiapark, München'} },
+        nav:{from:'Theresienwiese, München', to:'Olympiapark, München', mode:'walking'} },
       {ic:'🌳', t:'올림피아파크 놀이터·잔디언덕 (벤치 다수·엄마도 착석 휴식)', time:'14:30', endTime:'16:30'},
       {ic:'🚇', t:'올림픽공원 → 알리안츠 (U6·약 15~20분)', time:'16:30', endTime:'16:50',
-        nav:{from:'Olympiapark, München', to:'Allianz Arena, München'} },
+        nav:{from:'Olympiapark, München', to:'Allianz Arena, München', mode:'walking'} },
       {ic:'🛍️', t:'FC 바이에른 스토어 (축구 최애 코스)', time:'16:50', endTime:'17:50'},
       {ic:'🚇', t:'숙소 복귀 (U6→U3)', time:'17:50', endTime:'18:20',
-        nav:{from:'Allianz Arena, München', to:'Am Oberwiesenfeld 20, München'} },
+        nav:{from:'Allianz Arena, München', to:'Am Oberwiesenfeld 20, München', mode:'walking'} },
       {ic:'🍽️', t:'저녁 (숙소 근처·도보 5분)', time:'18:20', endTime:'19:30'},
       {ic:'🛌', t:'휴식·취침 준비 (다음날 06:32 추크슈피체 기차 대비 조기 취침)', time:'19:30'}
     ] },
@@ -1837,14 +1837,14 @@ const DAYS = [
     acts:[
       {ic:'😴', t:'늦잠·조식 (회복)', time:'09:00', endTime:'10:00'},
       {ic:'🚇', t:'숙소 → BMW박물관 (U3 직행)', time:'10:00', endTime:'10:20',
-        nav:{from:'Am Oberwiesenfeld 20, München', to:'BMW Museum, München'} },
+        nav:{from:'Am Oberwiesenfeld 20, München', to:'BMW Museum, München', mode:'walking'} },
       {ic:'🚗', t:'BMW 박물관·BMW월드 (실내·시뮬레이터 체험)', time:'10:20', endTime:'12:30'},
       {ic:'🍽️', t:'점심', time:'12:30', endTime:'13:30'},
       {ic:'🚶', t:'BMW → 알리안츠 아레나 (도보 10분권)', time:'13:30', endTime:'14:00',
         nav:{from:'BMW Museum, München', to:'Allianz Arena, München', mode:'walking'} },
       {ic:'🏟️', t:'알리안츠 아레나 투어 (홈경기 없는 주말 확인)', time:'14:00', endTime:'15:30'},
       {ic:'🚇', t:'숙소 복귀 (대중교통)', time:'15:30', endTime:'16:00',
-        nav:{from:'Allianz Arena, München', to:'Am Oberwiesenfeld 20, München'} },
+        nav:{from:'Allianz Arena, München', to:'Am Oberwiesenfeld 20, München', mode:'walking'} },
       {ic:'🧳', t:'휴식·짐 완전 정리 (새벽 이동 대비)', time:'16:00', endTime:'18:00'},
       {ic:'🍽️', t:'이른 저녁 (숙소 근처)', time:'18:00', endTime:'19:30'},
       {ic:'🛌', t:'조기 취침', time:'19:30', endTime:'21:00'},
@@ -2014,7 +2014,7 @@ const DAYS = [
       {ic:'🌿', t:'오전 자유일정 (선택 · 확정 일정 없음)', status:'confirmed'},
       {ic:'🍝', t:'점심', time:'12:30', endTime:'13:30', status:'confirmed'},
       {ic:'🚇', t:'숙소 → Colosseo역 이동', time:'13:30', endTime:'14:00', status:'confirmed',
-        nav:{from:'Via Sebastiano Veniero 22, Roma', to:'Colosseo (Metro B), Roma'} },
+        nav:{from:'Via Sebastiano Veniero 22, Roma', to:'Colosseo (Metro B), Roma', mode:'walking'} },
       {ic:'🏛️', t:'★콜로세움 & 포로로마노 투어', time:'14:00', endTime:'18:00', status:'booked',
         tourBooking:{
           provider:'형제투어 (패스트트랙, 한국인 가이드)',
@@ -5824,6 +5824,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-43 · 도슨트</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-44 · 도슨트</div>
 </body>
 </html>
