@@ -266,6 +266,12 @@
   .tour-detail-body li { margin-bottom: 2px; }
   .booking-req { display: inline-block; margin-top: 5px; font-size: 11px; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--dusk-coral), #E0607A); padding: 4px 10px; border-radius: 8px; text-decoration: none; }
   .booking-req:hover { opacity: .9; }
+  .nav-link { display: inline-block; margin-top: 5px; margin-left: 4px; font-size: 11px; font-weight: 800; color: #fff; background: linear-gradient(135deg, #4A90D9, #2E6FBE); padding: 4px 10px; border-radius: 8px; text-decoration: none; }
+  .nav-link:hover { opacity: .9; }
+  .transit-card { background: rgba(0,0,0,.03); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; }
+  .transit-card .transit-city { font-weight: 800; font-size: 13px; color: var(--text-dark); margin-bottom: 4px; }
+  .transit-card .transit-row { font-size: 12px; line-height: 1.7; }
+  .transit-card .transit-row b { color: var(--text-dark); }
   .day-title { font-size: 14px; font-weight: 500; color: var(--text-dark); margin-bottom: 6px; }
   .day-details { display: flex; flex-direction: column; gap: 5px; }
   .detail-row { display: flex; gap: 8px; font-size: 12px; color: var(--text-mid); align-items: flex-start; }
@@ -1034,6 +1040,7 @@
       <div class="tip-card"><div class="tip-title">🚄 Italo</div><div class="tip-text">이탈리아 고속열차. 피렌체→로마, 로마→밀라노 예매.</div></div>
       <div class="tip-card"><div class="tip-title">🗺 Google Maps</div><div class="tip-text">오프라인 지도 미리 다운로드 필수 (도시별로 저장).</div></div>
     </div>
+    <div id="localTransitWrap"></div>
   </div>
 </div>
 
@@ -1519,8 +1526,10 @@ const DAYS = [
     acts:[
       {ic:'🛬', t:'히드로 공항 도착', time:'17:30'},
       {ic:'🛃', t:'입국심사·수하물 수취', time:'17:30', endTime:'18:30'},
-      {ic:'🚆', t:'엘리자베스 라인 탑승 (히드로→토트넘코트로드) · 환승 없음, 약 50분', time:'18:30', endTime:'19:20'},
-      {ic:'🚶', t:'TCR역 하차 → 도보/우버로 숙소 이동 (블룸즈버리)', time:'19:20', endTime:'19:30'},
+      {ic:'🚆', t:'엘리자베스 라인 탑승 (히드로→토트넘코트로드) · 환승 없음, 약 50분', time:'18:30', endTime:'19:20',
+        nav:{from:'Heathrow Airport, London', to:'Tottenham Court Road Underground Station, London'} },
+      {ic:'🚶', t:'TCR역 하차 → 도보/우버로 숙소 이동 (블룸즈버리)', time:'19:20', endTime:'19:30',
+        nav:{from:'Tottenham Court Road Underground Station, London', to:'Bloomsbury, London', mode:'walking'} },
       {ic:'🏠', t:'숙소 도착(예상)', time:'20:00'}
     ] },
   { d:2, date:'9/26', wd:'토', city:'london', badges:['런던'],
@@ -1543,11 +1552,14 @@ const DAYS = [
           ]
         } },
       {ic:'🍽️', t:'점심', time:'12:00', endTime:'13:00'},
-      {ic:'🚶', t:'도보 이동 (박물관→트라팔가광장→빅벤→국회의사당→웨스트민스터 사원, 약 30~40분)', time:'13:00', endTime:'13:40'},
+      {ic:'🚶', t:'도보 이동 (박물관→트라팔가광장→빅벤→국회의사당→웨스트민스터 사원, 약 30~40분)', time:'13:00', endTime:'13:40',
+        nav:{from:'British Museum, London', to:'Westminster Abbey, London', mode:'walking'} },
       {ic:'⛴️', t:'Uber Boat 탑승 (Embankment→Greenwich)', time:'14:00', endTime:'14:40',
-        bookingRequired:{ label:'Uber Boat 예약 (Thames Clippers)', url:'https://www.thamesclippers.com/booking' } },
+        bookingRequired:{ label:'Uber Boat 예약 (Thames Clippers)', url:'https://www.thamesclippers.com/booking' },
+        nav:{from:'Embankment Pier, London', to:'Greenwich Pier, London'} },
       {ic:'🔭', t:'그리니치 자유관람 — 천문대 우선, 여유시 커티삭·마켓·해양박물관·퀸스하우스', time:'14:40', endTime:'17:00'},
-      {ic:'🚇', t:'DLR 탑승 (Cutty Sark역→Bank역 환승→Central line→Holborn역) · 숙소 복귀', time:'17:00'}
+      {ic:'🚇', t:'DLR 탑승 (Cutty Sark역→Bank역 환승→Central line→Holborn역) · 숙소 복귀', time:'17:00',
+        nav:{from:'Cutty Sark DLR Station, Greenwich, London', to:'Holborn Underground Station, London'} }
     ] },
   { d:3, date:'9/27', wd:'일', city:'london', badges:['런던'],
     title:'해리포터 스튜디오 투어',
@@ -1556,12 +1568,15 @@ const DAYS = [
     acts:[
       {ic:'🍳', t:'한인민박 조식 · 여유롭게 준비', time:'08:30', endTime:'09:30'},
       {ic:'🎒', t:'최종 점검(입장 바우처·컨택리스 카드·물·우산) · 출발 준비', time:'09:30', endTime:'09:40'},
-      {ic:'🚶', t:'숙소 출발 · 램스컨듀잇 St(블룸즈버리) → 유스턴역 도보 15~18분', time:'09:40', endTime:'09:58'},
+      {ic:'🚶', t:'숙소 출발 · 램스컨듀잇 St(블룸즈버리) → 유스턴역 도보 15~18분', time:'09:40', endTime:'09:58',
+        nav:{from:'Bloomsbury, London', to:'London Euston Station', mode:'walking'} },
       {ic:'🎫', t:'유스턴역 도착 · 아동 종이표 발권(반값), M&S 물/간식, 화장실', time:'09:58', endTime:'10:08'},
       {ic:'📋', t:'플랫폼 이동 · ⚠️ 소요 20분 이하 직통 확인(완행 아님)', time:'10:08', endTime:'10:10'},
-      {ic:'🚂', t:'Euston 출발 · 오프피크 직통 18~20분 · 컨택리스 태그', time:'10:10', endTime:'10:30'},
+      {ic:'🚂', t:'Euston 출발 · 오프피크 직통 18~20분 · 컨택리스 태그', time:'10:10', endTime:'10:30',
+        nav:{from:'London Euston Station', to:'Watford Junction Station'} },
       {ic:'🚉', t:'Watford Junction 도착 · 역 나와 좌측 셔틀 정류장 직행', time:'10:30', endTime:'10:50'},
-      {ic:'🚌', t:'★10:50 해리포터 셔틀 (15분) · 바우처 제시', time:'10:50', endTime:'11:05'},
+      {ic:'🚌', t:'★10:50 해리포터 셔틀 (15분) · 바우처 제시', time:'10:50', endTime:'11:05',
+        nav:{from:'Watford Junction Station', to:'Warner Bros. Studio Tour London, Leavesden'} },
       {ic:'🏰', t:'스튜디오 도착 · 보안검색·락커', time:'11:05', endTime:'11:15'},
       {ic:'⭐', t:'로비 여유 대기(약 45분) · 액티비티 패스포트 수령 + 완드 컴뱃 세션 시간 확인', time:'11:15', endTime:'12:00'},
       {ic:'🪄', t:'입장!', time:'12:00'},
@@ -1572,10 +1587,13 @@ const DAYS = [
       {ic:'🏰', t:'호그와트 성 미니어처(하이라이트) → 지팡이의 방', time:'16:30', endTime:'17:30'},
       {ic:'🛍️', t:'기념품 숍 · 30~45분', time:'17:30', endTime:'18:15'},
       {ic:'✨', t:'관람 종료 = 6시간 15분 · 폐관 22:00 — 더 있어도 OK', time:'18:15'},
-      {ic:'🚌', t:'셔틀 → 왓포드 정션', time:'18:20', endTime:'18:30'},
-      {ic:'🚂', t:'Watford Junction 출발 · ⚡빠른 열차만(16~22분) · 🐢Slower(50분) 금지 — 특이사항 시간표 참고', time:'18:36', endTime:'18:58'},
+      {ic:'🚌', t:'셔틀 → 왓포드 정션', time:'18:20', endTime:'18:30',
+        nav:{from:'Warner Bros. Studio Tour London, Leavesden', to:'Watford Junction Station'} },
+      {ic:'🚂', t:'Watford Junction 출발 · ⚡빠른 열차만(16~22분) · 🐢Slower(50분) 금지 — 특이사항 시간표 참고', time:'18:36', endTime:'18:58',
+        nav:{from:'Watford Junction Station', to:'London Euston Station'} },
       {ic:'🚉', t:'London Euston 도착', time:'18:58', endTime:'19:15'},
-      {ic:'🚶', t:'도보 → 숙소(램스컨듀잇 St)', time:'19:15', endTime:'19:35'},
+      {ic:'🚶', t:'도보 → 숙소(램스컨듀잇 St)', time:'19:15', endTime:'19:35',
+        nav:{from:'London Euston Station', to:'Bloomsbury, London', mode:'walking'} },
       {ic:'🍟', t:'저녁 (피시앤칩스 등) · 숙소 복귀', time:'19:40'}
     ] },
   { d:4, date:'9/28', wd:'월', city:'london', badges:['런던'],
@@ -1583,10 +1601,12 @@ const DAYS = [
     story:'런던 자연사박물관엔 거대한 <b>공룡 뼈</b>가 가득해. 특히 힌츠홀 천장엔 <b>진짜 대왕고래(블루웨일) 뼈</b>가 매달려 있는데, 지구에서 <b>가장 큰 동물</b>이라 심장만 해도 자동차만 하대!',
     foot:'🎟️ <b>내셔널갤러리 도슨트투어</b> 월 <b>14:10 미팅</b>(정면 맨 오른쪽 George Washington 동상 앞) · 자연사박물관 사전예약 시간슬롯 확인 필요<br>🧳 <b>준비할 것</b> ☐ 자연사박물관 시간슬롯 예약 ☐ 모임 10분 전 도착 ☐ 컨택리스 카드(현금 불가) ☐ 취소규정 사전 확인',
     acts:[
-      {ic:'🚇', t:'숙소 출발→Russell Square역→Piccadilly line (South Kensington역, 약 15분)', time:'09:50', endTime:'10:05'},
+      {ic:'🚇', t:'숙소 출발→Russell Square역→Piccadilly line (South Kensington역, 약 15분)', time:'09:50', endTime:'10:05',
+        nav:{from:'Russell Square Underground Station, London', to:'South Kensington Underground Station, London'} },
       {ic:'🦕', t:'자연사박물관 관람 · 사전예약 시간슬롯 확인 필요', time:'10:30', endTime:'12:30'},
       {ic:'🍽️', t:'점심', time:'12:30', endTime:'13:15'},
-      {ic:'🚇', t:'Piccadilly line 탑승 (South Kensington→Piccadilly Circus)', time:'13:15', endTime:'13:50'},
+      {ic:'🚇', t:'Piccadilly line 탑승 (South Kensington→Piccadilly Circus)', time:'13:15', endTime:'13:50',
+        nav:{from:'South Kensington Underground Station, London', to:'Piccadilly Circus Underground Station, London'} },
       {ic:'🖼️', t:'내셔널갤러리 앞 도착·대기 (모임시간 10분 전 도착 필수)', time:'14:00', endTime:'14:10'},
       {ic:'🖼️', t:'★내셔널갤러리 도슨트투어 — 전문가 명화해설', time:'14:10', endTime:'15:00', status:'booked',
         tourBooking:{
@@ -1600,7 +1620,8 @@ const DAYS = [
           ],
           cancellationPolicy:'국외여행 표준약관 제6조 특약 적용 — 일반 소비자분쟁해결기준과 다름, 예약 전 취소규정 반드시 재확인'
         } },
-      {ic:'🚇', t:'Piccadilly line 탑승 (Piccadilly Circus→Russell Square) · 숙소 복귀', time:'15:00'}
+      {ic:'🚇', t:'Piccadilly line 탑승 (Piccadilly Circus→Russell Square) · 숙소 복귀', time:'15:00',
+        nav:{from:'Piccadilly Circus Underground Station, London', to:'Russell Square Underground Station, London'} }
     ] },
   { d:5, date:'9/29', wd:'화', city:'paris', badges:['런던','→','파리'],
     title:'런던 출발 → 파리 · 바토무슈 센강 유람선',
@@ -1610,7 +1631,8 @@ const DAYS = [
     foot:'🚤 <b>바토무슈/바토파리지앵</b> 18:30 승선(⚠️예약확인필요) · 선착장 Port de la Bourdonnais · 일몰 골든아워<br>✅ <b>오늘 할 일</b><br>☐ 바토무슈/바토파리지앵 예약 확정하기<br>☐ 노트르담 앱 계정 미리 생성 (예약은 방문 2~3일 전에만 열림)<br>☐ 유심/이심 개통 확인 · 숙소 와이파이 연결',
     acts:[
       {ic:'😌', t:'휴식', time:'17:00', endTime:'18:15'},
-      {ic:'🚶', t:'선착장(Port de la Bourdonnais) 도착 · 숙소에서 도보 15~20분', time:'18:15'},
+      {ic:'🚶', t:'선착장(Port de la Bourdonnais) 도착 · 숙소에서 도보 15~20분', time:'18:15',
+        nav:{from:'4 Rue Robert de Flers, 75015 Paris', to:'Port de la Bourdonnais, Paris', mode:'walking'} },
       {ic:'🚤', t:'★바토무슈/바토파리지앵 승선', time:'18:30', endTime:'19:00', status:'need_confirm',
         tourBooking:{
           meetingTime:'18:15 선착장 도착 · 18:30 승선',
@@ -1626,7 +1648,8 @@ const DAYS = [
     story:'루브르는 원래 <b>성(요새)이자 왕이 살던 궁전</b>이었어 — 그래서 이렇게 어마어마하게 크지! 가장 유명한 그림 다빈치의 <b>모나리자</b>는 1911년에 <b>도둑맞은 사건</b> 덕분에 전 세계에 더 유명해졌대. 2년 뒤 되찾았고, 지금은 방탄유리 안에서 은은하게 웃고 있단다.<br><br>오르세 미술관은 원래 1900년에 지어진 <b>기차역</b>이었어! 지금도 커다란 유리 시계가 남아있어서, 시계 뒤에서 파리 시내를 내다보는 게 인기 포토스팟이야. 반 고흐의 "론 강의 별이 빛나는 밤"과 모네·르누아르 같은 인상파 화가들의 그림으로 가득한데, <b>"인상파"</b>라는 이름은 원래 비평가들이 "그림을 대충 인상만 그렸다"고 놀리던 말이었대!<br><br>노트르담 대성당은 약 850년 전에 짓기 시작한 거대한 성당이야. 소설 "노트르담의 꼽추"에서 종지기 콰지모도가 살던 곳이지. 2019년 큰 불로 지붕이 무너졌지만 전 세계가 힘을 모아 복원해 2024년 다시 문을 열었어. 종탑에 올라가면 그 유명한 가고일 석상을 코앞에서 볼 수 있어!',
     foot:'🎟️ <b>루브르(수키 투어)</b> 09:20 미팅(카페 마를리) · 입장권 별도 예약 필수 <a href="https://www.ticket.louvre.fr" target="_blank" rel="noopener">ticket.louvre.fr</a>(€22·18세 미만 무료) · 🎨 <b>오르세</b> 13:30~15:00 개인관람(입장권 필요) <a href="https://billetterie.musee-orsay.fr" target="_blank" rel="noopener">billetterie.musee-orsay.fr</a> · ⛪ <b>노트르담 종탑</b> 16:45 · <b>생트샤펠</b> 18:00<br>✅ <b>오늘 할 일</b> ☐ 루브르·오르세 입장권 각각 예약 ☐ 타이거 여권 지참 ☐ 노트르담 종탑·생트샤펠 티켓 확인',
     acts:[
-      {ic:'🚶', t:'숙소 출발 · La Motte-Picquet–Grenelle역까지 도보', time:'08:40'},
+      {ic:'🚶', t:'숙소 출발 · La Motte-Picquet–Grenelle역까지 도보', time:'08:40',
+        nav:{from:'4 Rue Robert de Flers, 75015 Paris', to:'La Motte-Picquet–Grenelle, Paris', mode:'walking'} },
       {ic:'🖼️', t:'★루브르 박물관 (수키 투어)', time:'09:20', endTime:'13:00', status:'confirmed',
         tourBooking:{
           provider:'수키 투어',
@@ -1637,10 +1660,12 @@ const DAYS = [
           extraCosts:['입장권 €22 (현장/온라인 별도 구매 필요)'],
           cautions:['17세 이하 무료입장이나 시간예약 필수, 여권 지참']
         } },
-      {ic:'🚶', t:'오르세 도보 이동', time:'13:00', endTime:'13:20'},
+      {ic:'🚶', t:'오르세 도보 이동', time:'13:00', endTime:'13:20',
+        nav:{from:'Musée du Louvre, Paris', to:"Musée d'Orsay, Paris", mode:'walking'} },
       {ic:'☕', t:'오르세 카페 휴식', time:'13:20', endTime:'13:30'},
       {ic:'🎨', t:'오르세 미술관 개인관람 (컴팩트, 뮤지엄패스)', time:'13:30', endTime:'15:00', status:'confirmed'},
-      {ic:'🚆', t:'RER C로 노트르담 이동 (환승 없음)', time:'15:00', endTime:'15:15'},
+      {ic:'🚆', t:'RER C로 노트르담 이동 (환승 없음)', time:'15:00', endTime:'15:15',
+        nav:{from:"Musée d'Orsay, Paris", to:'Cathédrale Notre-Dame de Paris'} },
       {ic:'⛪', t:'노트르담 대성당 내부 관람', time:'15:15', endTime:'15:45', status:'later',
         bookingRequired:{ label:'노트르담 예약 (방문 2~3일 전 오픈)', url:'https://resa.notredamedeparis.fr' } },
       {ic:'😌', t:'자유 시간 / 휴식', time:'15:45', endTime:'16:45'},
@@ -1654,7 +1679,8 @@ const DAYS = [
         tourBooking:{
           price:'약 €13~18 · 15~25분 소요',
           includes:'Uber 또는 G7 앱 미리 설치 권장'
-        } }
+        },
+        nav:{from:'Sainte-Chapelle, Paris', to:'4 Rue Robert de Flers, 75015 Paris', mode:'driving'} }
     ] },
   { d:7, date:'10/1', wd:'목', city:'munich', badges:['파리','→','뮌헨'],
     title:'개선문 · 오랑주리 미술관 · 뮌헨행 (TGV)',
@@ -1664,19 +1690,24 @@ const DAYS = [
     foot:'🎟️ <b>개선문</b> 10:00 (Paris Museum Pass·⚠️예약확인필요) · <b>오랑주리 미술관</b> 12:00 (모네 특별전 "Peindre le temps" 포함) <a href="https://www.musee-orangerie.fr" target="_blank" rel="noopener">musee-orangerie.fr</a><br>🚄 TGV 9577 <b>DB 앱에서 e티켓 오프라인 저장</b> (시내 와이파이 불안정 대비)<br>✅ <b>오늘 할 일</b> ☐ 개선문 입장 방식(뮤지엄패스) 확인 ☐ 오랑주리 티켓 준비 ☐ 체크아웃 전 짐 정리 ☐ TGV e티켓 오프라인 ☐ 여권 소지',
     acts:[
       {ic:'🚶', t:'숙소 출발', time:'09:15'},
-      {ic:'🚇', t:'6호선 이동 (환승 없음)', time:'09:15', endTime:'09:45'},
+      {ic:'🚇', t:'6호선 이동 (환승 없음)', time:'09:15', endTime:'09:45',
+        nav:{from:'La Motte-Picquet–Grenelle, Paris', to:'Charles de Gaulle–Étoile, Paris'} },
       {ic:'🗼', t:'개선문', time:'10:00', endTime:'10:45', status:'need_confirm',
         tourBooking:{
           extraCosts:['입장권: Paris Museum Pass 사용'],
           cautions:['입장 방식·예약 필요 여부 확인']
         } },
-      {ic:'🚇', t:'1호선으로 콩코드 이동', time:'10:45', endTime:'11:00'},
+      {ic:'🚇', t:'1호선으로 콩코드 이동', time:'10:45', endTime:'11:00',
+        nav:{from:'Charles de Gaulle–Étoile, Paris', to:'Concorde, Paris'} },
       {ic:'🌳', t:'튈르리 정원 산책', time:'11:00', endTime:'11:55'},
       {ic:'🖼️', t:'★오랑주리 미술관 — 모네 특별전 "Peindre le temps" 포함', time:'12:00', endTime:'12:45', status:'confirmed'},
-      {ic:'🚶', t:'도보 이동 (오르세역 방향)', time:'12:45', endTime:'13:05'},
-      {ic:'🚆', t:'RER C로 숙소 복귀', time:'13:05', endTime:'13:20'},
+      {ic:'🚶', t:'도보 이동 (오르세역 방향)', time:'12:45', endTime:'13:05',
+        nav:{from:"Musée de l'Orangerie, Paris", to:"Gare d'Orsay, Paris", mode:'walking'} },
+      {ic:'🚆', t:'RER C로 숙소 복귀', time:'13:05', endTime:'13:20',
+        nav:{from:"Gare d'Orsay, Paris", to:'La Motte-Picquet–Grenelle, Paris'} },
       {ic:'🍽️', t:'점심 + 체크아웃 + 짐 정리', time:'13:20', endTime:'14:00'},
-      {ic:'🚕', t:"택시로 동역(Gare de l'Est) 이동", time:'14:00', endTime:'14:35'},
+      {ic:'🚕', t:"택시로 동역(Gare de l'Est) 이동", time:'14:00', endTime:'14:35',
+        nav:{from:'4 Rue Robert de Flers, 75015 Paris', to:"Gare de l'Est, Paris", mode:'driving'} },
       {ic:'🚉', t:'동역 도착 (80분 전 버퍼 확보)', time:'14:35'}
     ] },
   { d:8, date:'10/2', wd:'금', city:'munich', badges:['뮌헨'],
@@ -1685,14 +1716,18 @@ const DAYS = [
     foot:'🍺 <b>옥토버페스트(테레지엔비제)</b> — 평일 낮이 가장 한산 · 입장 무료(맥주텐트·놀이기구는 개별 요금) · <b>미아방지 팔찌·소지품 주의</b> · U4/5 테레지엔비제역',
     acts:[
       {ic:'🍳', t:'기상·조식 (옥토버페스트 대비 여유 기상)', time:'09:30', endTime:'10:30'},
-      {ic:'🚇', t:'숙소 출발 → 테레지엔비제 (U3 환승1회→U4/5·약 25~30분)', time:'10:30', endTime:'11:00'},
+      {ic:'🚇', t:'숙소 출발 → 테레지엔비제 (U3 환승1회→U4/5·약 25~30분)', time:'10:30', endTime:'11:00',
+        nav:{from:'Am Oberwiesenfeld 20, München', to:'Theresienwiese, München'} },
       {ic:'🎡', t:'테레지엔비제 도착', time:'11:00', endTime:'11:30'},
       {ic:'🍺', t:'옥토버페스트 관람 (평일 낮=한산·놀이기구·전통음식 위주)', time:'11:30', endTime:'14:00'},
-      {ic:'🚇', t:'테레지엔비제 → 올림픽공원 (U4/5→U3·약 25~30분)', time:'14:00', endTime:'14:30'},
+      {ic:'🚇', t:'테레지엔비제 → 올림픽공원 (U4/5→U3·약 25~30분)', time:'14:00', endTime:'14:30',
+        nav:{from:'Theresienwiese, München', to:'Olympiapark, München'} },
       {ic:'🌳', t:'올림피아파크 놀이터·잔디언덕 (벤치 다수·엄마도 착석 휴식)', time:'14:30', endTime:'16:30'},
-      {ic:'🚇', t:'올림픽공원 → 알리안츠 (U6·약 15~20분)', time:'16:30', endTime:'16:50'},
+      {ic:'🚇', t:'올림픽공원 → 알리안츠 (U6·약 15~20분)', time:'16:30', endTime:'16:50',
+        nav:{from:'Olympiapark, München', to:'Allianz Arena, München'} },
       {ic:'🛍️', t:'FC 바이에른 스토어 (축구 최애 코스)', time:'16:50', endTime:'17:50'},
-      {ic:'🚇', t:'숙소 복귀 (U6→U3)', time:'17:50', endTime:'18:20'},
+      {ic:'🚇', t:'숙소 복귀 (U6→U3)', time:'17:50', endTime:'18:20',
+        nav:{from:'Allianz Arena, München', to:'Am Oberwiesenfeld 20, München'} },
       {ic:'🍽️', t:'저녁 (숙소 근처·도보 5분)', time:'18:20', endTime:'19:30'},
       {ic:'🛌', t:'휴식·취침 준비 (다음날 06:32 추크슈피체 기차 대비 조기 취침)', time:'19:30'}
     ] },
@@ -1701,15 +1736,20 @@ const DAYS = [
     story:'<b>추크슈피체</b>는 2,962m로 <b>독일에서 가장 높은 산</b>이야. 톱니바퀴 기차와 케이블카로 오르면 10월인데도 <b>안 녹고 쌓인 만년설</b>을 만질 수 있어! 정상에선 독일·오스트리아 알프스가 한눈에 보이고 발밑으로 구름이 지나간단다. 정상은 영하니까 방한복 꼭 챙기기!',
     foot:'⭐ <b>가르미셔 콤비티켓</b> — 뮌헨중앙역 자판기 or <a href="https://zugspitze.de" target="_blank" rel="noopener">zugspitze.de</a> · 날씨 유동성 위해 1~2일 전 구매 권장 (성인 €72 / 청소년 €57.5 / 아동 €36)<br>⚠️ 당일 아침 <a href="https://zugspitze.de" target="_blank" rel="noopener">zugspitze.de</a>에서 <b>케이블카 실시간 운행상태</b> 확인 (기상 악화 시 운휴)',
     acts:[
-      {ic:'⏰', t:'기상·중앙역 이동 (택시·도시락 지참)', time:'06:00', endTime:'06:32'},
-      {ic:'🚆', t:'뮌헨→가르미슈 기차 (좌석=휴식·콤비티켓 개시)', time:'06:32', endTime:'08:00'},
+      {ic:'⏰', t:'기상·중앙역 이동 (택시·도시락 지참)', time:'06:00', endTime:'06:32',
+        nav:{from:'Am Oberwiesenfeld 20, München', to:'München Hauptbahnhof', mode:'driving'} },
+      {ic:'🚆', t:'뮌헨→가르미슈 기차 (좌석=휴식·콤비티켓 개시)', time:'06:32', endTime:'08:00',
+        nav:{from:'München Hauptbahnhof', to:'Garmisch-Partenkirchen Bahnhof'} },
       {ic:'🔁', t:'톱니열차 환승·대기 (도보 2분)', time:'08:00', endTime:'08:30'},
-      {ic:'🚞', t:'톱니열차 → 추크슈플라트 (앉아서 이동)', time:'08:30', endTime:'09:45'},
+      {ic:'🚞', t:'톱니열차 → 추크슈플라트 (앉아서 이동)', time:'08:30', endTime:'09:45',
+        nav:{from:'Garmisch-Partenkirchen Bahnhof', to:'Zugspitzplatt'} },
       {ic:'🏔️', t:'정상 케이블카 → 알프스 만년설 체험 (방한복 필수·고도 적응 수시 체크)', time:'09:45', endTime:'12:30'},
       {ic:'🍽️', t:'정상 레스토랑 점심·휴식 (하산 전 충분히)', time:'12:30', endTime:'13:30'},
-      {ic:'🚡', t:'하산 → 아이브제 (케이블카·콤비티켓 내)', time:'13:30', endTime:'14:30'},
+      {ic:'🚡', t:'하산 → 아이브제 (케이블카·콤비티켓 내)', time:'13:30', endTime:'14:30',
+        nav:{from:'Zugspitze', to:'Eibsee, Grainau'} },
       {ic:'🏞️', t:'아이브제 호숫가 짧은 산책 (평지·뷰포인트)', time:'14:30', endTime:'15:15'},
-      {ic:'🚆', t:'가르미슈 → 뮌헨 복귀 (좌석=휴식)', time:'15:15', endTime:'17:00'},
+      {ic:'🚆', t:'가르미슈 → 뮌헨 복귀 (좌석=휴식)', time:'15:15', endTime:'17:00',
+        nav:{from:'Garmisch-Partenkirchen Bahnhof', to:'München Hauptbahnhof'} },
       {ic:'🛌', t:'숙소 복귀·저녁·취침 (늦잠 허용)', time:'17:00'}
     ] },
   { d:10, date:'10/4', wd:'일', city:'munich', badges:['뮌헨'],
@@ -1718,12 +1758,15 @@ const DAYS = [
     foot:'⭐ <b>알리안츠 아레나 투어</b> <a href="https://fcbayern.com/en/tours" target="_blank" rel="noopener">fcbayern.com/en/tours</a> — 일요일 시간대 조기 마감·<b>사전 예약 필수</b>·홈경기 충돌 재확인 · 🚗 <b>BMW 박물관</b> <a href="https://bmw-welt.com" target="_blank" rel="noopener">bmw-welt.com</a> (온라인 소폭 할인)<br>⭐ <b>10/5 새벽 공항 택시</b> — 숙소 프런트 or Bolt/FreeNow 앱으로 <b>05:15 픽업 전날 예약</b>',
     acts:[
       {ic:'😴', t:'늦잠·조식 (회복)', time:'09:00', endTime:'10:00'},
-      {ic:'🚇', t:'숙소 → BMW박물관 (U3 직행)', time:'10:00', endTime:'10:20'},
+      {ic:'🚇', t:'숙소 → BMW박물관 (U3 직행)', time:'10:00', endTime:'10:20',
+        nav:{from:'Am Oberwiesenfeld 20, München', to:'BMW Museum, München'} },
       {ic:'🚗', t:'BMW 박물관·BMW월드 (실내·시뮬레이터 체험)', time:'10:20', endTime:'12:30'},
       {ic:'🍽️', t:'점심', time:'12:30', endTime:'13:30'},
-      {ic:'🚶', t:'BMW → 알리안츠 아레나 (도보 10분권)', time:'13:30', endTime:'14:00'},
+      {ic:'🚶', t:'BMW → 알리안츠 아레나 (도보 10분권)', time:'13:30', endTime:'14:00',
+        nav:{from:'BMW Museum, München', to:'Allianz Arena, München', mode:'walking'} },
       {ic:'🏟️', t:'알리안츠 아레나 투어 (홈경기 없는 주말 확인)', time:'14:00', endTime:'15:30'},
-      {ic:'🚇', t:'숙소 복귀 (대중교통)', time:'15:30', endTime:'16:00'},
+      {ic:'🚇', t:'숙소 복귀 (대중교통)', time:'15:30', endTime:'16:00',
+        nav:{from:'Allianz Arena, München', to:'Am Oberwiesenfeld 20, München'} },
       {ic:'🧳', t:'휴식·짐 완전 정리 (새벽 이동 대비)', time:'16:00', endTime:'18:00'},
       {ic:'🍽️', t:'이른 저녁 (숙소 근처)', time:'18:00', endTime:'19:30'},
       {ic:'🛌', t:'조기 취침', time:'19:30', endTime:'21:00'},
@@ -1736,11 +1779,14 @@ const DAYS = [
     foot:'🌃 <b>야경투어</b> 18:30 미팅(성당 앞 계단) — 전날 밤/당일 카카오톡 안내 확인<br>🧳 <b>준비할 것</b> ☐ 체크인용 신분증(여권) ☐ 새벽 공항택시 전날 밤 예약 확정 ☐ 항공 e티켓 오프라인 저장 ☐ 편한 신발(두오모 지구 자갈길) ☐ 수신기 대여비 €5 현금 ☐ 개인 이어폰(3.5mm) ☐ 바람막이/겉옷',
     acts:[
       {ic:'⏰', t:'기상·최종 확인', time:'04:45', endTime:'05:15'},
-      {ic:'🚕', t:'숙소 → MUC 공항 (택시·사전예약 필수)', time:'05:15', endTime:'06:00'},
+      {ic:'🚕', t:'숙소 → MUC 공항 (택시·사전예약 필수)', time:'05:15', endTime:'06:00',
+        nav:{from:'Am Oberwiesenfeld 20, München', to:'Munich Airport (MUC)', mode:'driving'} },
       {ic:'🛃', t:'체크인·보안·탑승', time:'06:00', endTime:'07:55'},
-      {ic:'🏨', t:'택시로 숙소 이동·체크인·짐 (Hotel San Giorgio·두오모 도보 5분)', time:'13:15', endTime:'14:30'},
+      {ic:'🏨', t:'택시로 숙소 이동·체크인·짐 (Hotel San Giorgio·두오모 도보 5분)', time:'13:15', endTime:'14:30',
+        nav:{from:'Florence Airport (FLR)', to:'Via San Antonino 3, Firenze', mode:'driving'} },
       {ic:'😌', t:'체크인 후 휴식 (점심은 숙소 근처에서 편하게)', time:'14:30', endTime:'18:15'},
-      {ic:'🚶', t:'미팅장소(성당 앞 계단)로 이동', time:'18:15', endTime:'18:30'},
+      {ic:'🚶', t:'미팅장소(성당 앞 계단)로 이동', time:'18:15', endTime:'18:30',
+        nav:{from:'Via San Antonino 3, Firenze', to:'Chiesa dei Santi Michele e Gaetano, Firenze', mode:'walking'} },
       {ic:'🌃', t:'★피렌체 인기 야경투어 (전문 가이드·스냅사진 포함)', time:'18:30', endTime:'21:30', status:'confirmed',
         tourBooking:{
           meetingTime:'18:30',
@@ -1769,17 +1815,22 @@ const DAYS = [
     foot:'🎟️ <b>예약</b> · 아카데미아(다비드) <b>10/6 17:30</b> <a href="https://www.galleriaaccademiafirenze.it" target="_blank" rel="noopener">galleriaaccademiafirenze.it</a> · 피사 <b>COMPLETE+TOWER €27</b> 등탑 <b>09:45</b> <a href="https://www.opapisa.it" target="_blank" rel="noopener">opapisa.it</a> (캄포산토·박물관 포함이나 생략 OK) · 기차 <a href="https://www.trenitalia.com" target="_blank" rel="noopener">trenitalia.com</a><br>🧳 <b>준비할 것</b> ☐ 07:53 S.Rossore 직행 기차 ☐ 사탑 10:00 세션(도착 즉시 락커) ☐ 세례당 에코 시연 ☐ 귀로 Pisa Centrale 13:32(도보 20분) ☐ 아카데미아 17:30 ☐ 물·간식',
     acts:[
       {ic:'🍳', t:'조식·준비 (호텔이 S.M.N. 도보 5분)', time:'07:00', endTime:'07:45'},
-      {ic:'🚂', t:'피렌체 S.M.N. → 피사 S.Rossore · ⭐직행 07:53 (사탑 도보 5분!)', time:'07:53', endTime:'09:13'},
-      {ic:'🚶', t:'S.Rossore역 → 도보 5분 미라콜리 광장 · 락커에 짐부터 보관(등탑 반입금지)', time:'09:13', endTime:'09:35'},
+      {ic:'🚂', t:'피렌체 S.M.N. → 피사 S.Rossore · ⭐직행 07:53 (사탑 도보 5분!)', time:'07:53', endTime:'09:13',
+        nav:{from:'Firenze Santa Maria Novella', to:'Pisa San Rossore'} },
+      {ic:'🚶', t:'S.Rossore역 → 도보 5분 미라콜리 광장 · 락커에 짐부터 보관(등탑 반입금지)', time:'09:13', endTime:'09:35',
+        nav:{from:'Pisa San Rossore', to:'Piazza dei Miracoli, Pisa', mode:'walking'} },
       {ic:'⛪', t:'대성당(두오모) 둘러보기 · 등탑 대기', time:'09:35', endTime:'10:00'},
       {ic:'🗼', t:'★피사의 사탑 등탑 (예약 10:00 세션·251계단·타이거 체험!)', time:'10:00', endTime:'10:40'},
       {ic:'🔔', t:'세례당 — ⭐경비원 아카펠라 에코 시연(정각·30분마다·11:00 시연)', time:'10:40', endTime:'11:15'},
       {ic:'📸', t:'광장 잔디밭 "사탑 미는" 인증샷·휴식 (캄포산토는 시간 남으면)', time:'11:15', endTime:'11:40'},
       {ic:'🍽️', t:'점심 (피사·광장 근처)', time:'11:40', endTime:'12:40'},
-      {ic:'🚶', t:'구시가(카발리에리 광장·아르노 강변) 지나 Pisa Centrale 이동 (도보 20~25분)', time:'12:40', endTime:'13:20'},
-      {ic:'🚂', t:'Pisa Centrale → 피렌체 S.M.N. (13:32 → 14:01)', time:'13:32', endTime:'14:01'},
+      {ic:'🚶', t:'구시가(카발리에리 광장·아르노 강변) 지나 Pisa Centrale 이동 (도보 20~25분)', time:'12:40', endTime:'13:20',
+        nav:{from:'Piazza dei Miracoli, Pisa', to:'Pisa Centrale', mode:'walking'} },
+      {ic:'🚂', t:'Pisa Centrale → 피렌체 S.M.N. (13:32 → 14:01)', time:'13:32', endTime:'14:01',
+        nav:{from:'Pisa Centrale', to:'Firenze Santa Maria Novella'} },
       {ic:'🛋️', t:'숙소 복귀·휴식 (다비드 전 재충전)', time:'14:01', endTime:'16:45'},
-      {ic:'🚶', t:'숙소 → 아카데미아 (도보 12분)', time:'16:45', endTime:'17:20'},
+      {ic:'🚶', t:'숙소 → 아카데미아 (도보 12분)', time:'16:45', endTime:'17:20',
+        nav:{from:'Via San Antonino 3, Firenze', to:"Galleria dell'Accademia, Firenze", mode:'walking'} },
       {ic:'🗿', t:'★아카데미아(다비드) — 예약 17:30 세션·미켈란젤로 원본', time:'17:30', endTime:'18:45'},
       {ic:'🍝', t:'저녁 (피렌체·마지막 밤)', time:'19:00'}
     ] },
@@ -1791,11 +1842,14 @@ const DAYS = [
     foot:'🎟️ <b>우피치</b> <a href="https://www.b-ticket.com/b-ticket/uffizi" target="_blank" rel="noopener">b-ticket.com</a> (수 08:30 엔트런스 예약) · Italo <a href="https://www.italotreno.it" target="_blank" rel="noopener">italotreno.it</a><br>🧳 <b>준비할 것</b> ☐ 우피치 08:30 e티켓 ☐ 체크아웃·짐 호텔 보관(우피치 후 회수) ☐ Italo 12:28 e티켓 ☐ 로마 도착 이동계획(택시/지하철)',
     acts:[
       {ic:'🍳', t:'조식·체크아웃·짐 호텔 보관', time:'07:30', endTime:'08:00'},
-      {ic:'🚶', t:'숙소 → 우피치 (도보 15분)', time:'08:00', endTime:'08:30'},
+      {ic:'🚶', t:'숙소 → 우피치 (도보 15분)', time:'08:00', endTime:'08:30',
+        nav:{from:'Via San Antonino 3, Firenze', to:'Gallerie degli Uffizi, Firenze', mode:'walking'} },
       {ic:'🖼️', t:'★우피치 미술관 — 예약 08:30 세션 · 보티첼리·다빈치 (첫 입장 한산!)', time:'08:30', endTime:'11:00'},
-      {ic:'🧳', t:'숙소 짐 회수 → S.M.N.역 이동', time:'11:00', endTime:'11:45'},
+      {ic:'🧳', t:'숙소 짐 회수 → S.M.N.역 이동', time:'11:00', endTime:'11:45',
+        nav:{from:'Via San Antonino 3, Firenze', to:'Firenze Santa Maria Novella', mode:'walking'} },
       {ic:'🚉', t:'S.M.N.역 대기 · Italo 탑승 준비', time:'11:45', endTime:'12:28'},
-      {ic:'🚕', t:'테르미니 도착 · 택시로 숙소 이동', time:'15:00', endTime:'15:40'},
+      {ic:'🚕', t:'테르미니 도착 · 택시로 숙소 이동', time:'15:00', endTime:'15:40',
+        nav:{from:'Roma Termini', to:'Via Sebastiano Veniero 22, Roma', mode:'driving'} },
       {ic:'🛋️', t:'체크인 · 짐 정리 · 휴식', time:'15:40', endTime:'17:30'},
       {ic:'⛪', t:'★성 베드로 대성전 내부 (무료·복장 규정 O)', time:'17:30', endTime:'18:30'},
       {ic:'🌆', t:'성 베드로 광장 산책 · 저녁', time:'18:30', endTime:'20:00'},
@@ -1807,7 +1861,8 @@ const DAYS = [
     foot:'🎟️ <b>바티칸 투어</b>(유로자전거나라) 목 <b>07:40~13:10, Cipro역(A선) 미팅</b> · 현장결제 성인 52€ / 만18세 이하 42€ · 일요일 휴관<br>🚶 오후는 자유관광 추천 일정(카스텔 산탄젤로·나보나광장·판테온·트레비분수) — 콜로세움 방면은 10/10에 방문 예정이라 오늘은 피해요<br>🧳 <b>준비할 것</b> ☐ 여권 원본/사본 ☐ 3.5mm 이어폰(수신기 연결용) ☐ 어깨·무릎 가리는 복장(필수) ☐ 물·간식 ☐ 현장결제용 현금/카드',
     acts:[
       {ic:'🍳', t:'기상 · 조식 (간단히, 이동 여유 확보)', time:'06:50', endTime:'07:20', status:'confirmed'},
-      {ic:'🚕', t:'숙소 → Cipro역 이동 · 대중교통 중단 대비 택시 권장', time:'07:20', endTime:'07:40', status:'confirmed'},
+      {ic:'🚕', t:'숙소 → Cipro역 이동 · 대중교통 중단 대비 택시 권장', time:'07:20', endTime:'07:40', status:'confirmed',
+        nav:{from:'Via Sebastiano Veniero 22, Roma', to:'Cipro (Metro A), Roma', mode:'driving'} },
       {ic:'🖼️', t:'★바티칸 박물관 · 시스티나 · 성 베드로 성당 투어', time:'07:40', endTime:'13:10', status:'booked',
         tourBooking:{
           provider:'유로자전거나라',
@@ -1831,10 +1886,14 @@ const DAYS = [
           ]
         } },
       {ic:'🍝', t:'점심 (바티칸 인근)', time:'13:10', endTime:'14:00', status:'confirmed'},
-      {ic:'🏰', t:'카스텔 산탄젤로 (선택 · 하드리아누스 황제의 무덤, 도보 이동)', time:'14:15', endTime:'15:15', status:'confirmed'},
-      {ic:'⛲', t:'나보나 광장 (선택)', time:'15:30', endTime:'16:00', status:'confirmed'},
-      {ic:'🏛️', t:'판테온 (선택)', time:'16:00', endTime:'16:30', status:'confirmed'},
-      {ic:'⛲', t:'트레비 분수 — 동전 던지기 (선택)', time:'16:45', endTime:'17:15', status:'confirmed'},
+      {ic:'🏰', t:'카스텔 산탄젤로 (선택 · 하드리아누스 황제의 무덤, 도보 이동)', time:'14:15', endTime:'15:15', status:'confirmed',
+        nav:{from:"St. Peter's Square, Vatican City", to:"Castel Sant'Angelo, Roma", mode:'walking'} },
+      {ic:'⛲', t:'나보나 광장 (선택)', time:'15:30', endTime:'16:00', status:'confirmed',
+        nav:{from:"Castel Sant'Angelo, Roma", to:'Piazza Navona, Roma', mode:'walking'} },
+      {ic:'🏛️', t:'판테온 (선택)', time:'16:00', endTime:'16:30', status:'confirmed',
+        nav:{from:'Piazza Navona, Roma', to:'Pantheon, Roma', mode:'walking'} },
+      {ic:'⛲', t:'트레비 분수 — 동전 던지기 (선택)', time:'16:45', endTime:'17:15', status:'confirmed',
+        nav:{from:'Pantheon, Roma', to:'Trevi Fountain, Roma', mode:'walking'} },
       {ic:'🍝', t:'저녁식사 · 숙소 복귀', time:'18:00', status:'confirmed'}
     ] },
   { d:15, date:'10/9', wd:'금', city:'rome', badges:['로마'],
@@ -1843,7 +1902,8 @@ const DAYS = [
     foot:'🎟️ <b>남부투어(폼페이·아말피·포지타노)</b>(엔터남부여행 코스2) 금 <b>06:10 Hotel Canada 미팅</b>(Via Vicenza 58, 00185 Roma RM) · 결제완료 · 단체투어라 지각 시 합류 불가 — 미팅시간 엄수!<br>🧳 <b>준비할 것</b> ☐ 이른 기상(05:20~) ☐ 편한 신발 ☐ 멀미약(해안도로) ☐ 물·간식 ☐ 자유시간 현금(스피드보트 옵션 €20/인)',
     acts:[
       {ic:'🍳', t:'기상 · 조식 (이른 아침, 06:10 미팅 대비)', time:'05:20', endTime:'05:50', status:'confirmed'},
-      {ic:'🚕', t:'숙소 → Hotel Canada 이동 (미팅장소)', time:'05:50', endTime:'06:10', status:'confirmed'},
+      {ic:'🚕', t:'숙소 → Hotel Canada 이동 (미팅장소)', time:'05:50', endTime:'06:10', status:'confirmed',
+        nav:{from:'Via Sebastiano Veniero 22, Roma', to:'Via Vicenza 58, Roma', mode:'driving'} },
       {ic:'🚌', t:'★남부투어 — 폼페이 · 아말피 · 포지타노', time:'06:10', endTime:'20:30', status:'booked',
         tourBooking:{
           provider:'엔터남부여행 (코스2)',
@@ -1875,7 +1935,8 @@ const DAYS = [
       {ic:'😴', t:'늦잠 · 자유 기상 (전날 남부투어 회복)', status:'confirmed'},
       {ic:'🌿', t:'오전 자유일정 (선택 · 확정 일정 없음)', status:'confirmed'},
       {ic:'🍝', t:'점심', time:'12:30', endTime:'13:30', status:'confirmed'},
-      {ic:'🚇', t:'숙소 → Colosseo역 이동', time:'13:30', endTime:'14:00', status:'confirmed'},
+      {ic:'🚇', t:'숙소 → Colosseo역 이동', time:'13:30', endTime:'14:00', status:'confirmed',
+        nav:{from:'Via Sebastiano Veniero 22, Roma', to:'Colosseo (Metro B), Roma'} },
       {ic:'🏛️', t:'★콜로세움 & 포로로마노 투어', time:'14:00', endTime:'18:00', status:'booked',
         tourBooking:{
           provider:'형제투어 (패스트트랙, 한국인 가이드)',
@@ -1909,11 +1970,15 @@ const DAYS = [
     story:'🌍 <b>밀라노 두오모 — 135개의 뾰족탑 대성당</b><br>비행기 타기 전 잠깐 들르는 밀라노에는 <b>600년에 걸쳐 지은</b> 어마어마한 하얀 대성당이 있어요. 뾰족한 탑이 무려 135개! 지붕 위로도 올라갈 수 있는데, 대리석 숲 사이를 걷는 기분이래요. 우리 여행의 마지막 유럽 도시에서 이탈리아가 자랑하는 가장 화려한 성당을 눈에 담고 집으로 돌아갑니다. 18박의 대장정, 정말 수고했어요! 🏠',
     foot:'🎟️ 밀라노 두오모 <a href="https://www.duomomilano.it" target="_blank" rel="noopener">duomomilano.it</a> (짐 보관 후 반나절) · Italo·공항철도 e티켓 오프라인 저장<br>🧳 <b>준비할 것</b> ☐ 07:30 기상·08:30 체크아웃 ☐ 09:00 테르미니(택시) ☐ 밀라노역 짐 보관 ☐ 말펜사행 여유시간 ☐ 여권·탑승권',
     acts:[
-      {ic:'🧳', t:'기상·체크아웃·테르미니 이동(택시)', time:'07:30', endTime:'10:05'},
-      {ic:'🚄', t:'Italo 로마→밀라노 Centrale', time:'10:05', endTime:'13:00'},
+      {ic:'🧳', t:'기상·체크아웃·테르미니 이동(택시)', time:'07:30', endTime:'10:05',
+        nav:{from:'Via Sebastiano Veniero 22, Roma', to:'Roma Termini', mode:'driving'} },
+      {ic:'🚄', t:'Italo 로마→밀라노 Centrale', time:'10:05', endTime:'13:00',
+        nav:{from:'Roma Termini', to:'Milano Centrale'} },
       {ic:'🛅', t:'밀라노역 짐 보관', time:'13:00', endTime:'13:30'},
-      {ic:'⛪', t:'밀라노 두오모 반나절 관람', time:'13:30', endTime:'17:00'},
-      {ic:'🚆', t:'말펜사 공항철도 이동 · 체크인', time:'17:30', endTime:'20:00'},
+      {ic:'⛪', t:'밀라노 두오모 반나절 관람', time:'13:30', endTime:'17:00',
+        nav:{from:'Milano Centrale', to:'Duomo di Milano', mode:'walking'} },
+      {ic:'🚆', t:'말펜사 공항철도 이동 · 체크인', time:'17:30', endTime:'20:00',
+        nav:{from:'Milano Centrale', to:'Malpensa Airport (MXP)'} },
       {ic:'✈️', time:'22:00', t:'밀라노 말펜사(MXP·T1) 22:00 KE0928 → 10/12(월) 인천(ICN·T2) 16:40 도착 · 총 11시간 40분 · 수하물 1개 · 일반석(H)'}
     ] },
   { d:18, date:'10/12', wd:'월', city:'rome', transit:'transit', badges:['귀국'],
@@ -2005,6 +2070,37 @@ const TRANSPORT = [
   { icon:'🚄', route:'로마 → 밀라노 (Italo)', detail:'<strong>Italo</strong> · 10/11(일) 10:05 Roma Termini → 밀라노 Centrale<br>이후 공항철도로 공항 이동', app:'📱 앱: Italo' },
   { icon:'✈️', route:'밀라노 → 인천 (귀국)', detail:'10/11(일) 22:00 밀라노 말펜사(MXP·T1) 출발 → 10/12(월) 16:40 인천(ICN·T2) 도착<br>총 11시간 40분 · 수하물 1개 · 일반석(H)' },
 ];
+
+// 도시별 시내교통 카드/티켓 안내 — 도착 즉시 뭘 사야 하는지
+const LOCAL_TRANSIT = [
+  { flag:'🇬🇧', name:'런던',
+    card:'컨택리스 결제 (Oyster 카드 없이 바로 탭)',
+    where:'별도 카드 구매 필요 없음 — 트래블로그/트래블월렛 카드를 지하철·버스 노란 리더기에 그대로 탭(입장 시 1회, 지하철은 하차 시에도 1회)',
+    price:'요금은 자동 일일상한제(Daily Cap) 적용 — 하루 아무리 많이 타도 정해진 최대금액 이상 청구 안 됨',
+    childNote:'11세는 Zip Oyster 사진카드(11~15세 반값)를 받으려면 사전 온라인 신청+사진심사가 필요해 단기여행엔 비추천 — 그냥 성인 컨택리스 탭으로 진행 권장' },
+  { flag:'🇫🇷', name:'파리',
+    card:'Navigo Easy 카드 (재사용 가능한 IC카드) + t+ 낱장권/카르네',
+    where:'지하철역 매표창구(guichet) 또는 자판기(distributeur automatique), 담배가게(tabac)에서도 카드·충전 가능. 카드 자체 €2, t+ 카르네(10장 묶음) 충전 방식',
+    price:'t+ 낱장권 €2.15 / 카르네(10장) €17.35 — RER 공항구간은 별도 요금',
+    childNote:'4~9세만 반값 할인, 10세 이상은 성인요금 — 타이거(11세) 해당' },
+  { flag:'🇩🇪', name:'뮌헨',
+    card:'MVV 개별권 또는 1일권(Single-Tageskarte)',
+    where:'역 구내 자동발매기(Fahrkartenautomat) 또는 MVGO 앱에서 모바일 티켓 구매',
+    price:'1일권 성인 약 €8.90 (구역에 따라 변동)',
+    childNote:'6~14세 "Kinder(아동)" 요금 할인 있음 — 발매기에서 아동 옵션 선택, 타이거(11세) 해당' },
+  { flag:'🇮🇹', name:'피렌체',
+    card:'ATAF 단일권(90분권)',
+    where:'타바키(Tabacchi, 담배가게 겸 신문가판대) 또는 정류장 자판기에서 구매 — 탑승 후 반드시 차내 노란 펀칭기에 편칭(각인)해야 유효',
+    price:'사전구매 €1.70 / 버스 내 기사에게 직접 구매 시 €3(현금)',
+    childNote:'별도 아동 할인 없음 — 신장 1m 미만 무료가 일반적' },
+  { flag:'🇮🇹', name:'로마',
+    card:'ATAC BIT 단일권(100분권) 또는 로마패스',
+    where:'타바키 또는 지하철역 자판기에서 구매 — 탑승 후 노란/주황 펀칭기에 편칭 필수',
+    price:'BIT 단일권 €1.50',
+    childNote:'10세 미만 무료, 타이거(11세)는 성인요금' },
+];
+// 아이 트래블로그 카드 충전 권장액 — BUDGET_GUIDE.tr(2인 현지교통비) 절반 + 여유분, 도시간 기차/항공(이미 결제완료)은 제외
+const CHILD_CARD_GUIDE = { GBP:30, EUR:100 };
 
 // 사전 결제 확정 비용 (KRW) — Total 8,886,166
 const COSTS = [
@@ -2340,12 +2436,17 @@ function bookingRequiredHTML(br){
   if(!br) return '';
   return ` <a class="booking-req" href="${esc(br.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🔗 예약필요: ${esc(br.label)}</a>`;
 }
+function navHTML(nav){
+  if(!nav) return '';
+  const url='https://www.google.com/maps/dir/?api=1'+(nav.from?('&origin='+encodeURIComponent(nav.from)):'')+'&destination='+encodeURIComponent(nav.to)+'&travelmode='+(nav.mode||'transit');
+  return ` <a class="nav-link" href="${url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🗺️ 길찾기</a>`;
+}
 // 하루의 일정을 시간순으로 자동 배치 (숙소 체크인·기차/비행 시간·추가 일정)
 function fixedList(day){
   const f=[];
   if(day.transport) f.push({kind:'move', icon:day.transport.icon||'🚆', rawHtml:day.transport.text, title:strip(day.transport.text), time:day.transport.time||'', end:day.transport.end||''});
   if(day.hotel) f.push({kind:'hotel', icon:'🏨', rawHtml:day.hotel.text, title:strip(day.hotel.text), time:day.hotel.time||'', end:''});
-  (day.acts||[]).forEach(a=> f.push({kind:'act', icon:a.ic||'•', rawHtml:esc(a.t)+statusBadgeHTML(a.status)+tourBookingHTML(a.tourBooking)+bookingRequiredHTML(a.bookingRequired), title:a.t, time:a.time||'', end:a.endTime||''}));
+  (day.acts||[]).forEach(a=> f.push({kind:'act', icon:a.ic||'•', rawHtml:esc(a.t)+statusBadgeHTML(a.status)+tourBookingHTML(a.tourBooking)+bookingRequiredHTML(a.bookingRequired)+navHTML(a.nav), title:a.t, time:a.time||'', end:a.endTime||''}));
   return f;
 }
 function hashStr(x){ let h=0; x=String(x||''); for(let i=0;i<x.length;i++){ h=(h*31+x.charCodeAt(i))>>>0; } return h.toString(36); }
@@ -2730,6 +2831,32 @@ function renderTransport(){
       </div>
       ${t.cost?`<div class="transport-cost-badge">${esc(t.cost)}</div>`:''}
     </div>`).join('');
+}
+function renderLocalTransit(){
+  const wrap=document.getElementById('localTransitWrap'); if(!wrap) return;
+  const cards = LOCAL_TRANSIT.map(c=>`
+    <div class="transit-card">
+      <div class="transit-city">${c.flag} ${esc(c.name)}</div>
+      <div class="transit-row"><b>🎫 이용수단</b> ${esc(c.card)}</div>
+      <div class="transit-row"><b>🛒 구매처</b> ${esc(c.where)}</div>
+      <div class="transit-row"><b>💰 요금</b> ${esc(c.price)}</div>
+      <div class="transit-row"><b>🧒 아동요금</b> ${esc(c.childNote)}</div>
+    </div>`).join('');
+  wrap.innerHTML = `
+    <div class="section-header" style="margin-top:28px"><span class="section-icon">🚇</span><span class="section-title">시내교통 가이드 (도착 즉시 뭘 사야할까)</span></div>
+    ${cards}
+    <div class="hint" style="padding:8px 4px;font-size:12px;line-height:1.7;margin-top:2px">
+      💳 <b>타이거(11세) 트래블로그 카드 충전 추천</b> — 파운드 <b>£${CHILD_CARD_GUIDE.GBP}</b> (런던) / 유로 <b>€${CHILD_CARD_GUIDE.EUR}</b> (파리·뮌헨·피렌체·로마)면 일별 현지교통비를 충분히 커버해요. 도시 간 이동 기차·항공은 이미 결제 완료라 계산에서 제외했어요.
+    </div>
+    <div class="section-header" style="margin-top:20px"><span class="section-icon">📴</span><span class="section-title">인터넷 안 될 때 대비</span></div>
+    <div class="tips-grid">
+      <div class="tip-card"><div class="tip-title">🗺 오프라인 지도 저장</div><div class="tip-text">출발 전 와이파이에서 구글맵 앱 → 도시 검색 → 하단 카드 위로 스와이프 → ⋮ 더보기 → "오프라인 지도 다운로드". 런던·파리·뮌헨·피렌체·로마 각각 미리 저장해두면 인터넷 없이도 도보/운전 길찾기가 가능해요.</div></div>
+      <div class="tip-card"><div class="tip-title">📶 eSIM · 포켓와이파이</div><div class="tip-text">오프라인 지도는 실시간 대중교통 배차·환승 정보가 안 나와요. Airalo 등 유럽 eSIM을 미리 구매해두면 지도·번역 앱을 그대로 쓸 수 있어요.</div></div>
+      <div class="tip-card"><div class="tip-title">📱 현지 교통앱</div><div class="tip-text">런던 TfL Go · 파리 Bonjour RATP · 뮌헨 MVGO · 피렌체/로마 Moovit — 실시간 경로·지연정보 확인용.</div></div>
+      <div class="tip-card"><div class="tip-title">🚕 비상용 택시앱</div><div class="tip-text">지하철 불통 등 비상시 대비 Uber·FREENOW·Bolt 미리 설치해두면 안심.</div></div>
+      <div class="tip-card"><div class="tip-title">📸 승차권 캡처 습관</div><div class="tip-text">MVGO 등 모바일 승차권도 e티켓처럼 화면 캡처해서 사진첩에 저장 — 인터넷 안 될 때 앱 로딩 실패 대비.</div></div>
+    </div>
+  `;
 }
 function renderCost(){
   renderWallet();
@@ -4347,6 +4474,7 @@ function init(){
   renderCitySubtabs();
   renderHotels();
   renderTransport();
+  renderLocalTransit();
   renderCost();
   renderCommunity();
   renderChecklist();
@@ -5092,6 +5220,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-41</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-42</div>
 </body>
 </html>
