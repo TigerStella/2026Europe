@@ -5,7 +5,9 @@ const CACHE = 'noleu-europe-v80';
 const KEEP_PREFIX = 'trapble-history-audio';
 const ASSETS = [
   './', './manifest.webmanifest', './bag-192.png', './bag-512.png',
-  './data/docent_paris_orsay_orangerie.json', './audio/manifest.json',
+  './data/docent_london_national_gallery.json', './data/docent_paris_louvre.json',
+  './data/docent_paris_orsay_orangerie.json', './data/docent_florence_uffizi.json',
+  './data/docent_rome_vatican.json', './audio/manifest.json',
 ];
 
 self.addEventListener('install', (e) => {

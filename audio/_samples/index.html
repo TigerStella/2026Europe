@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>도슨트 목소리 비교</title>
+<style>
+  :root { --ink:#1E2535; --mid:#4A5568; --line:#E2DDD8; --bg:#FAF8F5; --card:#fff; --accent:#C9803B; }
+  @media (prefers-color-scheme: dark) { :root { --ink:#F0EDE8; --mid:#B8BFCC; --line:#3A4152; --bg:#171B24; --card:#222837; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:20px 16px 40px; font-family:-apple-system, system-ui, 'Noto Sans KR', sans-serif; background:var(--bg); color:var(--ink); line-height:1.6; }
+  main { max-width:560px; margin:0 auto; }
+  h1 { font-size:22px; margin:0 0 6px; }
+  p { font-size:16px; color:var(--mid); margin:0 0 16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-bottom:12px; }
+  .num { display:inline-block; min-width:32px; height:32px; line-height:32px; text-align:center; border-radius:16px; background:var(--accent); color:#fff; font-weight:800; margin-right:8px; }
+  .name { font-size:17px; font-weight:700; }
+  .sub { font-size:14px; color:var(--mid); margin:4px 0 10px; }
+  audio { width:100%; }
+  .note { font-size:14px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>🎧 도슨트 목소리 비교</h1>
+  <p>우피치 미술관 인트로 대본으로 만든 4가지 버전이에요. 모두 문장 단위로 합성하고 문장 사이에 쉼(0.3초, 물음표 뒤 0.45초)을 넣었어요. 들어 보고 마음에 드는 <b>번호</b>를 알려 주세요.</p>
+
+  <div class="card"><span class="num">1</span><span class="name">인준 · 속도 -5%</span>
+    <div class="sub">ko-KR-InJoonNeural · 지금 쓰는 목소리</div>
+    <audio controls preload="none" src="1_injoon_minus5.mp3"></audio></div>
+
+  <div class="card"><span class="num">2</span><span class="name">인준 · 기본 속도</span>
+    <div class="sub">ko-KR-InJoonNeural · +0%</div>
+    <audio controls preload="none" src="2_injoon_0.mp3"></audio></div>
+
+  <div class="card"><span class="num">3</span><span class="name">현수 · 기본 속도</span>
+    <div class="sub">ko-KR-HyunsuMultilingualNeural · +0%</div>
+    <audio controls preload="none" src="3_hyunsu_0.mp3"></audio></div>
+
+  <div class="card"><span class="num">4</span><span class="name">현수 · 속도 -5%</span>
+    <div class="sub">ko-KR-HyunsuMultilingualNeural · -5%</div>
+    <audio controls preload="none" src="4_hyunsu_minus5.mp3"></audio></div>
+
+  <p class="note">재생이 안 되면 음성 생성이 아직 끝나지 않은 거예요. 몇 분 뒤 새로고침해 주세요.</p>
+</main>
+</body>
+</html>
