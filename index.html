@@ -2197,6 +2197,10 @@ const COSTS = [
       ['피렌체 (10/5~10/7)', 546774],
       ['로마 (10/7~10/11)', 1259668],
   ] },
+  { cat:'💳 하나트래블카드 충전', items:[
+      ['EUR 80 충전 (9/25, 환율 1,550.09원)', 124007],
+      ['GBP 20 충전 (9/25, 환율 1,800.62원)', 36012],
+  ] },
 ];
 
 const COMMUNITY = {
@@ -2998,9 +3002,11 @@ const EXCHANGE = {
     { date:'2026-05-08', rate:1716.27, amt:58.26,  krw:99989  },
     { date:'',           rate:1746.04, amt:0.01,   krw:17     },
     { date:'2026-07-29', rate:1647.07, amt:435.00, krw:716475 },
+    { date:'2026-09-25', rate:1550.09, amt:80.00,  krw:124007 },
   ] },
   GBP: { records:[
     { date:'2026-07-29', rate:1922.24, amt:145.00, krw:278724 },
+    { date:'2026-09-25', rate:1800.62, amt:20.00,  krw:36012  },
   ] },
 };
 const WALLET_CCY = ['EUR','GBP'];
@@ -5898,6 +5904,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-45 · 도슨트 6관</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-46 · 도슨트 6관</div>
 </body>
 </html>
