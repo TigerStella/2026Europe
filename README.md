@@ -127,13 +127,22 @@ scripts/generate_audio.py          🎧 음성 생성 스크립트(edge-tts)
 
 ## 🎧 도슨트 모드 (박물관 상세 화면 확장)
 
-11살 아이가 폰을 들고 직접 그림을 찾아가는 모드입니다. 새 탭이 아니라, **역사 스탬프투어 → 🏛 박물관별로 보기 → 🎧 도슨트 표시 박물관**(현재 오르세·오랑주리)에서 열립니다. 기존 도장·퀴즈·저장 상태는 그대로 이어집니다.
+11살 아이가 폰을 들고 직접 그림을 찾아가는 모드입니다. 새 탭이 아니라, **역사 스탬프투어 → 🏛 박물관별로 보기 → 🎧 도슨트 표시 박물관**에서 열립니다. 현재 **6개 관 모두 지원**합니다.
+
+| 관 | 방문 | 동선 단서 | 데이터 파일 | 비고 |
+|---|---|---|---|---|
+| 내셔널 갤러리 | 9/28 14:00 | 8 | `docent_london_national_gallery.json` | 🎧 투어 모드, 해바라기 출장 중(absent) |
+| 루브르박물관 | 9/30 09:20 | 9 | `docent_paris_louvre.json` | 🎧 투어 모드, 함무라비는 ⭐ 보너스 |
+| 오르세미술관 | 9/30 13:30 | 8 | `docent_paris_orsay_orangerie.json` | 르누아르 무도회 출장 중, 별밤 현장 확인 |
+| 오랑주리미술관 | 10/1 12:00 | 4 | (위와 같은 파일) | |
+| 우피치미술관 | 10/7 08:30 | 8 | `docent_florence_uffizi.json` | 조토 성모는 🏰 중세로 분류 |
+| 바티칸미술관 | 10/8 07:40 | 9 | `docent_rome_vatican.json` | 시스티나 2작품은 🧠 기억 미션, 피에타는 성 베드로 대성전 | 기존 도장·퀴즈·저장 상태는 그대로 이어집니다.
 
 | 화면 | 기능 |
 |---|---|
-| 박물관 헤더 | 방문일·시각, 🕵️ 사건 파일(caseTitle·caseBrief), ▶ 인트로 음성, 동선 메모·관람 규칙, 📥 오프라인 저장, 📤 사진 내보내기, 👩 엄마 확인용 |
+| 박물관 헤더 | 방문일·시각, 🕵️ 사건 파일(caseTitle·caseBrief), ▶ 인트로 음성, 🎧 투어 모드 안내(`tourMode.note`), 동선 메모·관람 규칙, 📥 오프라인 저장, 📤 사진 내보내기, 👩 엄마 확인용 |
 | 정렬 | **[🚶 동선순 / 🕰 시대순]** — 기본 동선순(도슨트 순서 번호), 시대순은 기존 화면 그대로. JSON에 없는 기존 작품은 "시간이 남으면 더 볼 작품"으로 아래에 |
-| 작품 카드 | 순서 번호, 📍위치, 🇰🇷 그때 조선 · 🌍 그때 세계, 기존 도장·퀴즈 칩, 사진 찍으면 썸네일 |
+| 작품 카드 | 순서 번호, 📍위치, 🇰🇷 그때 조선 · 🌍 그때 세계, 기존 도장·퀴즈 칩, `bonus`면 ⭐ 보너스 단서, 사진 찍으면 썸네일 |
 | 힌트 | 🧩수수께끼 → 📍위치 → 🔑정답 순서로 공개. 사용한 힌트 수로 도장 등급 🥇금(0)·🥈은(1)·🥉동(2~3) |
 | 감상법 | 3단계 체크리스트 |
 | 음성 | 🎧 작가·배경 이야기 / 그림 속 비밀 — 한 번에 하나만 재생, 재생 중 표시, 0.9·1.0·1.2배속. 파일이 아직 없으면 "음성 준비 중"(비활성) + 📄 대본 읽기 |
@@ -146,31 +155,41 @@ scripts/generate_audio.py          🎧 음성 생성 스크립트(edge-tts)
 
 ### 데이터 병합 규칙
 `data/docent_*.json`을 앱이 불러와 기존 카드에 합칩니다.
-- **같은 작품이 이미 있으면 기존 필드는 그대로 두고 `docent` 하위 객체만 추가** — `orsay-dejeuner`→기존 `luncheon-grass`, `orsay-starry-rhone`→기존 `starry-rhone` (도장·퀴즈 기록 유지)
-- 새 작품은 카드로 추가. JSON에 없는 짧은 요약·이모지·시대·퀴즈 해설은 `index.html`의 `TRH_DC_SUPPLEMENT`에 있음
+- **같은 작품이 이미 있으면 기존 필드는 그대로 두고 `docent` 하위 객체만 추가** — `TRH_DC_MERGE_ID`에 19개 매핑(오르세 2 + 내셔널 4 + 루브르 5 + 우피치 4 + 바티칸 4). 기존 카드의 이름·연도·퀴즈·도장 기록은 그대로
+- 새 작품은 카드로 추가. JSON에 없는 짧은 요약·이모지·시대·퀴즈 해설은 `index.html`의 `TRH_DC_SUPPLEMENT`에 있음(내용은 그 작품 JSON의 대본·조선·세계 문장에서만 발췌)
 - JSON의 `order`(동선 순서)는 기존 시대순 정렬용 `order`와 겹치지 않게 `docent.order`로 저장
 - JSON 박물관 id `national-gallery`는 앱의 `national`로 매핑(`TRH_DC_MUSEUM_ALIAS`)
 
 ### 🔊 음성 만들기
-GitHub Actions가 자동으로 만듭니다 — 배포 브랜치에서 `data/docent_*.json`이나 `scripts/generate_audio.py`가 바뀌면 **「도슨트 음성 생성」 워크플로**가 edge-tts(`ko-KR-InJoonNeural`, 속도 -5%)로 `audio/{museumId}/…mp3`와 `audio/manifest.json`을 만들어 커밋하고 Pages를 다시 배포합니다. 대본을 고친 뒤 다시 만들려면 Actions 탭 → 「도슨트 음성 생성」 → Run workflow → `force` 체크.
+GitHub Actions가 자동으로 만듭니다 — 배포 브랜치에서 `data/docent_*.json`이나 `scripts/generate_audio.py`가 바뀌면 **「도슨트 음성 생성」 워크플로**가 `audio/{museumId}/…mp3`와 `audio/manifest.json`을 만들어 커밋하고 Pages를 다시 배포합니다(없는 파일만 생성).
 
-직접 만들 때(인터넷 되는 PC):
+**자연스럽게 들리도록 하는 처리** (`scripts/generate_audio.py`)
+- 읽기 전 다듬기: 「」『』·따옴표 제거, 줄표(—)→쉼표, `1300~1305년`→`1300년에서 1305년`, 괄호→앞뒤 쉼표
+- 대본을 **문장 단위로 따로 합성**한 뒤 문장 사이 **0.3초**(물음표 뒤 **0.45초**) 쉼을 넣어 ffmpeg로 mp3 하나로 이어 붙임
+- 목소리·속도·쉼 길이는 스크립트 맨 위 상수(`VOICE`, `RATE`, `PAUSE_SENTENCE`, `PAUSE_QUESTION`)
+
+**수동 실행**: Actions 탭 → 「도슨트 음성 생성」 → Run workflow
+- `force` 체크 → 전체 다시 생성(대본·목소리를 바꿨을 때)
+- `samples` 체크 → 우피치 인트로로 목소리 비교 샘플 4종만 `audio/_samples/`에 생성(재생 페이지: `audio/_samples/index.html`)
+
+직접 만들 때(인터넷 되는 PC, ffmpeg 필요):
 ```bash
 pip install edge-tts
-python scripts/generate_audio.py data/docent_*.json          # 없는 파일만 생성
-python scripts/generate_audio.py data/docent_*.json --force  # 전부 다시 생성
+python scripts/generate_audio.py 'data/docent_*.json'          # 없는 파일만 생성
+python scripts/generate_audio.py 'data/docent_*.json' --force  # 전부 다시 생성
+python scripts/generate_audio.py --samples                     # 목소리 비교 샘플
 ```
 
 ### ✈️ 오프라인
 - 앱 화면·도슨트 JSON은 서비스워커가 자동 저장(한 번 온라인으로 연 뒤).
 - 음성은 용량 때문에 **박물관마다 [📥 이 미술관 오프라인 저장]** 을 와이파이에서 눌러 둬야 합니다(진행률 표시, 완료 시 ✅). 비행기 모드에서도 재생됩니다.
-- 배포할 때마다 `sw.js`의 `CACHE` 버전(현재 `noleu-europe-v78`)을 올리세요. 이전 앱 캐시는 지워지지만 음성 저장본(`trapble-history-audio-*`)은 유지됩니다.
+- 배포할 때마다 `sw.js`의 `CACHE` 버전(현재 `noleu-europe-v80`)을 올리세요. 이전 앱 캐시는 지워지지만 음성 저장본(`trapble-history-audio-*`)은 유지됩니다.
 
 ### 📤 사진 백업
 [📤 사진 내보내기] — 공유 시트(갤러리·드라이브·카톡 등)를 지원하면 공유 시트로, 아니면 jpg 파일로 내려받습니다.
 > ⚠️ 브라우저 데이터를 지우면 사진이 사라져요. **매일 저녁 내보내기**를 권장합니다.
 
-### 새 박물관 콘텐츠 추가(내셔널 갤러리·루브르·우피치·바티칸 예정)
+### 새 박물관 콘텐츠 추가
 1. 같은 스키마로 `data/docent_<지역>_<박물관>.json` 추가
 2. `index.html`의 `TRH_DC_FILES` 배열에 파일 경로 추가, `sw.js`의 `ASSETS`에도 추가하고 `CACHE` 버전 올리기
 3. 기존 카드와 같은 작품이면 `TRH_DC_MERGE_ID`에 `{JSON작품id: 기존카드id}` 추가, 새 작품이면 `TRH_DC_SUPPLEMENT`에 요약·이모지 추가(없어도 동작)

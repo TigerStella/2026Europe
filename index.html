@@ -942,6 +942,7 @@
   .trh-case-audio .trh-audio-btn{ background:rgba(255,255,255,.14); color:#fff; }
   .trh-dc-note{ background:var(--trh-parch); border:1px solid var(--trh-line); border-radius:12px; padding:12px 14px; font-size:15px; line-height:1.6; margin-bottom:12px; }
   .trh-dc-note div+div{ margin-top:4px; }
+  .trh-tourmode{ background:#EEF0FA; border-color:#B9C0EA; color:#2F3877; }
   .trh-dc-tools{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
   .trh-dc-tools .trh-dc-btn{ font-size:14px; }
   .trh-toggle{ display:inline-flex; background:#EFE6D4; border-radius:24px; padding:4px; margin:0 0 14px; }
@@ -4875,10 +4876,23 @@ function trhMuseumGrad(mk){ return trhGrad(MUSEUMS[mk].city); }
    - 같은 작품이 이미 있으면(TRH_DC_MERGE_ID) 기존 필드는 그대로 두고 s.docent만 추가
    - 새 작품은 카드로 추가(JSON에 없는 요약·이모지·시대·퀴즈 해설은 TRH_DC_SUPPLEMENT)
    - 실패해도 기존 카드·도장·퀴즈는 그대로 동작 */
-const TRH_DC_FILES = ['data/docent_paris_orsay_orangerie.json'];   // 새 박물관 JSON은 여기에 추가
+const TRH_DC_FILES = [   // 새 박물관 JSON은 여기에 추가(여행 동선 순)
+  'data/docent_london_national_gallery.json',
+  'data/docent_paris_louvre.json',
+  'data/docent_paris_orsay_orangerie.json',
+  'data/docent_florence_uffizi.json',
+  'data/docent_rome_vatican.json',
+];
 const TRH_DC_MANIFEST = 'audio/manifest.json';
 const TRH_AUDIO_CACHE = 'trapble-history-audio-v1';                 // sw.js가 버전업 때 지우지 않는 버킷
-const TRH_DC_MERGE_ID = { 'orsay-dejeuner':'luncheon-grass', 'orsay-starry-rhone':'starry-rhone' };
+// { JSON 작품 id: 기존 카드 id } — 기존 카드의 도장·퀴즈 기록을 그대로 이어 쓰기 위한 매핑
+const TRH_DC_MERGE_ID = {
+  'orsay-dejeuner':'luncheon-grass', 'orsay-starry-rhone':'starry-rhone',
+  'ng-arnolfini':'arnolfini', 'ng-hay-wain':'haywain', 'ng-temeraire':'temeraire', 'ng-sunflowers-absent':'sunflowers',
+  'louvre-venus-milo':'venus-milo', 'louvre-nike':'nike', 'louvre-mona-lisa':'mona-lisa', 'louvre-liberty':'liberty', 'louvre-hammurabi':'hammurabi',
+  'uffizi-annunciation':'annunciation', 'uffizi-duke-urbino':'duke-urbino', 'uffizi-primavera':'primavera', 'uffizi-birth-venus':'birth-venus',
+  'vatican-laocoon':'laocoon', 'vatican-school-athens':'school-athens', 'vatican-creation-adam':'creation-adam', 'vatican-last-judgment':'last-judgment',
+};
 const TRH_DC_MUSEUM_ALIAS = { 'national-gallery':'national' };
 let TRH_DC_TRACKS = { '1':'작가·배경 이야기', '2':'그림 속 비밀' };
 const TRH_DC_SUPPLEMENT = {
@@ -4922,10 +4936,66 @@ const TRH_DC_SUPPLEMENT = {
     kid:'가족이 마차를 타고 나들이 가는 모습을 기념사진처럼 그린 그림이야. 화가 루소는 세관에서 일하며 혼자 그림을 배웠어. 사람들은 어린애 그림 같다고 비웃었지만, 젊은 피카소는 루소에게 반해 파티까지 열어줬대. 마차 밑의 강아지를 찾아봐!',
     sig:'학교 없이 독학한 화가가 새 미술의 길을 연 이야기 — 같은 해 조선에서는 최남선이 잡지 <b>『소년』</b>을 만들었어요.',
     why:['루소는 파리 세관에서 일해서 「세관원」이라는 별명이 붙었어.'] },
+
+  /* ── 내셔널 갤러리 (내용은 JSON audioScripts·joseon·world에서만 발췌) ── */
+  'ng-virgin-rocks': { emoji:'⛰', era:'르네상스',
+    kid:'레오나르도 다빈치가 그린 그림인데, 똑같은 구도의 쌍둥이 그림이 파리 루브르에 또 있어. 먼저 그린 건 루브르에, 나중 버전이 여기 런던에 있지. 레오나르도는 실제 바위와 식물을 관찰해서 동굴 속 바위와 풀꽃을 그렸대. 이틀 뒤 루브르에서 틀린 그림 찾기를 해 봐!',
+    why:['똑같은 구도의 쌍둥이 그림이 파리 루브르에 있어. 먼저 그린 버전이 루브르에 있지.'] },
+  'ng-ambassadors': { emoji:'🌐', era:'북유럽 르네상스',
+    kid:'영국에 온 프랑스 외교관 두 사람을 그린 그림이야. 두 사람 사이 선반엔 지구본·천체 관측 도구·악기·책이 놓여 있어. 발밑의 길쭉한 회색 물체는 그림 오른쪽 옆에서 비스듬히 보면 해골로 나타나 — 일부러 늘여 그린 「왜상」이야.',
+    why:['발밑 물체는 계산해서 늘여 그린 해골이라, 오른쪽 옆에서 비스듬히 봐야 제대로 보여.'] },
+  'ng-whistlejacket': { emoji:'🐎', era:'18세기 영국',
+    kid:'휘슬재킷은 실제로 있었던 유명한 경주마 이름이야. 화가 스텁스는 말을 제대로 그리려고 몇 달 동안 말의 뼈와 근육을 직접 연구하고, 말 해부학 책까지 냈어. 거의 실제 크기라 옆에 서면 진짜 말 앞에 선 기분이 들 거야.',
+    why:['스텁스는 몇 달 동안 말의 몸속 뼈와 근육을 직접 연구했어.'] },
+  'ng-vangogh-chair': { emoji:'🪑', era:'19세기 · 후기인상주의',
+    kid:'1888년 아를의 노란 집에서 고흐가 그린 자기 의자야. 친구 고갱이 함께 살러 오자, 자기 의자와 고갱의 의자를 한 장씩 그렸지. 뒤쪽 양파 상자에 「빈센트」라는 이름이 써 있어 — 자화상 대신 의자로 자기를 그린 거야.',
+    why:['뒤쪽 양파 상자에 「빈센트」라고 고흐 이름이 써 있어.'] },
+  /* ── 루브르 ── */
+  'louvre-apollo-gallery': { emoji:'☀️', era:'17세기 · 절대왕정',
+    kid:'「태양왕」 루이 14세 때 만든, 온통 태양과 금빛인 방이야. 베르사유의 「거울의 방」도 이 방을 본떠 만들었대. 2025년 10월, 공사 인부로 변장한 도둑들이 창문을 깨고 들어와 왕관 보석 여덟 점을 훔쳐 갔어. 그래서 지금은 보석 없이 방의 아름다움만 남아 있어.',
+    why:['2025년 10월 도둑들이 이 방에서 나폴레옹과 황후의 왕관 보석 여덟 점을 훔쳐 갔어.'] },
+  'louvre-virgin-rocks': { emoji:'🔍', era:'르네상스',
+    kid:'이틀 전 런던에서 본 「암굴의 성모」의 쌍둥이 그림, 레오나르도가 먼저 그린 버전이야. 이 파리 버전엔 머리 위 금색 후광이 없고, 오른쪽 천사가 손가락으로 아기 요한을 가리키고 있어. 런던 사진과 비교해 틀린 그림을 찾아봐!',
+    why:['파리 버전에는 머리 위 금색 후광이 없어. 런던 버전에만 있지.'] },
+  'louvre-cana': { emoji:'🍷', era:'르네상스',
+    kid:'모나리자 맞은편에 걸린, 루브르에서 가장 큰 그림이야(가로가 거의 10미터!). 예수가 결혼식 잔치에서 물을 포도주로 바꾼 이야기를 1560년대 베네치아의 화려한 파티처럼 그렸어. 1797년 나폴레옹 군대가 베네치아에서 가져왔는데, 너무 커서 반으로 잘라 옮겼대.',
+    why:['1797년 나폴레옹 군대가 베네치아를 점령하고 이 그림을 전리품으로 가져왔어.'] },
+  'louvre-coronation': { emoji:'👑', era:'19세기 · 나폴레옹',
+    kid:'1804년 12월 노트르담 대성당, 나폴레옹이 황제가 되는 날이야. 나폴레옹은 교황에게서 왕관을 받는 대신 자기 손으로 직접 썼대. 그림은 그다음, 아내 조제핀에게 왕관을 씌워 주려는 순간이야. 발코니의 어머니는 사실 이날 오지 않았는데 그려 넣었대.',
+    why:['나폴레옹의 어머니는 대관식에 오지 않았는데, 나폴레옹이 그려 넣으라고 해서 그림에 들어갔어.'] },
+  /* ── 우피치 ── */
+  'uffizi-giotto-maesta': { emoji:'✨', era:'르네상스의 시작', periodCat:'medieval',
+    kid:'이 방엔 치마부에·두초·조토, 세 화가의 금빛 성모님 그림이 있어. 다른 성모님들은 종이 인형처럼 납작한데, 조토의 성모님은 옷 밑으로 무릎이 불룩 튀어나와 진짜 의자에 앉은 것 같지. 그림 속에 진짜 공간을 만든 것, 이게 르네상스의 첫 번째 단서야.',
+    why:['조토의 성모님은 옷 밑으로 무릎이 튀어나와서 진짜 몸이 있는 것처럼 입체적으로 보여.'] },
+  'uffizi-doni-tondo': { emoji:'⭕', era:'르네상스',
+    kid:'자기가 화가가 아니라 조각가라고 했던 미켈란젤로가 나무판에 그린, 지금 남은 유일한 완성 그림이야. 피렌체 상인 아뇰로 도니가 결혼 기념으로 주문했어. 「톤도」는 동그란 그림이라는 뜻이고, 성모의 팔 근육이 돌로 깎은 것처럼 단단해 보여.',
+    why:['톤도는 동그란 그림이라는 뜻이야.'] },
+  'uffizi-goldfinch': { emoji:'🐦', era:'르네상스',
+    kid:'라파엘로가 스물세 살쯤 친구의 결혼 선물로 그린 그림이야. 아기 세례 요한이 아기 예수에게 방울새를 보여 주고 있어. 1547년 친구 집이 산사태로 무너져 그림이 열일곱 조각으로 부서졌지만, 2002년부터 6년 동안 정밀하게 복원됐어.',
+    why:['1547년 산사태로 집이 무너지면서 그림이 열일곱 조각으로 부서졌어.'] },
+  'uffizi-medusa': { emoji:'🛡', era:'16세기 말 · 카라바조',
+    kid:'눈이 마주치면 돌로 변한다는 신화 속 괴물 메두사야. 카라바조는 이 그림을 진짜 볼록한 나무 방패 위에 그렸는데, 오히려 움푹 들어가 보이게 그렸어. 메두사 얼굴은 카라바조가 자기 얼굴을 모델로 그렸다고 해.',
+    why:['카라바조는 볼록한 나무 방패 위에 메두사를 그렸어.'] },
+  /* ── 바티칸 ── */
+  'vatican-st-jerome': { emoji:'🦁', era:'르네상스',
+    kid:'레오나르도가 서른 살쯤 그리다 멈춘 그림이야. 성경을 라틴어로 번역한 학자 히에로니무스의 발밑엔 전설 속 사자가 있어. 이 그림은 한때 조각조각 잘려 있었는데, 나폴레옹의 삼촌 페슈 추기경이 조각을 찾아 모았대.',
+    why:['그림 조각을 모은 페슈 추기경은 나폴레옹의 삼촌이야.'] },
+  'vatican-pigna': { emoji:'🌲', era:'고대 로마', periodCat:'ancient',
+    kid:'높이가 거의 4미터인 청동 솔방울이야. 2,000년 전 고대 로마 사람들이 만들었고, 원래는 판테온 근처에서 꼭대기로 물을 뿜던 분수였어. 1608년에 지금 이 자리로 왔지. 양옆 청동 공작새는 복제품이야.',
+    why:['원래 판테온 근처에서 꼭대기로 물을 뿜던 분수였어.'] },
+  'vatican-torso': { emoji:'💪', era:'헬레니즘~고대 로마', periodCat:'ancient',
+    kid:'머리도 팔도 다리도 없이 몸통만 남은 조각이야. 「토르소」가 몸통이라는 뜻이지. 아테네의 조각가 아폴로니오스가 이름을 새겨 놓았고, 수백 년 동안 예술가들이 가장 사랑한 고대 조각이래. 이 비틀린 몸통을 기억해 뒀다가 시스티나 천장에서 비슷한 몸을 찾아봐.',
+    why:['토르소는 몸통이라는 뜻이야.'] },
+  'vatican-maps': { emoji:'🗺', era:'16세기 후반',
+    kid:'길이 120미터, 양쪽 벽에 이탈리아 지역 지도 40장이 그려진 복도야. 수도사이자 지도 전문가 이냐치오 단티가 설계했어. 주문한 교황 그레고리오 13세는 1582년에 지금 우리가 쓰는 달력(그레고리력)을 만든 교황이야.',
+    why:['그레고리오 13세는 1582년에 지금 우리가 쓰는 달력, 그레고리력을 만들었어.'] },
+  'vatican-pieta': { emoji:'🤍', era:'르네상스', place:'성 베드로 대성전(바티칸)',
+    kid:'미켈란젤로가 겨우 스물네 살 때 돌 하나를 깎아 만든 조각이야. 성모 마리아가 십자가에서 내려진 예수를 무릎에 안고 있어. 1972년 한 남자가 망치로 내리쳐 부서졌지만, 10개월 동안 복원한 뒤 방탄유리 안에 들어갔어.',
+    why:['미켈란젤로는 스물네 살 때 피에타를 만들었어.'] },
 };
 let trhDcManifest = {};          // { audioMuseumId: [path,…] }
 let trhDcAudioSet = new Set();   // 실제로 생성된 음성 파일 경로
-let trhDcPromise = null, trhDcLoaded = false;
+let trhDcPromise = null, trhDcLoaded = false, trhDcMuseumSeq = 0;
 function trhDcMuseumKey(id){ return TRH_DC_MUSEUM_ALIAS[id] || id; }
 function trhDocentLoad(){
   if(trhDcPromise) return trhDcPromise;
@@ -4955,21 +5025,23 @@ function trhDcMerge(data){
       MUSEUM_ORDER.push(mk);
     }
     MUSEUMS[mk].docent = { audioMuseumId:m.id, visit:m.visit||null, caseTitle:m.caseTitle||'', caseBrief:m.caseBrief||'',
-      rules:m.rules||[], routeNote:m.routeNote||'', intro:m.intro||null };
+      rules:m.rules||[], routeNote:m.routeNote||'', intro:m.intro||null,
+      tourMode:(m.tourMode && m.tourMode.on!==false) ? m.tourMode : null };
     const city = MUSEUMS[mk].city;
+    const mSeq = trhDcMuseumSeq++;   // 도시 뷰 정렬용(박물관마다 겹치지 않게)
     (m.works || []).forEach(w=>{
       const dc = { workId:w.id, audioMuseumId:m.id, order:w.order||0, title:w.title||'', titleOriginal:w.titleOriginal||'',
         status:w.status||'on_display', statusNote:w.statusNote||'', location:w.location||'',
         hints:(w.hints||[]).filter(h=>h && String(h).trim()), howToSee:w.howToSee||[], audioScripts:w.audioScripts||{},
         photoMission:w.photoMission||'', memoryMission:w.memoryMission||'',
-        joseon:w.joseon||'', world:w.world||'', links:w.links||[], factCheck:w.factCheck||'' };
+        joseon:w.joseon||'', world:w.world||'', links:w.links||[], factCheck:w.factCheck||'', bonus:!!w.bonus };
       const existing = trhSite(TRH_DC_MERGE_ID[w.id] || w.id);
       if(existing){ existing.docent = dc; return; }   // 기존 필드 유지 + 신규 필드만 추가
       const sup = TRH_DC_SUPPLEMENT[w.id] || {};
       const quiz = (w.quiz||[]).filter(q=>q && Array.isArray(q.options) && typeof q.answer==='number')
         .map((q,i)=>({ q:q.q, opts:q.options, a:q.answer, why:(sup.why && sup.why[i]) || '' }));
-      HISTORY_SITES.push({ id:w.id, city, order:200 + mi*20 + (w.order||0), era:sup.era || '근대 미술',
-        name:w.title, by:[w.artist, w.year].filter(Boolean).join(' · '), place:MUSEUMS[mk].name,
+      HISTORY_SITES.push({ id:w.id, city, order:200 + mSeq*20 + (w.order||0), era:sup.era || '근대 미술',
+        name:w.title, by:[w.artist, w.year].filter(Boolean).join(' · '), place:sup.place || MUSEUMS[mk].name,
         emoji:sup.emoji || '🖼', museum:mk, periodCat:sup.periodCat || 'modern',
         sig:sup.sig || '', kid:sup.kid || '', quiz, docent:dc });
     });
@@ -5220,10 +5292,10 @@ function openSiteDetail(id, opt){
         <h4>${dc?'🧭 한눈에 보기':'🧭 11살 눈높이 이야기'}</h4>
         <p>${esc(s.kid)}</p>
       </div>
-      <div class="trh-detail-block">
+      ${s.sig ? `<div class="trh-detail-block">
         <h4>📖 세계사 연결 포인트</h4>
         <div class="trh-connect">${s.sig}</div>
-      </div>
+      </div>` : ''}
       ${noteHtml}
       ${sourceHtml}
       <div class="trh-detail-actions">
@@ -5622,6 +5694,7 @@ function trhDcMuseumHeader(mk){
       ${visitTxt?`<div class="trh-visit">${esc(visitTxt)}</div>`:''}
       ${d.intro && d.intro.script ? `<div class="trh-case-audio">${trhAudioBtn(introPath, '인트로 — 도슨트 형의 첫인사')}</div>` : ''}
     </div>
+    ${d.tourMode && d.tourMode.note ? `<div class="trh-dc-note trh-tourmode"><b>🎧 투어 모드</b> — ${esc(d.tourMode.note)}</div>` : ''}
     ${(d.routeNote || d.rules.length) ? `<div class="trh-dc-note">${d.routeNote?`<div>🧭 <b>동선</b> ${esc(d.routeNote)}</div>`:''}${d.rules.map(r=>`<div>⚠️ ${esc(r)}</div>`).join('')}</div>` : ''}
     ${trhMom && d.intro && d.intro.factCheck ? `<div class="trh-fact">🔍 인트로 사실 확인: ${esc(d.intro.factCheck)}</div>` : ''}
     <div class="trh-dc-tools">
@@ -5636,6 +5709,7 @@ function trhDocentCard(s){
   const st = eff==='absent' ? `<span class="trh-chip trh-chip-absent">🧳 출장 중</span>` : (eff==='check' ? `<span class="trh-chip trh-chip-check">🟡 현장 확인</span>` : '');
   const stamp = visited ? `<span class="trh-chip trh-chip-stamp">✓ 방문 완료</span>${g?`<span class="trh-chip trh-chip-medal">${TRH_GRADE[g].icon} ${TRH_GRADE[g].label}</span>`:''}` : `<span class="trh-chip trh-chip-todo">🎫 도장 미획득</span>`;
   const qchip = (s.quiz && s.quiz.length) ? `<span class="trh-chip trh-chip-quiz">❓ 퀴즈 ${s.quiz.length}문제</span>` : '';
+  const bonus = dc.bonus ? `<span class="trh-chip trh-chip-medal">⭐ 보너스 단서</span>` : '';
   return `<div class="trh-site trh-dcard ${visited?'visited':''} ${eff==='absent'?'dc-absent':''}" onclick="openSiteDetail('${s.id}')">
     <div class="trh-thumb" data-photo-site="${s.id}" style="background:${trhGrad(s.city)}"><span class="trh-order">${dc.order}</span><span class="trh-thumb-emoji">${s.emoji}</span></div>
     <div class="trh-site-body">
@@ -5644,7 +5718,7 @@ function trhDocentCard(s){
       ${eff!=='absent' && dc.location ? `<div class="trh-dc-loc">📍 ${esc(dc.location)}</div>` : ''}
       ${dc.joseon ? `<div class="trh-dc-line">🇰🇷 ${esc(dc.joseon)}</div>` : ''}
       ${dc.world ? `<div class="trh-dc-line">🌍 ${esc(dc.world)}</div>` : ''}
-      <div class="trh-site-foot">${st}${stamp}${qchip}</div>
+      <div class="trh-site-foot">${bonus}${st}${stamp}${qchip}</div>
     </div>
   </div>`;
 }
@@ -5824,6 +5898,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-43 · 도슨트</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-44 · 도슨트 6관</div>
 </body>
 </html>

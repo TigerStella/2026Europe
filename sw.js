@@ -1,11 +1,13 @@
 /* 노을과 타이거의 유럽여행 — service worker (오프라인 지원) */
 // 배포마다 버전을 올린다 → 이전 앱 셸 캐시는 activate 때 정리됨
-const CACHE = 'noleu-europe-v79';
+const CACHE = 'noleu-europe-v80';
 // 🎧 도슨트 음성 오프라인 저장본(박물관 화면의 「📥 오프라인 저장」 버튼이 채움) — 버전업 때 지우지 않음
 const KEEP_PREFIX = 'trapble-history-audio';
 const ASSETS = [
   './', './manifest.webmanifest', './bag-192.png', './bag-512.png',
-  './data/docent_paris_orsay_orangerie.json', './audio/manifest.json',
+  './data/docent_london_national_gallery.json', './data/docent_paris_louvre.json',
+  './data/docent_paris_orsay_orangerie.json', './data/docent_florence_uffizi.json',
+  './data/docent_rome_vatican.json', './audio/manifest.json',
 ];
 
 self.addEventListener('install', (e) => {
