@@ -928,7 +928,85 @@
   @keyframes trhStampIn{ 0%{ transform:scale(2.4) rotate(18deg); opacity:0; } 60%{ transform:scale(.9) rotate(-8deg); opacity:1; } 100%{ transform:scale(1) rotate(-7deg); } }
   .trh-celebrate-t{ font-size:19px; font-weight:800; color:var(--trh-ink); margin:12px 0 4px; }
   .trh-celebrate-s{ font-size:13px; color:var(--text-mid); line-height:1.5; }
+  /* ── 🎧 도슨트 모드 (걸으면서 읽기: 본문 16px↑, 터치 44px↑) ── */
+  .trh-dc-btn{ min-height:44px; padding:10px 16px; font-size:15px; font-weight:700; border-radius:12px; border:none; cursor:pointer; font-family:inherit; display:inline-flex; align-items:center; justify-content:center; gap:6px; }
+  .trh-dc-btn:disabled{ opacity:.55; cursor:default; }
+  .trh-btn-ghost2{ background:#EFE6D4; color:var(--trh-ink); }
+  .trh-case{ background:linear-gradient(135deg,#1F2A44,#34466B); color:#fff; border-radius:16px; padding:16px 16px 14px; margin-bottom:12px; position:relative; overflow:hidden; }
+  .trh-case::after{ content:'🔎'; position:absolute; right:-6px; top:-8px; font-size:70px; opacity:.12; }
+  .trh-case-label{ font-size:11px; letter-spacing:2px; color:#FFD8A0; font-weight:700; }
+  .trh-case-title{ font-size:20px; font-weight:800; margin:4px 0 6px; line-height:1.3; }
+  .trh-case-brief{ font-size:16px; line-height:1.6; opacity:.95; }
+  .trh-visit{ margin-top:10px; font-size:14px; color:#FFE7C2; font-weight:700; }
+  .trh-case-audio{ margin-top:12px; }
+  .trh-case-audio .trh-audio-btn{ background:rgba(255,255,255,.14); color:#fff; }
+  .trh-dc-note{ background:var(--trh-parch); border:1px solid var(--trh-line); border-radius:12px; padding:12px 14px; font-size:15px; line-height:1.6; margin-bottom:12px; }
+  .trh-dc-note div+div{ margin-top:4px; }
+  .trh-dc-tools{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .trh-dc-tools .trh-dc-btn{ font-size:14px; }
+  .trh-toggle{ display:inline-flex; background:#EFE6D4; border-radius:24px; padding:4px; margin:0 0 14px; }
+  .trh-toggle button{ min-height:44px; padding:0 18px; border:none; border-radius:20px; background:transparent; font-weight:700; font-size:15px; color:var(--text-mid); cursor:pointer; font-family:inherit; }
+  .trh-toggle button.on{ background:#fff; color:var(--trh-ink); box-shadow:0 2px 6px rgba(0,0,0,.1); }
+  .trh-order{ position:absolute; top:5px; left:5px; min-width:28px; height:28px; border-radius:14px; background:#fff; color:#3A2C1A; font-size:15px; font-weight:800; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(0,0,0,.25); z-index:2; }
+  .trh-thumb.has-photo .trh-thumb-emoji, .trh-thumb.has-photo .trh-thumb-ph{ opacity:0; }
+  .trh-dcard .trh-site-name{ font-size:17px; }
+  .trh-dc-loc{ font-size:15px; color:var(--trh-ink); margin:4px 0 2px; font-weight:600; }
+  .trh-dc-line{ font-size:14.5px; color:var(--text-mid); line-height:1.5; }
+  .trh-site.dc-absent{ background:#F1F1F1; border-color:#D6D6D6; }
+  .trh-site.dc-absent .trh-thumb{ filter:grayscale(1); opacity:.7; }
+  .trh-chip-absent{ background:#E4E4E4; color:#5E5E5E; }
+  .trh-chip-check{ background:#FFF0B3; color:#8A6A00; }
+  .trh-chip-medal{ background:#FFF4DA; color:#9A6A1B; }
+  .trh-dc{ font-size:16px; line-height:1.7; }
+  .trh-dc-sec{ margin:0 0 16px; }
+  .trh-dc-sec h4{ font-size:14px; font-weight:800; color:var(--trh-accent); margin-bottom:8px; letter-spacing:.3px; }
+  .trh-dc-sec p{ font-size:16px; line-height:1.7; color:var(--text-dark); }
+  .trh-dc-status{ border-radius:12px; padding:12px 14px; margin-bottom:14px; font-size:16px; line-height:1.6; }
+  .trh-dc-status p{ margin-top:4px; }
+  .trh-dc-status.check{ background:#FFF6CC; border:1.5px solid #F2CF45; }
+  .trh-dc-status.absent{ background:#EEEEEE; border:1.5px solid #CFCFCF; color:#4A4A4A; }
+  .trh-dc-status.ok{ background:#EDF6EE; border:1.5px solid #9CC9A5; color:#2E6238; }
+  .trh-dc-row{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .trh-dc-row .trh-dc-btn{ flex:1; min-width:120px; }
+  .trh-btn-yes{ background:#3B7A47; color:#fff; }
+  .trh-btn-no{ background:#8C8C8C; color:#fff; }
+  .trh-linkbtn{ background:none; border:none; color:var(--london); text-decoration:underline; font-size:14px; cursor:pointer; min-height:44px; padding:0 6px; font-family:inherit; }
+  .trh-hint-text{ background:#FFFBEF; border:1px dashed #E8C98A; border-radius:10px; padding:10px 12px; margin-bottom:8px; font-size:16px; }
+  .trh-hint-btn{ width:100%; background:#FFF1D6; color:#8A5A12; }
+  .trh-small{ font-size:14px !important; color:var(--text-light) !important; margin-top:6px; line-height:1.5 !important; }
+  .trh-audio-btn{ width:100%; justify-content:space-between; background:#EEF0FA; color:#3E4790; margin-bottom:8px; }
+  .trh-audio-btn.playing{ background:#5560A8; color:#fff; box-shadow:0 0 0 3px rgba(85,96,168,.25); }
+  .trh-audio-btn .st{ font-size:14px; font-weight:800; white-space:nowrap; }
+  .trh-rate{ display:flex; gap:6px; align-items:center; font-size:14px; color:var(--text-light); }
+  .trh-rate button{ min-height:44px; min-width:56px; border-radius:10px; border:1.5px solid var(--trh-line); background:#fff; font-weight:700; font-size:15px; cursor:pointer; font-family:inherit; }
+  .trh-rate button.on{ border-color:#5560A8; background:#EEF0FA; color:#3E4790; }
+  .trh-script summary{ cursor:pointer; font-size:15px; font-weight:700; color:var(--text-mid); min-height:44px; display:flex; align-items:center; }
+  .trh-script p{ font-size:15.5px; margin-bottom:10px; }
+  .trh-dc-check{ display:flex; gap:10px; align-items:flex-start; width:100%; text-align:left; min-height:48px; padding:10px 12px; margin-bottom:8px; border:1.5px solid var(--trh-line); border-radius:12px; background:#fff; font-size:16px; line-height:1.55; cursor:pointer; font-family:inherit; color:var(--text-dark); }
+  .trh-dc-check .bx{ font-size:20px; line-height:1.2; }
+  .trh-dc-check.on{ background:#EDF6EE; border-color:#9CC9A5; }
+  .trh-photo-btn{ width:100%; background:linear-gradient(135deg,var(--sunset-gold),var(--dusk-coral)); color:#fff; }
+  .trh-photo-thumbs{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .trh-photo-thumbs .ph{ position:relative; }
+  .trh-photo-thumbs img{ width:84px; height:84px; object-fit:cover; border-radius:10px; cursor:pointer; display:block; }
+  .trh-photo-thumbs .rm{ position:absolute; top:-8px; right:-8px; width:28px; height:28px; border-radius:50%; border:none; background:#E0607A; color:#fff; font-size:14px; cursor:pointer; }
+  .trh-jw{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+  .trh-jw > div{ background:var(--trh-parch); border:1px solid var(--trh-line); border-radius:12px; padding:10px 12px; }
+  .trh-jw h5{ font-size:13px; color:var(--trh-accent); margin-bottom:4px; }
+  .trh-jw p{ font-size:15px; line-height:1.55; }
+  .trh-links{ display:flex; flex-direction:column; gap:8px; }
+  .trh-link-chip{ display:block; width:100%; text-align:left; min-height:44px; padding:10px 12px; border-radius:12px; border:1.5px solid var(--trh-line); background:#fff; font-size:15px; line-height:1.45; font-family:inherit; color:var(--text-dark); }
+  .trh-link-chip.go{ cursor:pointer; border-color:#9DB3D6; background:#F3F7FD; }
+  .trh-link-chip small{ display:block; font-size:13px; color:var(--text-light); margin-top:2px; }
+  .trh-fact{ background:#F4F0FF; border:1px dashed #A99AD8; border-radius:10px; padding:10px 12px; font-size:14px; line-height:1.6; color:#4B3F7A; margin:0 0 14px; }
+  .trh-best{ background:#FFF8E6; border:1.5px solid #E8C98A; border-radius:14px; padding:14px; margin:18px 0; }
+  .trh-best h4{ font-size:17px; color:#8A5A12; margin-bottom:10px; }
+  .trh-best-sel, .trh-best-note{ width:100%; min-height:48px; font-size:16px; padding:10px 12px; border:1.5px solid var(--trh-line); border-radius:10px; background:#fff; font-family:inherit; margin-bottom:8px; }
+  .trh-x{ position:sticky; top:0; float:right; width:44px; height:44px; border-radius:22px; border:none; background:#EFE6D4; font-size:18px; cursor:pointer; z-index:3; }
+  .trh-stamp-medal{ position:absolute; bottom:-4px; right:-4px; font-size:16px; transform:rotate(7deg); }
+  .trh-photobar{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; background:var(--trh-parch); border:1px solid var(--trh-line); border-radius:12px; padding:10px 12px; margin-bottom:18px; font-size:14px; color:var(--text-mid); }
   @media (max-width:600px){
+    .trh-jw{ grid-template-columns:1fr; }
     .trh-thumb{ flex-basis:76px; width:76px; height:76px; }
     .trh-citycard{ flex-basis:170px; }
   }
@@ -4499,6 +4577,16 @@ const TRH_LS = {
   visited:    'trapble_history_visited_v1',    // { siteId: true }  ← 방문 도장(퀴즈 통과) 완료
   cityquiz:   'trapble_history_cityquiz_v1',   // { city: bestScore } ← 도시 종합퀴즈 최고점
   museumquiz: 'trapble_history_museumquiz_v1', // { museumKey: bestScore } ← 박물관 종합미션 최고점
+  // ── 🎧 도슨트 모드 (전부 신규 키 — 위 3개 키는 그대로) ──
+  hints:       'trapble_history_hints_v1',       // { siteId: 사용한 힌트 수 }
+  grade:       'trapble_history_grade_v1',       // { siteId: 'gold'|'silver'|'bronze' } ← 도장 받을 때 확정
+  checklist:   'trapble_history_checklist_v1',   // { siteId: [bool,bool,bool] } ← 감상법 체크
+  checkresult: 'trapble_history_checkresult_v1', // { siteId: 'present'|'absent' } ← 현장 확인 결과
+  memory:      'trapble_history_memory_v1',      // { siteId: '기억 미션 기록' } ← 촬영 금지 구역용
+  best:        'trapble_history_best_v1',        // { museumKey: {siteId, note, ts} } ← 오늘의 베스트 1
+  audiorate:   'trapble_history_audiorate_v1',   // 0.9 | 1.0 | 1.2
+  mom:         'trapble_history_mommode_v1',     // true → 엄마 확인용(factCheck·statusNote) 표시
+  offline:     'trapble_history_offline_v1',     // { audioMuseumId: {n,total,ts} }
 };
 function trhLoad(key, def){ try{ const v=JSON.parse(localStorage.getItem(key)); return (v===null||v===undefined)?def:v; }catch(e){ return def; } }
 function trhSave(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){ toast('저장 공간이 부족해요'); } }
@@ -4513,19 +4601,20 @@ const MUSEUMS = {
   national: { key:'national', name:'내셔널 갤러리', en:'National Gallery',   city:'london',   country:'영국',   flag:'🇬🇧', icon:'🖼' },
   louvre:   { key:'louvre',   name:'루브르박물관',  en:'Musée du Louvre',    city:'paris',    country:'프랑스', flag:'🇫🇷', icon:'🔺' },
   orsay:    { key:'orsay',    name:'오르세미술관',  en:"Musée d'Orsay",      city:'paris',    country:'프랑스', flag:'🇫🇷', icon:'🕰' },
+  orangerie:{ key:'orangerie',name:'오랑주리미술관', en:"Musée de l'Orangerie", city:'paris', country:'프랑스', flag:'🇫🇷', icon:'🪷' },
   uffizi:   { key:'uffizi',   name:'우피치미술관',  en:'Uffizi Gallery',     city:'florence', country:'이탈리아', flag:'🇮🇹', icon:'🎨' },
   vatican:  { key:'vatican',  name:'바티칸미술관',  en:'Vatican Museums',    city:'rome',     country:'바티칸(세계에서 가장 작은 나라)', flag:'🇻🇦', icon:'⛪' },
 };
-const MUSEUM_ORDER = ['british','national','louvre','orsay','uffizi','vatican'];
+const MUSEUM_ORDER = ['british','national','louvre','orsay','orangerie','uffizi','vatican'];
 // 나라별 그룹(여행 동선 순서)
 const MUSEUM_COUNTRY_GROUPS = [
   { country:'영국',   flag:'🇬🇧', museums:['british','national'] },
-  { country:'프랑스', flag:'🇫🇷', museums:['louvre','orsay'] },
+  { country:'프랑스', flag:'🇫🇷', museums:['louvre','orsay','orangerie'] },
   { country:'이탈리아', flag:'🇮🇹', museums:['uffizi'] },
   { country:'바티칸',  flag:'🇻🇦', museums:['vatican'] },
 ];
 const PERIOD_CAT_ORDER = ['ancient','medieval','modern','contemporary'];
-const PERIOD_CAT_LABEL = { ancient:'🏺 고대', medieval:'🏰 중세', modern:'🖼 근대 (르네상스~19세기)', contemporary:'🌆 현대' };
+const PERIOD_CAT_LABEL = { ancient:'🏺 고대', medieval:'🏰 중세', modern:'🖼 근대 (르네상스~20세기 초)', contemporary:'🌆 현대' };
 
 // 도시별 부제(시대 흐름) — 홈/배너 표기용. 탭 진행 순서는 여행 동선(CITY_ORDER) 그대로.
 const TRH_CITY_ERA = {
@@ -4781,6 +4870,113 @@ function trhMuseumTotal(mk){ return trhMuseumSites(mk).length; }
 function trhMuseumComplete(mk){ return trhMuseumTotal(mk)>0 && trhMuseumDone(mk)===trhMuseumTotal(mk); }
 function trhMuseumGrad(mk){ return trhGrad(MUSEUMS[mk].city); }
 
+/* ══════════════════ 🎧 도슨트 모드 — 데이터 로드·병합 ══════════════════
+   data/docent_*.json(외부 파일)을 런타임에 불러와 HISTORY_SITES·MUSEUMS에 병합한다.
+   - 같은 작품이 이미 있으면(TRH_DC_MERGE_ID) 기존 필드는 그대로 두고 s.docent만 추가
+   - 새 작품은 카드로 추가(JSON에 없는 요약·이모지·시대·퀴즈 해설은 TRH_DC_SUPPLEMENT)
+   - 실패해도 기존 카드·도장·퀴즈는 그대로 동작 */
+const TRH_DC_FILES = ['data/docent_paris_orsay_orangerie.json'];   // 새 박물관 JSON은 여기에 추가
+const TRH_DC_MANIFEST = 'audio/manifest.json';
+const TRH_AUDIO_CACHE = 'trapble-history-audio-v1';                 // sw.js가 버전업 때 지우지 않는 버킷
+const TRH_DC_MERGE_ID = { 'orsay-dejeuner':'luncheon-grass', 'orsay-starry-rhone':'starry-rhone' };
+const TRH_DC_MUSEUM_ALIAS = { 'national-gallery':'national' };
+let TRH_DC_TRACKS = { '1':'작가·배경 이야기', '2':'그림 속 비밀' };
+const TRH_DC_SUPPLEMENT = {
+  'orsay-clock': { emoji:'🕰', era:'19세기 말 · 기차의 시대',
+    kid:'오르세 미술관은 원래 1900년에 지은 기차역이었어. 맨 위층 커다란 시계 뒤로 가면, 유리 시계판 너머로 파리 시내가 보여. 기차역 시절엔 승객들에게 시간을 알려주던 시계였지. 기차가 생기면서 사람들은 처음으로 분 단위까지 시간을 맞추기 시작했대.',
+    sig:'<b>기차와 표준 시간</b> — 산업혁명이 바꾼 생활. 같은 해 조선에서도 <b>경인선</b>이 서울까지 이어졌어요.',
+    why:['이 건물은 1900년 파리 박람회 때 기차역으로 지어졌다가 1986년 미술관이 됐어.'] },
+  'orsay-saint-lazare': { emoji:'🚂', era:'19세기 · 인상주의',
+    kid:'모네가 파리의 생라자르 기차역을 그린 그림이야. 모네가 그리고 싶었던 건 기차 모양이 아니라, 증기 연기 사이로 새어 드는 빛이었어. 딱딱한 선 대신 뭉개진 붓자국으로 그 순간의 느낌을 그렸지 — 이게 바로 인상파야.',
+    sig:'<b>증기기관과 산업혁명</b>, 빛을 그린 <b>인상주의</b> — 「19세기 인상주의」와 연결돼요.',
+    why:['모네는 기차 부품이 아니라 연기 사이로 비치는 빛, 그 순간의 인상을 그리고 싶었어.'] },
+  'orsay-little-dancer': { emoji:'🎀', era:'19세기 · 인상주의',
+    kid:'파리 오페라 발레 학교의 14살 학생 마리를 모델로 한 조각이야. 처음 전시됐을 땐 밀랍으로 만들고 진짜 머리카락과 천 치마를 달아서 사람들이 깜짝 놀랐대. 지금 보는 건 드가가 세상을 떠난 뒤 청동으로 떠낸 작품이야.',
+    sig:'<b>가난한 발레 학생</b>의 현실을 담은 드가의 조각 — 「19세기 도시 생활과 인상주의」와 연결돼요.',
+    why:['1881년 처음 전시된 원본은 밀랍으로 만들었어. 청동은 드가가 세상을 떠난 뒤 떠낸 거야.'] },
+  'orsay-vangogh-selfportrait': { emoji:'🧑‍🎨', era:'19세기 · 후기인상주의',
+    kid:'반 고흐가 1889년, 몸과 마음이 아파 병원에 머물던 때 그린 자화상이야. 배경은 파란 물결처럼 빙글빙글 소용돌이치는데, 얼굴만은 또렷하지. 살아 있을 때 그림이 거의 안 팔렸던 고흐를 동생 테오가 끝까지 도와줬어.',
+    sig:'감정을 붓질로 표현한 <b>후기인상주의</b> — 같은 해 파리엔 <b>에펠탑</b>이 완공됐어요.',
+    why:['동생 테오가 형에게 돈을 보내고 편지를 주고받으며 끝까지 도왔어.'] },
+  'orsay-pompon-bear': { emoji:'🐻‍❄️', era:'20세기 초 · 새로운 조각',
+    kid:'털 한 올 없이 매끈한 하얀 곰 조각이야. 조각가 퐁퐁은 오랫동안 로댕 밑에서 남의 작품을 대신 깎는 일을 하다가, 67살에 이 흰곰으로 드디어 유명해졌어. 자잘한 털은 다 지우고 걸어가는 움직임만 남긴 게 비밀이야.',
+    sig:'복잡한 것을 덜어낸 <b>단순한 형태</b>의 조각 — 비슷한 때 조선에선 <b>첫 어린이날</b>(1923)이 생겼어요.',
+    why:['퐁퐁은 1922년, 67살에 흰곰 조각으로 크게 성공했어. 늦게 핀 꽃이지!'] },
+  'orsay-renoir-absent': { emoji:'🧳', era:'19세기 · 인상주의',
+    kid:'원래 오르세에 있어야 할 르누아르의 「물랭 드 라 갈레트의 무도회」는 지금 출장 중이야! 런던 내셔널 갤러리의 르누아르 특별전에 빌려줬거든. 우리가 런던에서 파리로 올 때, 이 그림은 파리에서 런던으로 간 거지. 대신 다음 날 오랑주리에서 르누아르를 만나.',
+    sig:'미술관끼리 그림을 빌려주는 <b>특별전</b> — 명작도 여행을 해요.',
+    why:['런던 내셔널 갤러리의 르누아르 특별전(2026.10.3~)에 빌려줬어.'] },
+  'orangerie-nympheas-1': { emoji:'🪷', era:'20세기 초 · 모네의 수련',
+    kid:'벽 전체가 연못인 타원형 방이야. 모네는 지베르니 집 앞에 연못을 직접 만들고 30년 가까이 수련만 그렸어. 제1차 세계대전이 끝난 다음 날, 모네는 이 수련 그림을 나라에 선물하겠다고 편지를 썼지. 전쟁으로 지친 사람들이 쉬어 가는 평화의 방이야.',
+    sig:'<b>제1차 세계대전</b>이 끝난 뒤 평화를 위한 선물 — 다음 해 조선에서는 <b>3·1 운동</b>이 일어났어요.',
+    why:['1918년 11월 11일 제1차 세계대전이 끝나고, 바로 다음 날 모네가 선물 편지를 썼어.'] },
+  'orangerie-nympheas-2': { emoji:'🌿', era:'20세기 초 · 모네의 수련',
+    kid:'첫 번째 방보다 조금 더 어둡고 깊은 느낌의 두 번째 수련 방이야. 버드나무 가지가 커튼처럼 드리워져 있지. 이 무렵 모네는 눈병 때문에 세상이 누렇고 흐릿하게 보였지만 붓을 놓지 않았어.',
+    sig:'1944년 <b>파리 해방</b> 전투 때 포탄에 상처를 입었다가 복원된 그림 — 평화의 선물이 전쟁을 겪은 이야기예요.',
+    why:['모네는 말년에 백내장 때문에 색이 흐릿하게 보였고, 1923년에 수술을 받았어.'] },
+  'orangerie-renoir-piano': { emoji:'🎹', era:'19세기 말 · 인상주의',
+    kid:'두 소녀가 피아노 앞에서 악보를 들여다보는 그림이야. 르누아르는 13살 때 도자기 공장에서 접시에 그림을 그리던 소년이었어. 어제 오르세에서 못 본 르누아르를 여기서 만나는 거야 — 사라진 단서 해결!',
+    sig:'파리의 <b>벨 에포크(아름다운 시절)</b> — 2년 뒤 조선에서는 <b>동학 농민 운동</b>이 일어났어요.',
+    why:['르누아르는 열세 살 때부터 도자기 공장에서 접시에 그림을 그렸어.'] },
+  'orangerie-rousseau-carriole': { emoji:'🐕', era:'20세기 초 · 독학 화가',
+    kid:'가족이 마차를 타고 나들이 가는 모습을 기념사진처럼 그린 그림이야. 화가 루소는 세관에서 일하며 혼자 그림을 배웠어. 사람들은 어린애 그림 같다고 비웃었지만, 젊은 피카소는 루소에게 반해 파티까지 열어줬대. 마차 밑의 강아지를 찾아봐!',
+    sig:'학교 없이 독학한 화가가 새 미술의 길을 연 이야기 — 같은 해 조선에서는 최남선이 잡지 <b>『소년』</b>을 만들었어요.',
+    why:['루소는 파리 세관에서 일해서 「세관원」이라는 별명이 붙었어.'] },
+};
+let trhDcManifest = {};          // { audioMuseumId: [path,…] }
+let trhDcAudioSet = new Set();   // 실제로 생성된 음성 파일 경로
+let trhDcPromise = null, trhDcLoaded = false;
+function trhDcMuseumKey(id){ return TRH_DC_MUSEUM_ALIAS[id] || id; }
+function trhDocentLoad(){
+  if(trhDcPromise) return trhDcPromise;
+  trhDcPromise = (async ()=>{
+    try{
+      const r = await fetch(TRH_DC_MANIFEST, {cache:'no-cache'});
+      if(r.ok) trhDcManifest = await r.json() || {};
+    }catch(e){}
+    Object.values(trhDcManifest).forEach(a=>(a||[]).forEach(p=>trhDcAudioSet.add(p)));
+    for(const f of TRH_DC_FILES){
+      try{
+        const r = await fetch(f, {cache:'no-cache'});
+        if(!r.ok) continue;
+        trhDcMerge(await r.json());
+      }catch(e){ console.warn('[도슨트] 불러오기 실패', f, e); }
+    }
+    trhDcLoaded = true;
+  })();
+  return trhDcPromise;
+}
+function trhDcMerge(data){
+  if(data && data.meta && data.meta.tracks) TRH_DC_TRACKS = Object.assign({}, TRH_DC_TRACKS, data.meta.tracks);
+  ((data && data.museums) || []).forEach((m, mi)=>{
+    const mk = trhDcMuseumKey(m.id);
+    if(!MUSEUMS[mk]){  // 아직 등록 안 된 박물관(향후 JSON) — 최소 정보로 등록
+      MUSEUMS[mk] = { key:mk, name:m.name, en:m.nameOriginal||'', city:m.city||'paris', country:m.country||'', flag:m.flag||'', icon:m.icon||'🏛' };
+      MUSEUM_ORDER.push(mk);
+    }
+    MUSEUMS[mk].docent = { audioMuseumId:m.id, visit:m.visit||null, caseTitle:m.caseTitle||'', caseBrief:m.caseBrief||'',
+      rules:m.rules||[], routeNote:m.routeNote||'', intro:m.intro||null };
+    const city = MUSEUMS[mk].city;
+    (m.works || []).forEach(w=>{
+      const dc = { workId:w.id, audioMuseumId:m.id, order:w.order||0, title:w.title||'', titleOriginal:w.titleOriginal||'',
+        status:w.status||'on_display', statusNote:w.statusNote||'', location:w.location||'',
+        hints:(w.hints||[]).filter(h=>h && String(h).trim()), howToSee:w.howToSee||[], audioScripts:w.audioScripts||{},
+        photoMission:w.photoMission||'', memoryMission:w.memoryMission||'',
+        joseon:w.joseon||'', world:w.world||'', links:w.links||[], factCheck:w.factCheck||'' };
+      const existing = trhSite(TRH_DC_MERGE_ID[w.id] || w.id);
+      if(existing){ existing.docent = dc; return; }   // 기존 필드 유지 + 신규 필드만 추가
+      const sup = TRH_DC_SUPPLEMENT[w.id] || {};
+      const quiz = (w.quiz||[]).filter(q=>q && Array.isArray(q.options) && typeof q.answer==='number')
+        .map((q,i)=>({ q:q.q, opts:q.options, a:q.answer, why:(sup.why && sup.why[i]) || '' }));
+      HISTORY_SITES.push({ id:w.id, city, order:200 + mi*20 + (w.order||0), era:sup.era || '근대 미술',
+        name:w.title, by:[w.artist, w.year].filter(Boolean).join(' · '), place:MUSEUMS[mk].name,
+        emoji:sup.emoji || '🖼', museum:mk, periodCat:sup.periodCat || 'modern',
+        sig:sup.sig || '', kid:sup.kid || '', quiz, docent:dc });
+    });
+  });
+}
+function trhMuseumHasDocent(mk){ return !!(MUSEUMS[mk] && MUSEUMS[mk].docent) && trhMuseumSites(mk).some(s=>s.docent); }
+
 /* ── 뷰 전환 ── */
 function trhShow(view){
   ['trhHome','trhCity','trhMuseumList','trhMuseum','trhPassport'].forEach(v=>{ const el=document.getElementById(v); if(el) el.style.display = (v===view)?'block':'none'; });
@@ -4791,6 +4987,17 @@ function trhShow(view){
 /* ── 렌더: 홈(여행 동선순) ── */
 function renderHistory(){
   renderHistoryHome();
+  trhDocentLoad().then(trhRerenderCurrent);
+}
+let trhCurCity=null, trhCurMuseum=null, trhCurSite=null;
+function trhVisible(id){ const el=document.getElementById(id); return !!el && el.style.display!=='none'; }
+// 현재 열린 화면만 다시 그림(스크롤 유지)
+function trhRerenderCurrent(){
+  if(trhVisible('trhHome')) renderHistoryHome();
+  if(trhVisible('trhCity') && trhCurCity) openHistoryCity(trhCurCity, {keep:true});
+  if(trhVisible('trhMuseumList')) renderMuseumList();
+  if(trhVisible('trhMuseum') && trhCurMuseum) openMuseum(trhCurMuseum, {keep:true});
+  if(trhVisible('trhPassport')) renderPassport();
 }
 function renderHistoryHome(){
   const done=trhAllDone(), total=trhAllTotal();
@@ -4831,6 +5038,8 @@ function renderHistoryHome(){
       </div>
     </div>
 
+    ${trhPhotoBarHtml()}
+
     <div class="trh-overall">
       <div class="trh-overall-head"><span>🏆 전체 탐험 진행률</span><span>${done} / ${total}곳 · ${pct}%</span></div>
       <div class="trh-bar"><div class="trh-bar-fill" style="width:${pct}%"></div></div>
@@ -4845,10 +5054,12 @@ function renderHistoryHome(){
 
     <p class="hint" style="margin-top:18px">🕰 <b>안내</b> — 각 도시 안의 장소는 <b>시대(연대)순</b>으로 정리돼 있어 「시간의 흐름」을 느낄 수 있어요. 탭 홈의 도시 순서는 <b>실제 여행 동선</b>을 따라요.</p>
   `;
+  trhFillPhotoCount();
 }
 
 /* ── 렌더: 도시 상세(시대순) ── */
-function openHistoryCity(city){
+function openHistoryCity(city, opt){
+  opt=opt||{}; trhCurCity=city;
   const ci=CITIES[city];
   const sites=trhCitySites(city);
   // 시대(era)별 그룹핑 — order 순서 유지
@@ -4862,7 +5073,7 @@ function openHistoryCity(city){
   const d=trhCityDone(city), t=trhCityTotal(city);
   const allVisited = trhCityComplete(city);
   const best = trhCityQuiz[city];
-  const comboBtn = `<button class="trh-btn ${allVisited?'trh-btn-gold':'trh-btn-ghost'}" style="${allVisited?'':'opacity:.55'}" onclick="${allVisited?`startCityQuiz('${city}')`:`toast('이 도시의 모든 장소를 방문하면 종합 퀴즈가 열려요!')`}">🧠 ${ci.name} 종합 퀴즈${best!==undefined?` · 최고 ${best}/5`:''}</button>`;
+  const comboBtn = `<button class="trh-btn ${allVisited?'trh-btn-gold':'trh-btn-ghost2'}" style="${allVisited?'':'opacity:.55'}" onclick="${allVisited?`startCityQuiz('${city}')`:`toast('이 도시의 모든 장소를 방문하면 종합 퀴즈가 열려요!')`}">🧠 ${ci.name} 종합 퀴즈${best!==undefined?` · 최고 ${best}/5`:''}</button>`;
 
   document.getElementById('trhCity').innerHTML = `
     <button class="trh-btn trh-btn-back" onclick="backToHistoryHome()">← 탐험 지도로</button>
@@ -4875,7 +5086,8 @@ function openHistoryCity(city){
     <p class="hint">🕰 아래는 <b>시대(연대)순</b>이에요. 장소를 눌러 이야기를 읽고, 퀴즈를 맞혀 도장을 찍어요!</p>
     ${groupHtml}
   `;
-  trhShow('trhCity');
+  if(!opt.keep) trhShow('trhCity');
+  trhFillCardThumbs();
 }
 function backToHistoryHome(){ renderHistoryHome(); trhShow('trhHome'); }
 
@@ -4883,6 +5095,7 @@ function backToHistoryHome(){ renderHistoryHome(); trhShow('trhHome'); }
 function openMuseumList(){ renderMuseumList(); trhShow('trhMuseumList'); }
 function backToMuseumList(){ renderMuseumList(); trhShow('trhMuseumList'); }
 function renderMuseumList(){
+  if(!trhDcLoaded) trhDocentLoad().then(()=>{ if(trhVisible('trhMuseumList')) renderMuseumList(); });
   const groups = MUSEUM_COUNTRY_GROUPS.map(g=>{
     const cards = g.museums.map(mk=>{
       const m=MUSEUMS[mk], d=trhMuseumDone(mk), t=trhMuseumTotal(mk), pct=t?Math.round(d/t*100):0, complete=trhMuseumComplete(mk);
@@ -4894,7 +5107,7 @@ function renderMuseumList(){
         </div>
         <div class="trh-citycard-body">
           <div class="trh-citycard-name">${esc(m.name)}<small>${esc(m.en)}</small></div>
-          <div class="trh-citycard-era">${m.flag} ${esc(m.country)}</div>
+          <div class="trh-citycard-era">${m.flag} ${esc(m.country)}${m.docent?' · <b style="color:#C9803B">🎧 도슨트</b>':''}</div>
           <div class="trh-citycard-prog"><span>${t}점 중 ${d}점 방문</span><span>${pct}%</span></div>
           <div class="trh-mini-bar"><div class="trh-mini-fill" style="width:${pct}%;background:${CITIES[m.city].color}"></div></div>
         </div>
@@ -4908,13 +5121,14 @@ function renderMuseumList(){
     <div class="trh-hero" style="padding:18px 18px 16px">
       <div class="trh-hero-eyebrow">Museum Highlights</div>
       <div class="trh-hero-title" style="font-size:clamp(20px,5vw,28px)">박물관별 탐험 🏛</div>
-      <div class="trh-hero-sub">세계 6대 박물관에서 "꼭 봐야 할 작품"만 모았어요. 각 박물관 안에서는 고대 → 중세 → 근대 → 현대 순서로 만나요.</div>
+      <div class="trh-hero-sub">우리가 가는 박물관·미술관에서 "꼭 봐야 할 작품"만 모았어요. 🎧 표시가 있는 곳은 도슨트 형이 동선대로 안내해 줘요!</div>
     </div>
     ${groups}
     <p class="hint" style="margin-top:18px">🔎 이 목록은 각 박물관의 공식 하이라이트·전문 여행 기사를 인터넷에서 교차 확인해 구성했어요. (상세 카드의 📚 참고 자료 표시 참고)</p>
   `;
 }
-function openMuseum(mk){
+function openMuseum(mk, opt){
+  opt=opt||{}; trhCurMuseum=mk;
   const m=MUSEUMS[mk];
   const sites=trhMuseumSites(mk);
   const periodsPresent = PERIOD_CAT_ORDER.filter(pc=>sites.some(s=>s.periodCat===pc));
@@ -4933,7 +5147,11 @@ function openMuseum(mk){
   const allVisited=trhMuseumComplete(mk);
   const best=trhMuseumQuiz[mk];
   const qn=Math.min(5,t);
-  const comboBtn = `<button class="trh-btn ${allVisited?'trh-btn-gold':'trh-btn-ghost'}" style="${allVisited?'':'opacity:.55'}" onclick="${allVisited?`startMuseumQuiz('${mk}')`:`toast('이 박물관의 모든 작품을 방문하면 종합 미션이 열려요!')`}">🧠 ${esc(m.name)} 종합 미션${best!==undefined?` · 최고 ${best}/${qn}`:''}</button>`;
+  const comboBtn = `<button class="trh-btn ${allVisited?'trh-btn-gold':'trh-btn-ghost2'}" style="${allVisited?'':'opacity:.55'}" onclick="${allVisited?`startMuseumQuiz('${mk}')`:`toast('이 박물관의 모든 작품을 방문하면 종합 미션이 열려요!')`}">🧠 ${esc(m.name)} 종합 미션${best!==undefined?` · 최고 ${best}/${qn}`:''}</button>`;
+  // 도슨트 박물관: [동선순 / 시대순] 토글(기본 동선순). 시대순은 기존 화면 그대로
+  const hasDc = trhMuseumHasDocent(mk);
+  const sort = hasDc ? (trhMuseumSort[mk] || 'route') : 'era';
+  const sortToggle = hasDc ? `<div class="trh-toggle"><button class="${sort==='route'?'on':''}" onclick="trhSetMuseumSort('${mk}','route')">🚶 동선순</button><button class="${sort==='era'?'on':''}" onclick="trhSetMuseumSort('${mk}','era')">🕰 시대순</button></div>` : '';
 
   document.getElementById('trhMuseum').innerHTML = `
     <button class="trh-btn trh-btn-back" onclick="backToMuseumList()">← 박물관 목록으로</button>
@@ -4942,11 +5160,14 @@ function openMuseum(mk){
       <div class="trh-cb-sub">${m.flag} ${esc(m.country)} · ${esc(CITIES[m.city].name)}</div>
       <div style="margin-top:10px;font-size:12.5px;font-weight:700">📍 ${t}점 중 <b>${d}점</b> 방문 완료 ${allVisited?'· 🏅 박물관 마스터!':''}</div>
     </div>
+    ${trhDcMuseumHeader(mk)}
     <div style="margin-bottom:14px">${comboBtn}</div>
-    <p class="hint">🕰 이 박물관 안에서는 <b>고대 → 중세 → 근대 → 현대</b> 순서로 정리했어요. (소장품이 없는 시대는 생략)</p>
-    ${periodHtml}
+    ${sortToggle}
+    ${sort==='route' ? trhDcRouteList(mk) : `<p class="hint">🕰 이 박물관 안에서는 <b>고대 → 중세 → 근대 → 현대</b> 순서로 정리했어요. (소장품이 없는 시대는 생략)</p>${periodHtml}`}
+    ${trhDcBestHtml(mk)}
   `;
-  trhShow('trhMuseum');
+  if(!opt.keep) trhShow('trhMuseum');
+  trhAudioUi(); trhFillCardThumbs(); trhFillPhotoCount();
 }
 
 function trhSiteCard(s){
@@ -4954,7 +5175,7 @@ function trhSiteCard(s){
   const badge = visited ? `<span class="trh-chip trh-chip-stamp">✓ 방문 완료</span>` : `<span class="trh-chip trh-chip-todo">🎫 도장 미획득</span>`;
   const qchip = (s.quiz&&s.quiz.length)?`<span class="trh-chip trh-chip-quiz">❓ 퀴즈 ${s.quiz.length}문제</span>`:'';
   return `<div class="trh-site ${visited?'visited':''}" onclick="openSiteDetail('${s.id}')">
-    <div class="trh-thumb" style="background:${trhGrad(s.city)}">
+    <div class="trh-thumb" data-photo-site="${s.id}" style="background:${trhGrad(s.city)}">
       <span class="trh-thumb-emoji">${s.emoji}</span>
       <span class="trh-thumb-ph">🖼 현지에서 실제로 확인!</span>
     </div>
@@ -4968,24 +5189,35 @@ function trhSiteCard(s){
 }
 
 /* ── 사이트 상세 모달 ── */
-function openSiteDetail(id){
+function openSiteDetail(id, opt){
+  opt=opt||{};
   const s=trhSite(id); if(!s) return;
+  if(!opt.refresh) trhAudioStop();   // 새 작품을 열면 재생 중이던 음성 정지(새로고침일 땐 유지)
+  trhCurSite=id;
   const visited=!!trhVisited[s.id];
-  const sourceHtml = s.source ? `<div class="trh-source">📚 참고 자료(위키피디아): <a href="${esc(s.source)}" target="_blank" rel="noopener">${esc(s.source)}</a></div>` : `<div class="trh-source">📚 기초 조사 자료 기반 카드예요.</div>`;
+  const dc=s.docent, eff=dc?trhDcEffStatus(s):'on_display';
+  const srcLabel = s.source && s.source.includes('wikipedia') ? '참고 자료(위키피디아)' : '참고 자료';
+  const sourceHtml = s.source ? `<div class="trh-source">📚 ${srcLabel}: <a href="${esc(s.source)}" target="_blank" rel="noopener">${esc(s.source)}</a></div>`
+    : (dc ? `<div class="trh-source">🎧 도슨트 콘텐츠 카드예요.${trhMom?'':' (사실 확인 메모는 박물관 화면의 「👩 엄마 확인용」에서 볼 수 있어요)'}</div>` : `<div class="trh-source">📚 기초 조사 자료 기반 카드예요.</div>`);
   const noteHtml = s.note ? `<div class="trh-note">※ ${esc(s.note)}</div>` : '';
+  const g = trhGrade[s.id];
   const actionBtn = visited
-    ? `<button class="trh-btn trh-btn-ghost" style="background:#EDF6EE;color:#3B7A47" disabled>✓ 이미 도장을 받았어요</button>`
+    ? `<button class="trh-btn trh-btn-ghost" style="background:#EDF6EE;color:#3B7A47" disabled>✓ 이미 도장을 받았어요${g?` · ${TRH_GRADE[g].icon} ${TRH_GRADE[g].label}`:''}</button>`
     : `<button class="trh-btn trh-btn-gold" onclick="startSiteQuiz('${s.id}')">🎫 도장 찍기 (퀴즈 풀기)</button>`;
+  const heroBg = eff==='absent' ? 'linear-gradient(135deg,#9A9A9A,#6E6E6E)' : trhGrad(s.city);
+  const heroTxt = eff==='absent' ? '🧳 지금 출장 중인 그림이에요' : '🖼 실제 작품·현장은 여행지에서 직접 확인해요!';
   document.getElementById('trhSiteBody').innerHTML = `
-    <div class="trh-detail">
-      <div class="trh-detail-hero" style="background:${trhGrad(s.city)}">
+    <div class="trh-detail ${dc?'trh-dc':''}">
+      ${dc?`<button class="trh-x" aria-label="닫기" onclick="trhCloseSite()">✕</button>`:''}
+      <div class="trh-detail-hero" style="background:${heroBg}">
         <span class="e">${s.emoji}</span>
-        <span class="trh-detail-ph">🖼 실제 작품·현장은 여행지에서 직접 확인해요!</span>
+        <span class="trh-detail-ph">${heroTxt}</span>
       </div>
-      <h3>${esc(s.name)}</h3>
-      <div class="trh-detail-meta">${CITIES[s.city].flag} ${CITIES[s.city].name} · ${esc(s.era)} · ${esc(s.by)}<br>📍 ${esc(s.place)}</div>
+      <h3>${dc?`<span style="color:var(--trh-accent)">${dc.order}.</span> `:''}${esc(s.name)}</h3>
+      <div class="trh-detail-meta">${CITIES[s.city].flag} ${CITIES[s.city].name} · ${esc(s.era)} · ${esc(s.by)}<br>📍 ${esc(s.place)}${dc&&dc.titleOriginal?` · <i>${esc(dc.titleOriginal)}</i>`:''}</div>
+      ${dc ? trhDcPanel(s) : ''}
       <div class="trh-detail-block">
-        <h4>🧭 11살 눈높이 이야기</h4>
+        <h4>${dc?'🧭 한눈에 보기':'🧭 11살 눈높이 이야기'}</h4>
         <p>${esc(s.kid)}</p>
       </div>
       <div class="trh-detail-block">
@@ -4996,17 +5228,19 @@ function openSiteDetail(id){
       ${sourceHtml}
       <div class="trh-detail-actions">
         ${actionBtn}
-        <button class="trh-btn trh-btn-ghost" style="background:#EFE6D4;color:#3A2C1A" onclick="closeModal('trhSiteModal')">닫기</button>
+        <button class="trh-btn trh-btn-ghost" style="background:#EFE6D4;color:#3A2C1A" onclick="trhCloseSite()">닫기</button>
       </div>
     </div>`;
   document.getElementById('trhSiteModal').classList.add('open');
+  trhAudioUi();
+  if(dc) trhRenderThumbs(s.id);
 }
 
 /* ── 사이트 퀴즈 (통과 시 스탬프) ── */
 let trhQuizState=null;
 function startSiteQuiz(siteId){
   const s=trhSite(siteId); if(!s||!s.quiz||!s.quiz.length){ trhAwardStamp(siteId); return; }
-  closeModal('trhSiteModal');
+  trhAudioStop(); closeModal('trhSiteModal');
   trhQuizState={ mode:'site', siteId, city:s.city, qs:s.quiz, i:0, correct:0 };
   renderQuizQuestion();
   document.getElementById('trhQuizModal').classList.add('open');
@@ -5111,17 +5345,22 @@ function finishQuiz(){
   }
 }
 /* ── 스탬프 획득 ── */
-function trhAwardStamp(siteId){
+function trhAwardStamp(siteId, opt){
+  opt=opt||{};
   const s=trhSite(siteId); if(!s) return;
-  const already=!!trhVisited[siteId];
   trhVisited[siteId]=true; trhSave(TRH_LS.visited, trhVisited);
+  // 도슨트 작품: 힌트 사용 수로 도장 등급 확정(금 0 · 은 1 · 동 2~3)
+  let gradeTxt='';
+  if(s.docent && !trhGrade[siteId]){ trhGrade[siteId]=trhGradeFor(trhHints[siteId]||0); trhSave(TRH_LS.grade, trhGrade); }
+  if(s.docent && trhGrade[siteId]){ const g=TRH_GRADE[trhGrade[siteId]]; gradeTxt=`<br><b>${g.icon} ${g.label}</b>${trhGrade[siteId]==='gold'?' — 힌트 없이 찾았어!':''}`; }
+  const viaTxt = opt.via==='photo' ? '📸 사진 인증 완료!<br>' : (opt.via==='memory' ? '✍️ 기억 미션 완료!<br>' : '');
   const cityComplete = trhCityComplete(s.city);
   const museumComplete = s.museum && trhMuseumComplete(s.museum);
   const grand = trhAllCitiesComplete();
   // 축하 오버레이
   document.getElementById('trhCelStamp').textContent = s.emoji;
   let title='🎫 스탬프 획득!';
-  let sub=`${CITIES[s.city].name} · ${esc(s.name)}<br>여권에 도장이 찍혔어요!`;
+  let sub=`${viaTxt}${CITIES[s.city].name} · ${esc(s.name)}<br>여권에 도장이 찍혔어요!${gradeTxt}`;
   if(grand){ title='🧭 세계사 탐험가 달성!'; sub='5개 도시를 모두 완주했어요!<br>진짜 대단한 탐험가예요! 🎉'; document.getElementById('trhCelStamp').textContent='🧭'; }
   else if(cityComplete){ title=`🏅 ${CITIES[s.city].name} 완주!`; sub=`${CITIES[s.city].name}의 모든 장소를 방문했어요!<br>완주 뱃지를 받았어요! 🎉`; document.getElementById('trhCelStamp').textContent=TRH_CITY_STAMP[s.city]; }
   else if(museumComplete){ const mm=MUSEUMS[s.museum]; title=`🏅 ${esc(mm.name)} 마스터!`; sub=`${esc(mm.name)}의 "꼭 봐야 할 작품"을 모두 방문했어요!<br>박물관 마스터 뱃지를 받았어요! 🎉`; document.getElementById('trhCelStamp').textContent=mm.icon; }
@@ -5130,10 +5369,372 @@ function trhAwardStamp(siteId){
   document.getElementById('trhCelebrate').classList.add('show');
   toast('🎫 스탬프를 획득했어요!');
   // 화면 갱신(현재 열려 있는 뷰 유지)
-  if(document.getElementById('trhCity').style.display!=='none'){ openHistoryCity(s.city); }
-  if(document.getElementById('trhMuseum').style.display!=='none' && s.museum){ openMuseum(s.museum); }
-  if(document.getElementById('trhMuseumList').style.display!=='none'){ renderMuseumList(); }
+  if(trhVisible('trhCity') && trhCurCity){ openHistoryCity(trhCurCity, {keep:true}); }
+  if(trhVisible('trhMuseum') && trhCurMuseum){ openMuseum(trhCurMuseum, {keep:true}); }
+  if(trhVisible('trhMuseumList')){ renderMuseumList(); }
   renderHistoryHome();
+}
+
+/* ══════════════════ 🎧 도슨트 모드 — 상태 ══════════════════ */
+let trhHints     = trhLoad(TRH_LS.hints, {});
+let trhGrade     = trhLoad(TRH_LS.grade, {});
+let trhChecklist = trhLoad(TRH_LS.checklist, {});
+let trhCheckRes  = trhLoad(TRH_LS.checkresult, {});
+let trhMemory    = trhLoad(TRH_LS.memory, {});
+let trhBest      = trhLoad(TRH_LS.best, {});
+let trhMom       = !!trhLoad(TRH_LS.mom, false);
+let trhOffline   = trhLoad(TRH_LS.offline, {});
+let trhMuseumSort = {};   // { museumKey: 'route'|'era' } — 도슨트 박물관 기본값은 동선순
+const TRH_GRADE = { gold:{icon:'🥇',label:'금 도장'}, silver:{icon:'🥈',label:'은 도장'}, bronze:{icon:'🥉',label:'동 도장'} };
+function trhGradeFor(n){ return n<=0 ? 'gold' : (n===1 ? 'silver' : 'bronze'); }
+// 현장 확인(check) 결과까지 반영한 실제 표시 상태
+function trhDcEffStatus(s){
+  const dc=s.docent; if(!dc) return 'on_display';
+  if(dc.status==='check'){ const r=trhCheckRes[s.id]; return r==='absent' ? 'absent' : (r==='present' ? 'on_display' : 'check'); }
+  return dc.status || 'on_display';
+}
+function trhDcRouteComplete(mk){ const ds=trhMuseumSites(mk).filter(s=>s.docent); return ds.length>0 && ds.every(s=>trhVisited[s.id]); }
+function trhFmtDate(iso){ if(!iso) return ''; const [y,m,d]=iso.split('-').map(Number); const wd='일월화수목금토'[new Date(y,m-1,d).getDay()]; return `${m}/${d}(${wd})`; }
+
+/* ── 음성: 전역 플레이어 1개 → 한 번에 하나만 재생 ── */
+const trhAudio = new Audio();
+trhAudio.preload = 'none';
+let trhAudioCur = null, trhAudioBlobUrl = null;
+let trhAudioRate = Number(trhLoad(TRH_LS.audiorate, 1)) || 1;
+trhAudio.addEventListener('play', trhAudioUi);
+trhAudio.addEventListener('pause', trhAudioUi);
+trhAudio.addEventListener('ended', ()=>{ trhAudioCur=null; trhAudioUi(); });
+trhAudio.addEventListener('error', ()=>{ if(trhAudioCur){ toast('음성을 불러오지 못했어요 (인터넷 또는 오프라인 저장 확인)'); trhAudioCur=null; trhAudioUi(); } });
+function trhDcAudioPath(dc, track){ return `audio/${dc.audioMuseumId}/${dc.workId}_${track}.mp3`; }
+async function trhAudioSrc(path){
+  // 오프라인 저장본이 있으면 그걸로 재생(비행기 모드 대응)
+  try{
+    if('caches' in window){
+      const hit = await (await caches.open(TRH_AUDIO_CACHE)).match(path);
+      if(hit){ if(trhAudioBlobUrl) URL.revokeObjectURL(trhAudioBlobUrl); trhAudioBlobUrl = URL.createObjectURL(await hit.blob()); return trhAudioBlobUrl; }
+    }
+  }catch(e){}
+  return path;
+}
+async function trhAudioToggle(path){
+  if(trhAudioCur===path && trhAudio.src){ if(trhAudio.paused) trhAudio.play().catch(()=>{}); else trhAudio.pause(); return; }
+  trhAudio.pause(); trhAudioCur = path; trhAudioUi();
+  trhAudio.src = await trhAudioSrc(path);
+  trhAudio.defaultPlaybackRate = trhAudioRate; trhAudio.playbackRate = trhAudioRate;
+  try{ await trhAudio.play(); }catch(e){ if(e && e.name!=='AbortError'){ toast('음성을 재생할 수 없어요'); trhAudioCur=null; } }
+  trhAudioUi();
+}
+function trhAudioStop(){ trhAudio.pause(); trhAudioCur=null; trhAudioUi(); }
+function trhSetRate(r){ trhAudioRate=r; trhSave(TRH_LS.audiorate, r); trhAudio.playbackRate=r; trhAudioUi(); }
+function trhAudioUi(){
+  document.querySelectorAll('[data-audio]').forEach(b=>{
+    const mine = b.dataset.audio===trhAudioCur, on = mine && !trhAudio.paused;
+    b.classList.toggle('playing', on);
+    const st=b.querySelector('.st'); if(st) st.textContent = on ? '⏸ 재생 중' : (mine && trhAudio.src ? '▶ 이어 듣기' : '▶ 듣기');
+  });
+  document.querySelectorAll('[data-rate]').forEach(b=>b.classList.toggle('on', Number(b.dataset.rate)===trhAudioRate));
+}
+function trhAudioBtn(path, label){
+  if(!trhDcAudioSet.has(path)) return `<button class="trh-dc-btn trh-audio-btn" disabled><span>🔇 ${esc(label)}</span><span class="st">음성 준비 중</span></button>`;
+  return `<button class="trh-dc-btn trh-audio-btn" data-audio="${esc(path)}" onclick="event.stopPropagation();trhAudioToggle('${path}')"><span>🎧 ${esc(label)}</span><span class="st">▶ 듣기</span></button>`;
+}
+
+/* ── 사진: IndexedDB(trapble_history_photos) ── */
+let trhDbP = null; const trhPhotoUrls = {};
+function trhDb(){
+  if(trhDbP) return trhDbP;
+  trhDbP = new Promise((res, rej)=>{
+    if(!('indexedDB' in window)) return rej(new Error('IndexedDB 미지원'));
+    const rq = indexedDB.open('trapble_history_photos', 1);
+    rq.onupgradeneeded = ()=>{ const db=rq.result; if(!db.objectStoreNames.contains('photos')){ const st=db.createObjectStore('photos', {keyPath:'id', autoIncrement:true}); st.createIndex('siteId','siteId'); } };
+    rq.onsuccess = ()=>res(rq.result); rq.onerror = ()=>rej(rq.error);
+  });
+  trhDbP.catch(()=>{ trhDbP=null; });
+  return trhDbP;
+}
+async function trhPhotoAdd(siteId, blob){
+  const db = await trhDb();
+  return new Promise((res, rej)=>{ const tx=db.transaction('photos','readwrite'); tx.objectStore('photos').add({siteId, blob, ts:Date.now()}); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); });
+}
+async function trhPhotoList(siteId){
+  const db = await trhDb();
+  return new Promise((res, rej)=>{ const st=db.transaction('photos','readonly').objectStore('photos'); const rq = siteId ? st.index('siteId').getAll(siteId) : st.getAll(); rq.onsuccess=()=>res(rq.result||[]); rq.onerror=()=>rej(rq.error); });
+}
+async function trhPhotoDelete(id){
+  const db = await trhDb();
+  return new Promise((res, rej)=>{ const tx=db.transaction('photos','readwrite'); tx.objectStore('photos').delete(id); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); });
+}
+function trhPhotoUrl(p){ if(!trhPhotoUrls[p.id]) trhPhotoUrls[p.id]=URL.createObjectURL(p.blob); return trhPhotoUrls[p.id]; }
+// 긴 변 1280px · JPEG 0.7 로 압축
+async function trhCompressImage(file){
+  const url = URL.createObjectURL(file);
+  try{
+    const img = await new Promise((res, rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=()=>rej(new Error('이미지를 읽을 수 없어요')); i.src=url; });
+    const sc = Math.min(1, 1280/Math.max(img.naturalWidth, img.naturalHeight));
+    const w = Math.max(1, Math.round(img.naturalWidth*sc)), h = Math.max(1, Math.round(img.naturalHeight*sc));
+    const cv = document.createElement('canvas'); cv.width=w; cv.height=h; cv.getContext('2d').drawImage(img, 0, 0, w, h);
+    return await new Promise((res, rej)=>cv.toBlob(b=>b?res(b):rej(new Error('압축 실패')), 'image/jpeg', 0.7));
+  } finally { URL.revokeObjectURL(url); }
+}
+async function trhOnPhoto(siteId, input){
+  const file = input.files && input.files[0]; input.value=''; if(!file) return;
+  toast('📸 사진 저장 중…');
+  try{
+    await trhPhotoAdd(siteId, await trhCompressImage(file));
+    if(!trhVisited[siteId]) trhAwardStamp(siteId, {via:'photo'});
+    else { toast('📸 사진을 저장했어요!'); trhRefreshViews(); }
+    trhRefreshDetail();
+  }catch(e){ toast('사진 저장에 실패했어요 — '+(e && e.message || '')); }
+}
+async function trhRenderThumbs(siteId){
+  const box = document.getElementById('trhThumbs'); if(!box) return;
+  let ps=[]; try{ ps = await trhPhotoList(siteId); }catch(e){ return; }
+  box.innerHTML = ps.sort((a,b)=>a.ts-b.ts).map(p=>`<div class="ph"><img src="${trhPhotoUrl(p)}" alt="인증 사진" onclick="trhShowImg(this.src)"><button class="rm" aria-label="사진 삭제" onclick="trhDelPhoto(${p.id})">✕</button></div>`).join('');
+}
+async function trhDelPhoto(id){ if(!confirm('이 사진을 지울까요? (도장은 그대로 남아요)')) return; try{ await trhPhotoDelete(id); }catch(e){} trhRenderThumbs(trhCurSite); trhRefreshViews(); }
+function trhShowImg(src){ const im=document.getElementById('imgModalImg'), md=document.getElementById('imgModal'); if(im&&md){ im.src=src; md.classList.add('open'); } }
+// 카드 썸네일에 가장 최근 인증 사진 표시
+async function trhFillCardThumbs(){
+  const els=[...document.querySelectorAll('[data-photo-site]')]; if(!els.length) return;
+  let all=[]; try{ all = await trhPhotoList(null); }catch(e){ return; }
+  const latest={}; all.forEach(p=>{ if(!latest[p.siteId] || p.ts>latest[p.siteId].ts) latest[p.siteId]=p; });
+  els.forEach(el=>{ const p=latest[el.dataset.photoSite]; if(!p) return; el.style.backgroundImage=`url(${trhPhotoUrl(p)})`; el.style.backgroundSize='cover'; el.style.backgroundPosition='center'; el.classList.add('has-photo'); });
+}
+
+/* ── 상호작용 ── */
+function trhUseHint(id){ const s=trhSite(id); if(!s||!s.docent) return; trhHints[id]=Math.min((trhHints[id]||0)+1, s.docent.hints.length); trhSave(TRH_LS.hints, trhHints); trhRefreshDetail(); }
+function trhToggleCheck(id, i){ const a=(trhChecklist[id]||[]).slice(); a[i]=!a[i]; trhChecklist[id]=a; trhSave(TRH_LS.checklist, trhChecklist); trhRefreshDetail(); }
+function trhSetCheck(id, val){ if(val) trhCheckRes[id]=val; else delete trhCheckRes[id]; trhSave(TRH_LS.checkresult, trhCheckRes); trhRefreshDetail(); trhRefreshViews(); }
+function trhSaveMemory(id){
+  const el=document.getElementById('trhMem'); const t=(el&&el.value||'').trim();
+  if(!t){ toast('본 것을 한 줄이라도 적어 봐!'); return; }
+  trhMemory[id]=t; trhSave(TRH_LS.memory, trhMemory);
+  if(!trhVisited[id]) trhAwardStamp(id, {via:'memory'}); else toast('✍️ 기록을 저장했어요');
+  trhRefreshDetail();
+}
+function trhToggleMom(){ trhMom=!trhMom; trhSave(TRH_LS.mom, trhMom); trhRefreshViews(); trhRefreshDetail(); }
+function trhSetMuseumSort(mk, v){ trhMuseumSort[mk]=v; openMuseum(mk, {keep:true}); }
+function trhSaveBest(mk){
+  const sel=document.getElementById('trhBestSel'), note=document.getElementById('trhBestNote');
+  if(!sel || !sel.value){ toast('제일 좋았던 작품을 골라 줘!'); return; }
+  trhBest[mk]={ siteId:sel.value, note:(note&&note.value||'').trim(), ts:Date.now() }; trhSave(TRH_LS.best, trhBest);
+  toast('🏆 오늘의 베스트를 저장했어요!'); openMuseum(mk, {keep:true});
+}
+function trhRefreshDetail(){
+  const bk=document.getElementById('trhSiteModal'); if(!bk || !bk.classList.contains('open') || !trhCurSite) return;
+  const md=bk.querySelector('.modal'); const top=md?md.scrollTop:0;
+  openSiteDetail(trhCurSite, {refresh:true}); if(md) md.scrollTop=top;
+}
+function trhRefreshViews(){
+  if(trhVisible('trhMuseum') && trhCurMuseum) openMuseum(trhCurMuseum, {keep:true});
+  if(trhVisible('trhCity') && trhCurCity) openHistoryCity(trhCurCity, {keep:true});
+}
+function trhCloseSite(){ trhAudioStop(); closeModal('trhSiteModal'); }
+// 연결 단서: 같은 앱 안 박물관이면 해당 작품(없으면 박물관)으로 이동, external은 텍스트만
+function trhDcNorm(t){ return String(t||'').replace(/\([^)]*\)/g,'').replace(/[\s·,.'"「」『』!?\-—~:]/g,'').toLowerCase(); }
+function trhDcResolveLink(l){
+  const mk=trhDcMuseumKey(l.museum);
+  if(mk==='external' || !MUSEUMS[mk]) return {type:'text'};
+  const nt=trhDcNorm(l.title), sites=trhMuseumSites(mk);
+  let hit = nt && sites.find(x=>{ const nn=trhDcNorm(x.name); return nn && (nn===nt || nn.includes(nt) || (nn.length>=2 && nt.includes(nn))); });
+  if(!hit && nt) hit = sites.find(x=>x.docent && trhDcNorm(x.docent.title)===nt);
+  if(!hit && nt.length>=2) hit = sites.find(x=>trhDcNorm(x.by).includes(nt));
+  return hit ? {type:'site', mk, id:hit.id} : {type:'museum', mk};
+}
+function trhGoLink(type, mk, id){
+  trhCloseSite(); openMuseum(mk);
+  if(type==='site') setTimeout(()=>openSiteDetail(id), 60);
+}
+
+/* ── 사진 백업: IndexedDB 사진을 파일로(공유 시트 우선, 안 되면 다운로드) ── */
+const TRH_PHOTO_WARN = '브라우저 데이터를 지우면 사진이 사라져요. 매일 저녁 내보내기 권장.';
+function trhPhotoBarHtml(){
+  return `<div class="trh-photobar"><button class="trh-dc-btn trh-btn-ghost2" onclick="trhExportPhotos()">📤 사진 내보내기 <span class="trh-photo-count"></span></button><span>⚠️ ${TRH_PHOTO_WARN}</span></div>`;
+}
+async function trhFillPhotoCount(){
+  const els=document.querySelectorAll('.trh-photo-count'); if(!els.length) return;
+  let n=0; try{ n=(await trhPhotoList(null)).length; }catch(e){}
+  els.forEach(el=>el.textContent = n ? `(${n}장)` : '');
+}
+async function trhExportPhotos(){
+  let all=[]; try{ all=await trhPhotoList(null); }catch(e){ toast('사진 저장소를 열 수 없어요'); return; }
+  if(!all.length){ toast('아직 인증 사진이 없어요'); return; }
+  const pad=n=>String(n).padStart(2,'0');
+  const files = all.sort((a,b)=>a.ts-b.ts).map((p,i)=>{
+    const d=new Date(p.ts);
+    return new File([p.blob], `stamptour_${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}_${p.siteId}_${i+1}.jpg`, {type:'image/jpeg', lastModified:p.ts});
+  });
+  if(navigator.canShare && navigator.share){
+    try{
+      if(navigator.canShare({files})){ await navigator.share({files, title:'역사 스탬프투어 사진', text:`인증 사진 ${files.length}장`}); toast('📤 공유 창을 열었어요'); return; }
+    }catch(e){ if(e && e.name==='AbortError') return; }
+  }
+  for(const f of files){
+    const a=document.createElement('a'); a.href=URL.createObjectURL(f); a.download=f.name; document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+    await new Promise(r=>setTimeout(r, 400));
+  }
+  toast(`📤 사진 ${files.length}장을 내려받았어요`);
+}
+
+/* ── 오프라인 저장: manifest의 음성 + 도슨트 JSON을 별도 캐시 버킷에 저장 ── */
+let trhOfflineBusy = false;
+function trhOfflineLabel(amid){
+  const o=trhOffline[amid], total=(trhDcManifest[amid]||[]).length;
+  if(o && total && o.n>=total) return `✅ 오프라인 저장됨 (${o.n}개)`;
+  return '📥 이 미술관 오프라인 저장';
+}
+async function trhOfflineSave(mk){
+  const d=MUSEUMS[mk] && MUSEUMS[mk].docent; if(!d || trhOfflineBusy) return;
+  if(!('caches' in window)){ toast('이 브라우저는 오프라인 저장을 지원하지 않아요'); return; }
+  const list=(trhDcManifest[d.audioMuseumId]||[]).slice();
+  if(!list.length){ toast('아직 음성 파일이 없어요 — 음성 생성이 끝나면 다시 눌러 주세요'); return; }
+  trhOfflineBusy=true;
+  const btn=()=>document.getElementById('trhOffBtn');
+  let done=0, fail=0;
+  try{
+    const cache=await caches.open(TRH_AUDIO_CACHE);
+    for(const p of list){
+      try{
+        if(!(await cache.match(p))){ const r=await fetch(p, {cache:'no-cache'}); if(!r.ok) throw new Error(r.status); await cache.put(p, r); }
+        done++;
+      }catch(e){ fail++; }
+      const b=btn(); if(b) b.textContent=`📥 저장 중… ${done+fail}/${list.length}`;
+    }
+    for(const f of [...TRH_DC_FILES, TRH_DC_MANIFEST]){ try{ const r=await fetch(f, {cache:'no-cache'}); if(r.ok) await cache.put(f, r); }catch(e){} }
+  }finally{ trhOfflineBusy=false; }
+  trhOffline[d.audioMuseumId]={ n:done, total:list.length, ts:Date.now() }; trhSave(TRH_LS.offline, trhOffline);
+  const b=btn();
+  if(fail){ if(b) b.textContent=`⚠️ ${done}/${list.length} 저장 — 다시 누르면 이어서 저장`; toast('일부 파일을 저장하지 못했어요. 와이파이에서 다시 눌러 주세요'); }
+  else { if(b) b.textContent=`✅ 오프라인 저장됨 (${done}개)`; toast('✅ 비행기 모드에서도 음성을 들을 수 있어요!'); }
+}
+
+/* ── 렌더: 박물관 헤더(사건 파일) ── */
+function trhDcMuseumHeader(mk){
+  const m=MUSEUMS[mk], d=m && m.docent; if(!d) return '';
+  const v=d.visit;
+  const visitTxt = v ? `🗓 방문 ${trhFmtDate(v.date)} ${v.time||''}${v.type?` · ${v.type}`:''}${v.budgetMin?` · 약 ${v.budgetMin}분`:''}` : '';
+  const introPath = d.intro ? (d.intro.audio || `audio/${d.audioMuseumId}/intro.mp3`) : '';
+  return `<div class="trh-case">
+      <div class="trh-case-label">🕵️ 사건 파일 · CASE FILE</div>
+      <div class="trh-case-title">${esc(d.caseTitle)}</div>
+      <div class="trh-case-brief">${esc(d.caseBrief)}</div>
+      ${visitTxt?`<div class="trh-visit">${esc(visitTxt)}</div>`:''}
+      ${d.intro && d.intro.script ? `<div class="trh-case-audio">${trhAudioBtn(introPath, '인트로 — 도슨트 형의 첫인사')}</div>` : ''}
+    </div>
+    ${(d.routeNote || d.rules.length) ? `<div class="trh-dc-note">${d.routeNote?`<div>🧭 <b>동선</b> ${esc(d.routeNote)}</div>`:''}${d.rules.map(r=>`<div>⚠️ ${esc(r)}</div>`).join('')}</div>` : ''}
+    ${trhMom && d.intro && d.intro.factCheck ? `<div class="trh-fact">🔍 인트로 사실 확인: ${esc(d.intro.factCheck)}</div>` : ''}
+    <div class="trh-dc-tools">
+      <button class="trh-dc-btn trh-btn-ghost2" id="trhOffBtn" onclick="trhOfflineSave('${mk}')">${trhOfflineLabel(d.audioMuseumId)}</button>
+      <button class="trh-dc-btn trh-btn-ghost2" onclick="trhExportPhotos()">📤 사진 내보내기 <span class="trh-photo-count"></span></button>
+      <button class="trh-dc-btn trh-btn-ghost2" onclick="trhToggleMom()">${trhMom ? '🙈 엄마 메모 숨기기' : '👩 엄마 확인용'}</button>
+    </div>`;
+}
+/* ── 렌더: 동선순 카드 ── */
+function trhDocentCard(s){
+  const dc=s.docent, eff=trhDcEffStatus(s), visited=!!trhVisited[s.id], g=trhGrade[s.id];
+  const st = eff==='absent' ? `<span class="trh-chip trh-chip-absent">🧳 출장 중</span>` : (eff==='check' ? `<span class="trh-chip trh-chip-check">🟡 현장 확인</span>` : '');
+  const stamp = visited ? `<span class="trh-chip trh-chip-stamp">✓ 방문 완료</span>${g?`<span class="trh-chip trh-chip-medal">${TRH_GRADE[g].icon} ${TRH_GRADE[g].label}</span>`:''}` : `<span class="trh-chip trh-chip-todo">🎫 도장 미획득</span>`;
+  const qchip = (s.quiz && s.quiz.length) ? `<span class="trh-chip trh-chip-quiz">❓ 퀴즈 ${s.quiz.length}문제</span>` : '';
+  return `<div class="trh-site trh-dcard ${visited?'visited':''} ${eff==='absent'?'dc-absent':''}" onclick="openSiteDetail('${s.id}')">
+    <div class="trh-thumb" data-photo-site="${s.id}" style="background:${trhGrad(s.city)}"><span class="trh-order">${dc.order}</span><span class="trh-thumb-emoji">${s.emoji}</span></div>
+    <div class="trh-site-body">
+      <div class="trh-site-name">${esc(s.name)}</div>
+      <div class="trh-site-meta">${esc(s.by)}</div>
+      ${eff!=='absent' && dc.location ? `<div class="trh-dc-loc">📍 ${esc(dc.location)}</div>` : ''}
+      ${dc.joseon ? `<div class="trh-dc-line">🇰🇷 ${esc(dc.joseon)}</div>` : ''}
+      ${dc.world ? `<div class="trh-dc-line">🌍 ${esc(dc.world)}</div>` : ''}
+      <div class="trh-site-foot">${st}${stamp}${qchip}</div>
+    </div>
+  </div>`;
+}
+function trhDcRouteList(mk){
+  const sites=trhMuseumSites(mk);
+  const route=sites.filter(s=>s.docent).sort((a,b)=>a.docent.order-b.docent.order);
+  const rest=sites.filter(s=>!s.docent);
+  return `<p class="hint" style="font-size:14px">🚶 도슨트 형이 짠 <b>관람 순서</b>예요. 번호대로 찾아가며 도장을 모아요!</p>`
+    + route.map(trhDocentCard).join('')
+    + (rest.length ? `<div class="trh-section-label" style="margin-top:18px">➕ 시간이 남으면 더 볼 작품</div>${rest.map(trhSiteCard).join('')}` : '');
+}
+function trhDcBestHtml(mk){
+  if(!(MUSEUMS[mk] && MUSEUMS[mk].docent) || !trhDcRouteComplete(mk)) return '';
+  const b=trhBest[mk]||{}, sites=trhMuseumSites(mk).filter(s=>s.docent && trhDcEffStatus(s)!=='absent');
+  return `<div class="trh-best">
+    <h4>🏆 관람 완료! 오늘의 베스트 1</h4>
+    <select id="trhBestSel" class="trh-best-sel"><option value="">— 제일 좋았던 작품 고르기 —</option>${sites.map(s=>`<option value="${s.id}" ${b.siteId===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select>
+    <textarea id="trhBestNote" class="trh-best-note" rows="2" maxlength="200" placeholder="한 줄 감상: 왜 제일 좋았어?">${esc(b.note||'')}</textarea>
+    <button class="trh-dc-btn trh-btn-gold" style="width:100%" onclick="trhSaveBest('${mk}')">💾 저장하기</button>
+    ${b.siteId ? `<p class="trh-small">✅ 저장됨 — ${esc((trhSite(b.siteId)||{}).name||'')}${b.note?` · “${esc(b.note)}”`:''}</p>` : ''}
+  </div>`;
+}
+/* ── 렌더: 작품 상세의 도슨트 패널 ── */
+function trhDcHints(s){
+  const dc=s.docent, used=Math.min(trhHints[s.id]||0, dc.hints.length), visited=!!trhVisited[s.id];
+  const labels=['🧩 수수께끼','📍 위치','🔑 정답'];
+  let h=`<div class="trh-dc-sec"><h4>💡 단서 찾기 힌트</h4>`;
+  h += dc.hints.slice(0, used).map((t,i)=>`<div class="trh-hint-text"><b>${labels[i]||'💡 힌트'}</b> ${esc(t)}</div>`).join('');
+  if(used < dc.hints.length) h += `<button class="trh-dc-btn trh-hint-btn" onclick="trhUseHint('${s.id}')">💡 힌트 ${used+1} 보기 · ${labels[used]||''}</button>`;
+  if(!visited){ const g=TRH_GRADE[trhGradeFor(used)]; h += used===0 ? `<p class="trh-small">힌트 없이 찾으면 🥇 <b>금 도장</b>! 힌트 1개면 🥈 은, 2개 이상이면 🥉 동이에요.</p>` : `<p class="trh-small">지금 도장을 받으면 <b>${g.icon} ${g.label}</b>이에요.</p>`; }
+  else if(trhGrade[s.id]){ const g=TRH_GRADE[trhGrade[s.id]]; h += `<p class="trh-small">받은 도장: <b>${g.icon} ${g.label}</b></p>`; }
+  return h+'</div>';
+}
+function trhDcPanel(s){
+  const dc=s.docent, eff=trhDcEffStatus(s);
+  let h='';
+  // 상태
+  if(dc.status==='check'){
+    const r=trhCheckRes[s.id];
+    if(!r) h += `<div class="trh-dc-status check"><b>🟡 현장 확인 미션</b><p>이 그림은 곧 다른 나라로 출장 갈 예정이라 오늘 있을지 몰라. 직접 가서 확인해 줘!</p>
+      <div class="trh-dc-row"><button class="trh-dc-btn trh-btn-yes" onclick="trhSetCheck('${s.id}','present')">👀 봤어요</button><button class="trh-dc-btn trh-btn-no" onclick="trhSetCheck('${s.id}','absent')">🙈 없었어요</button></div></div>`;
+    else if(r==='present') h += `<div class="trh-dc-status ok">👀 현장에서 직접 확인했어요! <button class="trh-linkbtn" onclick="trhSetCheck('${s.id}',null)">선택 바꾸기</button></div>`;
+    else h += `<div class="trh-dc-status absent"><b>🧳 오늘은 출장 중이었어요.</b><p>대신 이야기를 듣고 퀴즈로 도장을 받아요.</p><button class="trh-linkbtn" onclick="trhSetCheck('${s.id}',null)">선택 바꾸기</button></div>`;
+  } else if(eff==='absent'){
+    h += `<div class="trh-dc-status absent"><b>🧳 이 그림은 지금 출장 중!</b><p>${esc(dc.hints[0] || '음성으로 사라진 이유를 들어 보고, 퀴즈로 도장을 받아요.')}</p></div>`;
+  }
+  if(trhMom && dc.statusNote) h += `<div class="trh-fact">📌 상태 메모: ${esc(dc.statusNote)}</div>`;
+  // 위치 · 힌트
+  if(eff!=='absent' && dc.location) h += `<div class="trh-dc-sec"><h4>📍 어디에 있을까?</h4><p>${esc(dc.location)}</p></div>`;
+  if(eff!=='absent' && dc.hints.length) h += trhDcHints(s);
+  // 음성(absent는 1트랙만)
+  const tracks = Object.keys(dc.audioScripts).filter(k=>String(dc.audioScripts[k]||'').trim()).filter(k=>eff!=='absent' || k==='1');
+  if(tracks.length){
+    const anyReady = tracks.some(t=>trhDcAudioSet.has(trhDcAudioPath(dc,t)));
+    h += `<div class="trh-dc-sec"><h4>🎧 도슨트 형의 이야기</h4>
+      ${tracks.map(t=>trhAudioBtn(trhDcAudioPath(dc,t), TRH_DC_TRACKS[t] || ('트랙 '+t))).join('')}
+      ${anyReady ? `<div class="trh-rate">속도 ${[0.9,1,1.2].map(r=>`<button data-rate="${r}" onclick="trhSetRate(${r})">${r===1?'1.0':r}×</button>`).join('')}</div>` : `<p class="trh-small">🔇 음성 파일을 준비하고 있어요. 그동안 아래 대본을 엄마가 읽어 줘도 좋아요.</p>`}
+      <details class="trh-script"><summary>📄 대본 읽기</summary>${tracks.map(t=>`<p><b>${esc(TRH_DC_TRACKS[t]||('트랙 '+t))}</b><br>${esc(dc.audioScripts[t])}</p>`).join('')}</details>
+    </div>`;
+  }
+  // 감상법
+  if(eff!=='absent' && dc.howToSee.length){
+    const ck=trhChecklist[s.id]||[];
+    h += `<div class="trh-dc-sec"><h4>👀 이렇게 감상해 봐 (${ck.filter(Boolean).length}/${dc.howToSee.length})</h4>${dc.howToSee.map((t,i)=>`<button class="trh-dc-check ${ck[i]?'on':''}" onclick="trhToggleCheck('${s.id}',${i})"><span class="bx">${ck[i]?'☑':'☐'}</span><span>${i+1}. ${esc(t)}</span></button>`).join('')}</div>`;
+  }
+  // 미션: 기억 미션(촬영 금지) > 사진 미션
+  if(dc.memoryMission){
+    h += `<div class="trh-dc-sec"><h4>🧠 기억 미션 (촬영 금지 구역)</h4><p>${esc(dc.memoryMission)}</p>
+      <textarea id="trhMem" class="trh-best-note" rows="3" maxlength="400" placeholder="눈으로 본 것을 기억해서 적어 봐">${esc(trhMemory[s.id]||'')}</textarea>
+      <button class="trh-dc-btn trh-btn-gold" style="width:100%" onclick="trhSaveMemory('${s.id}')">✍️ 기록하고 도장 받기</button></div>`;
+  } else if(dc.photoMission && !/^없음/.test(dc.photoMission.trim()) && eff!=='absent'){
+    h += `<div class="trh-dc-sec"><h4>📸 사진 미션</h4><p>${esc(dc.photoMission)}</p>
+      <label class="trh-dc-btn trh-photo-btn">📷 사진 찍어 인증하기<input type="file" accept="image/*" capture="environment" style="display:none" onchange="trhOnPhoto('${s.id}',this)"></label>
+      <p class="trh-small">사진을 올리면 도장이 바로 찍혀요! (플래시는 끄기)</p>
+      <div class="trh-photo-thumbs" id="trhThumbs"></div></div>`;
+  } else if(dc.photoMission){
+    h += `<p class="trh-small" style="margin-bottom:14px">🔗 ${esc(dc.photoMission)}</p>`;
+  }
+  // 조선 · 세계
+  if(dc.joseon || dc.world) h += `<div class="trh-jw">${dc.joseon?`<div><h5>🇰🇷 그때 조선에서는</h5><p>${esc(dc.joseon)}</p></div>`:''}${dc.world?`<div><h5>🌍 그때 세계에서는</h5><p>${esc(dc.world)}</p></div>`:''}</div>`;
+  // 연결 단서
+  if(dc.links.length){
+    h += `<div class="trh-dc-sec"><h4>🔗 연결 단서</h4><div class="trh-links">${dc.links.map(l=>{
+      const r=trhDcResolveLink(l), mname = r.mk ? MUSEUMS[r.mk].name : '여행 밖';
+      const body = `${r.type==='site'?'🖼':(r.type==='museum'?'🏛':'🌐')} <b>${esc(mname)}</b> · ${esc(l.title)}${l.note?`<small>${esc(l.note)}</small>`:''}`;
+      return r.type==='text' ? `<div class="trh-link-chip">${body}</div>` : `<button class="trh-link-chip go" onclick="trhGoLink('${r.type}','${r.mk}','${r.id||''}')">${body}</button>`;
+    }).join('')}</div></div>`;
+  }
+  if(trhMom && dc.factCheck) h += `<div class="trh-fact">🔍 사실 확인(엄마용): ${esc(dc.factCheck)}</div>`;
+  return h;
 }
 
 /* ── 여권 / 스탬프북 ── */
@@ -5146,6 +5747,7 @@ function renderPassport(){
       return `<div class="trh-stamp ${got?'got':''}" style="${got?`border-color:${ci.color};color:${ci.color}`:''}" title="${esc(s.name)}">
         <span class="trh-stamp-emoji">${got?s.emoji:'❔'}</span>
         <span class="trh-stamp-lbl">${got?esc(s.name.slice(0,7)):'미방문'}</span>
+        ${got && trhGrade[s.id] ? `<span class="trh-stamp-medal">${TRH_GRADE[trhGrade[s.id]].icon}</span>` : ''}
       </div>`;
     }).join('');
     const d=trhCityDone(c), t=trhCityTotal(c);
@@ -5163,8 +5765,10 @@ function renderPassport(){
       ${grand?'<div style="text-align:center;margin-top:12px;background:rgba(255,215,160,.18);border-radius:10px;padding:8px;font-size:12.5px;color:#FFE7C2;font-weight:700">🧭 세계사 탐험가 — 5개 도시 완주!</div>':''}
       ${cityBlocks}
     </div>
-    <p class="hint">🎫 장소의 퀴즈를 맞히면 이 여권에 도장이 찍혀요. 도시별로 도장 색과 모양이 달라요!</p>
+    <p class="hint">🎫 장소의 퀴즈를 맞히면(🎧 도슨트 작품은 사진 인증으로도) 이 여권에 도장이 찍혀요. 도시별로 도장 색과 모양이 달라요! 도슨트 작품은 힌트를 적게 쓸수록 🥇금·🥈은·🥉동 도장이에요.</p>
+    ${trhPhotoBarHtml()}
   `;
+  trhFillPhotoCount();
 }
 
 init();
@@ -5220,6 +5824,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-42</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-43 · 도슨트</div>
 </body>
 </html>

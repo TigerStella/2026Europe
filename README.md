@@ -5,14 +5,24 @@
 
 ## 주요 기능
 - 📅 날짜별 가로 타임라인 + 도시별 상세 일정 (일정·투어 추가)
-- 🎫 **역사 스탬프투어** — 교과서 속 세계사 현장을 미리 공부하고 현지에서 도장을 모으는 탐험 탭 (아래 참고)
+- 🎫 **역사 스탬프투어** — 교과서 속 세계사 현장을 미리 공부하고 현지에서 도장을 모으는 탐험 탭 + 🎧 박물관 도슨트 모드 (아래 참고)
 - 💱 실시간 환율 · 🌤 도시별 실시간 날씨
 - 🌍 커뮤니티 추천(방문지·맛집)
 - 📔 엄마/아들 여행 일기 (포스트잇·사진)
 - ✍️ 브런치 발행 · 📖 EPUB/PDF 전자책 내보내기
 - 💾 데이터 백업/복원
 
-`index.html` 하나로 동작합니다. 브라우저에서 열어 사용하세요.
+앱 본체는 `index.html` 하나입니다. 역사 스탬프투어의 도슨트 콘텐츠만 `data/`(JSON)·`audio/`(mp3)로 분리되어 있어,
+GitHub Pages 같은 웹 서버에서 열어야 도슨트 기능이 모두 보입니다(파일을 직접 열면 기존 카드만 보임).
+
+```
+index.html                         앱 전체(일정·숙소·…·역사 스탬프투어)
+sw.js                              서비스워커(오프라인) — 배포마다 CACHE 버전 올리기
+data/docent_*.json                 🎧 박물관별 도슨트 콘텐츠(작품·힌트·대본·미션)
+audio/{museumId}/*.mp3             🎧 도슨트 음성(자동 생성) + audio/manifest.json(음성 목록)
+scripts/generate_audio.py          🎧 음성 생성 스크립트(edge-tts)
+.github/workflows/docent-audio.yml 🎧 음성 자동 생성 워크플로
+```
 
 ---
 
@@ -103,8 +113,69 @@
 | `trapble_history_visited_v1` | 방문(퀴즈 통과) 완료한 장소 `{ siteId: true }` (도시 뷰·박물관 뷰 공용) |
 | `trapble_history_cityquiz_v1` | 도시별 종합 퀴즈 최고 점수 `{ city: bestScore }` |
 | `trapble_history_museumquiz_v1` | 박물관별 종합 미션 최고 점수 `{ museumKey: bestScore }` |
+| `trapble_history_hints_v1` | 🎧 작품별 사용한 힌트 수 |
+| `trapble_history_grade_v1` | 🎧 도장 등급 `gold/silver/bronze` (도장 받을 때 확정) |
+| `trapble_history_checklist_v1` | 🎧 감상법 체크 상태 |
+| `trapble_history_checkresult_v1` | 🎧 현장 확인 결과 `present/absent` |
+| `trapble_history_memory_v1` | 🎧 기억 미션(촬영 금지 구역) 기록 |
+| `trapble_history_best_v1` | 🎧 박물관별 오늘의 베스트 1 + 한 줄 감상 |
+| `trapble_history_audiorate_v1` | 🎧 음성 재생 속도 |
+| `trapble_history_mommode_v1` | 🎧 엄마 확인용 표시 여부 |
+| `trapble_history_offline_v1` | 🎧 음성 오프라인 저장 현황 |
 
-브라우저를 닫아도 진행 상황이 유지됩니다.
+브라우저를 닫아도 진행 상황이 유지됩니다. 인증 사진은 용량이 커서 localStorage가 아니라 **IndexedDB `trapble_history_photos`**(store `photos`)에 저장됩니다.
+
+## 🎧 도슨트 모드 (박물관 상세 화면 확장)
+
+11살 아이가 폰을 들고 직접 그림을 찾아가는 모드입니다. 새 탭이 아니라, **역사 스탬프투어 → 🏛 박물관별로 보기 → 🎧 도슨트 표시 박물관**(현재 오르세·오랑주리)에서 열립니다. 기존 도장·퀴즈·저장 상태는 그대로 이어집니다.
+
+| 화면 | 기능 |
+|---|---|
+| 박물관 헤더 | 방문일·시각, 🕵️ 사건 파일(caseTitle·caseBrief), ▶ 인트로 음성, 동선 메모·관람 규칙, 📥 오프라인 저장, 📤 사진 내보내기, 👩 엄마 확인용 |
+| 정렬 | **[🚶 동선순 / 🕰 시대순]** — 기본 동선순(도슨트 순서 번호), 시대순은 기존 화면 그대로. JSON에 없는 기존 작품은 "시간이 남으면 더 볼 작품"으로 아래에 |
+| 작품 카드 | 순서 번호, 📍위치, 🇰🇷 그때 조선 · 🌍 그때 세계, 기존 도장·퀴즈 칩, 사진 찍으면 썸네일 |
+| 힌트 | 🧩수수께끼 → 📍위치 → 🔑정답 순서로 공개. 사용한 힌트 수로 도장 등급 🥇금(0)·🥈은(1)·🥉동(2~3) |
+| 감상법 | 3단계 체크리스트 |
+| 음성 | 🎧 작가·배경 이야기 / 그림 속 비밀 — 한 번에 하나만 재생, 재생 중 표시, 0.9·1.0·1.2배속. 파일이 아직 없으면 "음성 준비 중"(비활성) + 📄 대본 읽기 |
+| 사진 인증 | 카메라 촬영 → 긴 변 1280px·JPEG 0.7 압축 → IndexedDB 저장 → **도장 자동 획득**(퀴즈로 받아도 됨) |
+| 기억 미션 | `memoryMission`이 있으면 사진 대신 텍스트 기록으로 도장(바티칸 시스티나 등 촬영 금지 구역용) |
+| 연결 단서 | 같은 앱에 있는 작품이면 그 카드로, 없으면 해당 박물관으로 이동. `external`은 텍스트만 |
+| 상태 | `absent` 회색 "🧳 출장 중" + 음성 1트랙만 · `check` 노란 "🟡 현장 확인" + [👀 봤어요 / 🙈 없었어요](없었어요 → 출장 중 스타일) |
+| 관람 후 | 동선의 모든 작품 도장 완료 시 "🏆 오늘의 베스트 1" 선택 + 한 줄 감상 |
+| 엄마 확인용 | JSON의 `factCheck`·`statusNote`는 아이 화면에 안 보이고, 👩 토글을 켰을 때만 표시 |
+
+### 데이터 병합 규칙
+`data/docent_*.json`을 앱이 불러와 기존 카드에 합칩니다.
+- **같은 작품이 이미 있으면 기존 필드는 그대로 두고 `docent` 하위 객체만 추가** — `orsay-dejeuner`→기존 `luncheon-grass`, `orsay-starry-rhone`→기존 `starry-rhone` (도장·퀴즈 기록 유지)
+- 새 작품은 카드로 추가. JSON에 없는 짧은 요약·이모지·시대·퀴즈 해설은 `index.html`의 `TRH_DC_SUPPLEMENT`에 있음
+- JSON의 `order`(동선 순서)는 기존 시대순 정렬용 `order`와 겹치지 않게 `docent.order`로 저장
+- JSON 박물관 id `national-gallery`는 앱의 `national`로 매핑(`TRH_DC_MUSEUM_ALIAS`)
+
+### 🔊 음성 만들기
+GitHub Actions가 자동으로 만듭니다 — 배포 브랜치에서 `data/docent_*.json`이나 `scripts/generate_audio.py`가 바뀌면 **「도슨트 음성 생성」 워크플로**가 edge-tts(`ko-KR-InJoonNeural`, 속도 -5%)로 `audio/{museumId}/…mp3`와 `audio/manifest.json`을 만들어 커밋하고 Pages를 다시 배포합니다. 대본을 고친 뒤 다시 만들려면 Actions 탭 → 「도슨트 음성 생성」 → Run workflow → `force` 체크.
+
+직접 만들 때(인터넷 되는 PC):
+```bash
+pip install edge-tts
+python scripts/generate_audio.py data/docent_*.json          # 없는 파일만 생성
+python scripts/generate_audio.py data/docent_*.json --force  # 전부 다시 생성
+```
+
+### ✈️ 오프라인
+- 앱 화면·도슨트 JSON은 서비스워커가 자동 저장(한 번 온라인으로 연 뒤).
+- 음성은 용량 때문에 **박물관마다 [📥 이 미술관 오프라인 저장]** 을 와이파이에서 눌러 둬야 합니다(진행률 표시, 완료 시 ✅). 비행기 모드에서도 재생됩니다.
+- 배포할 때마다 `sw.js`의 `CACHE` 버전(현재 `noleu-europe-v78`)을 올리세요. 이전 앱 캐시는 지워지지만 음성 저장본(`trapble-history-audio-*`)은 유지됩니다.
+
+### 📤 사진 백업
+[📤 사진 내보내기] — 공유 시트(갤러리·드라이브·카톡 등)를 지원하면 공유 시트로, 아니면 jpg 파일로 내려받습니다.
+> ⚠️ 브라우저 데이터를 지우면 사진이 사라져요. **매일 저녁 내보내기**를 권장합니다.
+
+### 새 박물관 콘텐츠 추가(내셔널 갤러리·루브르·우피치·바티칸 예정)
+1. 같은 스키마로 `data/docent_<지역>_<박물관>.json` 추가
+2. `index.html`의 `TRH_DC_FILES` 배열에 파일 경로 추가, `sw.js`의 `ASSETS`에도 추가하고 `CACHE` 버전 올리기
+3. 기존 카드와 같은 작품이면 `TRH_DC_MERGE_ID`에 `{JSON작품id: 기존카드id}` 추가, 새 작품이면 `TRH_DC_SUPPLEMENT`에 요약·이모지 추가(없어도 동작)
+4. 촬영 금지 작품은 `photoMission` 대신 `memoryMission`(텍스트) 사용
+5. 푸시하면 음성은 워크플로가 자동 생성
 
 ## 전체 사이트 목록 — ① 여행 동선순 목차
 📗 = 기존 조사 자료(28개 기초 데이터) · 🆕 = 위키피디아 참고 신규 리서치
