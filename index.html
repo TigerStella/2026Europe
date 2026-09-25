@@ -5246,6 +5246,7 @@ function openMuseum(mk, opt){
   `;
   if(!opt.keep) trhShow('trhMuseum');
   trhAudioUi(); trhFillCardThumbs(); trhFillPhotoCount();
+  if(m.docent && m.docent.intro) trhPrepareAudio([m.docent.intro.audio || `audio/${m.docent.audioMuseumId}/intro.mp3`]);
 }
 
 function trhSiteCard(s){
@@ -5312,6 +5313,7 @@ function openSiteDetail(id, opt){
   document.getElementById('trhSiteModal').classList.add('open');
   trhAudioUi();
   if(dc) trhRenderThumbs(s.id);
+  if(dc) trhPrepareAudio(Object.keys(dc.audioScripts).map(t=>trhDcAudioPath(dc,t)));
 }
 
 /* ── 사이트 퀴즈 (통과 시 스탬프) ── */
@@ -5477,29 +5479,42 @@ function trhFmtDate(iso){ if(!iso) return ''; const [y,m,d]=iso.split('-').map(N
 /* ── 음성: 전역 플레이어 1개 → 한 번에 하나만 재생 ── */
 const trhAudio = new Audio();
 trhAudio.preload = 'none';
-let trhAudioCur = null, trhAudioBlobUrl = null;
+let trhAudioCur = null;
 let trhAudioRate = Number(trhLoad(TRH_LS.audiorate, 1)) || 1;
+const trhAudioBlobs = {};   // { 경로: blob URL } — 오프라인 저장본을 미리 꺼내 둔 것
 trhAudio.addEventListener('play', trhAudioUi);
 trhAudio.addEventListener('pause', trhAudioUi);
 trhAudio.addEventListener('ended', ()=>{ trhAudioCur=null; trhAudioUi(); });
 trhAudio.addEventListener('error', ()=>{ if(trhAudioCur){ toast('음성을 불러오지 못했어요 (인터넷 또는 오프라인 저장 확인)'); trhAudioCur=null; trhAudioUi(); } });
 function trhDcAudioPath(dc, track){ return `audio/${dc.audioMuseumId}/${dc.workId}_${track}.mp3`; }
-async function trhAudioSrc(path){
-  // 오프라인 저장본이 있으면 그걸로 재생(비행기 모드 대응)
+// 오프라인 저장본을 화면을 열 때 미리 blob으로 준비 → 탭하면 기다림 없이 바로 재생(비행기 모드 대응)
+async function trhPrepareAudio(paths){
+  if(!('caches' in window)) return;
   try{
-    if('caches' in window){
-      const hit = await (await caches.open(TRH_AUDIO_CACHE)).match(path);
-      if(hit){ if(trhAudioBlobUrl) URL.revokeObjectURL(trhAudioBlobUrl); trhAudioBlobUrl = URL.createObjectURL(await hit.blob()); return trhAudioBlobUrl; }
+    const c = await caches.open(TRH_AUDIO_CACHE);
+    for(const p of paths){
+      if(!p || trhAudioBlobs[p]) continue;
+      const hit = await c.match(p);
+      if(hit) trhAudioBlobs[p] = URL.createObjectURL(await hit.blob());
     }
   }catch(e){}
-  return path;
 }
-async function trhAudioToggle(path){
-  if(trhAudioCur===path && trhAudio.src){ if(trhAudio.paused) trhAudio.play().catch(()=>{}); else trhAudio.pause(); return; }
-  trhAudio.pause(); trhAudioCur = path; trhAudioUi();
-  trhAudio.src = await trhAudioSrc(path);
+function trhAudioFail(e){
+  if(e && e.name==='AbortError') return;
+  trhAudioCur=null; trhAudioUi();
+  toast(e && e.name==='NotAllowedError' ? '재생이 막혔어요 — 버튼을 한 번 더 눌러 주세요' : '음성을 재생할 수 없어요 (볼륨·인터넷 확인)');
+}
+// ⚠️ await 없이 탭 직후 바로 play() — 아이폰·아이패드·인앱 브라우저는 탭과 재생 사이에 기다림이 있으면 재생을 막음
+function trhAudioToggle(path){
+  if(trhAudioCur===path && trhAudio.src){
+    if(trhAudio.paused){ const pr=trhAudio.play(); if(pr) pr.catch(trhAudioFail); } else trhAudio.pause();
+    return;
+  }
+  trhAudio.pause(); trhAudioCur = path;
+  trhAudio.src = trhAudioBlobs[path] || path;
   trhAudio.defaultPlaybackRate = trhAudioRate; trhAudio.playbackRate = trhAudioRate;
-  try{ await trhAudio.play(); }catch(e){ if(e && e.name!=='AbortError'){ toast('음성을 재생할 수 없어요'); trhAudioCur=null; } }
+  const pr = trhAudio.play();
+  if(pr) pr.catch(trhAudioFail);
   trhAudioUi();
 }
 function trhAudioStop(){ trhAudio.pause(); trhAudioCur=null; trhAudioUi(); }
