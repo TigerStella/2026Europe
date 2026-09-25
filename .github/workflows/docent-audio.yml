@@ -1,6 +1,9 @@
-# 도슨트 음성 생성 — data/docent_*.json 의 대본을 edge-tts(ko-KR-InJoonNeural, -5%)로 mp3 생성 후 커밋
-# - 배포 브랜치에 도슨트 JSON/스크립트가 바뀌면 자동 실행
-# - Actions 탭 → "도슨트 음성 생성" → Run workflow 로 수동 실행 가능(force: 기존 파일도 다시 생성)
+# 도슨트 음성 생성 — data/docent_*.json 의 대본을 edge-tts로 mp3 생성 후 커밋
+# - 문장 단위 합성 + 문장 사이 쉼(ffmpeg로 이어 붙임), 목소리 설정은 scripts/generate_audio.py 상단 상수
+# - 배포 브랜치에 도슨트 JSON/스크립트가 바뀌면 자동 실행(없는 파일만 생성)
+# - Actions 탭 → "도슨트 음성 생성" → Run workflow 로 수동 실행 가능
+#     force   : 기존 파일도 전부 다시 생성
+#     samples : 목소리 비교 샘플 4개만 audio/_samples/ 에 생성(전체 생성 안 함)
 name: 도슨트 음성 생성
 
 on:
@@ -8,6 +11,10 @@ on:
     inputs:
       force:
         description: '기존 음성 파일도 다시 생성(--force)'
+        type: boolean
+        default: false
+      samples:
+        description: '목소리 비교 샘플만 생성(audio/_samples/)'
         type: boolean
         default: false
   push:
@@ -27,7 +34,7 @@ concurrency:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 
@@ -35,10 +42,18 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: edge-tts 설치
-        run: pip install edge-tts
+      - name: edge-tts · ffmpeg 설치
+        run: |
+          pip install edge-tts
+          command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+          ffmpeg -version | head -1
+
+      - name: 목소리 비교 샘플 생성
+        if: ${{ inputs.samples }}
+        run: python scripts/generate_audio.py --samples
 
       - name: 음성 생성
+        if: ${{ !inputs.samples }}
         run: python scripts/generate_audio.py 'data/docent_*.json' ${{ inputs.force && '--force' || '' }}
 
       - name: 음성 파일 커밋
@@ -52,7 +67,14 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          git commit -m "chore(audio): 도슨트 음성 생성 (edge-tts ko-KR-InJoonNeural)"
+          if [ "${{ inputs.samples }}" = "true" ]; then
+            MSG="chore(audio): 도슨트 목소리 비교 샘플 4종 생성"
+          elif [ "${{ inputs.force }}" = "true" ]; then
+            MSG="chore(audio): 도슨트 음성 전체 다시 생성 (문장 단위 합성)"
+          else
+            MSG="chore(audio): 도슨트 음성 생성"
+          fi
+          git commit -m "$MSG"
           for i in 1 2 3; do
             git pull --rebase origin "$GITHUB_REF_NAME" && git push origin "HEAD:$GITHUB_REF_NAME" && break
             sleep 5
