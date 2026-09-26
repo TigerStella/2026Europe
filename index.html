@@ -803,7 +803,7 @@
   .dday-badge{display:inline-block;background:linear-gradient(135deg,var(--sunset-gold),var(--dusk-coral));color:#fff;font-size:12px;font-weight:700;padding:4px 12px;border-radius:16px;margin:-4px 0 12px;}
 
   /* ══════════════ 🎫 역사 스탬프투어 (탐험 테마 · #history 스코프) ══════════════ */
-  #history{ --trh-parch:#FFFDF7; --trh-ink:#3A2C1A; --trh-line:#E7D9BE; --trh-accent:#C9803B; }
+  #history, #trhMineModal{ --trh-parch:#FFFDF7; --trh-ink:#3A2C1A; --trh-line:#E7D9BE; --trh-accent:#C9803B; }
   #history .container{ max-width:900px; }
   .trh-hero{ position:relative; overflow:hidden; border-radius:18px; padding:22px 20px; margin-bottom:18px;
     background:linear-gradient(135deg,#2D3F5E 0%,#3E5A7A 45%,#C9803B 130%); color:#fff; }
@@ -1005,6 +1005,33 @@
   .trh-best-sel, .trh-best-note{ width:100%; min-height:48px; font-size:16px; padding:10px 12px; border:1.5px solid var(--trh-line); border-radius:10px; background:#fff; font-family:inherit; margin-bottom:8px; }
   .trh-x{ position:sticky; top:0; float:right; width:44px; height:44px; border-radius:22px; border:none; background:#EFE6D4; font-size:18px; cursor:pointer; z-index:3; }
   .trh-stamp-medal{ position:absolute; bottom:-4px; right:-4px; font-size:16px; transform:rotate(7deg); }
+  /* ➕ 내가 찾은 작품 */
+  .trh-mine-add{ width:100%; min-height:52px; font-size:16px; background:#FFF3DC; color:#8A4B12; border:2px dashed #E3B271; margin-bottom:14px; }
+  .trh-mine{ background:#FFFBF3; border:1px solid var(--trh-line); border-radius:14px; padding:12px; margin:16px 0; }
+  .trh-mine h4{ margin:2px 2px 10px; font-size:16px; color:var(--trh-ink); }
+  .trh-mine-empty{ font-size:14px; color:var(--text-mid); margin:0 2px 12px; }
+  .trh-mine-card{ display:flex; gap:12px; align-items:flex-start; background:#fff; border:1px solid var(--trh-line); border-radius:12px; padding:10px; margin-bottom:10px; cursor:pointer; }
+  .trh-mine-ph{ flex:0 0 72px; height:72px; border-radius:10px; background:#EFE6D4 center/cover no-repeat; display:flex; align-items:center; justify-content:center; font-size:28px; }
+  .trh-mine-ph.has-photo{ font-size:0; }
+  .trh-mine-t{ font-size:16px; font-weight:800; color:var(--trh-ink); word-break:break-all; }
+  .trh-mine-m{ font-size:14px; color:var(--text-mid); margin-top:3px; white-space:pre-wrap; word-break:break-all; }
+  .trh-mine-d{ font-size:12px; color:var(--text-light); margin-top:4px; }
+  .trh-mine-card .trh-mine-add{ margin:0; }
+  .modal-back.trh-sheet-back{ align-items:flex-end; padding:0; }
+  .modal.trh-sheet{ border-radius:18px 18px 0 0; max-width:560px; padding:18px 16px calc(18px + env(safe-area-inset-bottom)); }
+  .trh-sheet h3{ font-size:18px; margin-bottom:12px; }
+  .trh-sheet label.lb{ display:block; font-size:14px; font-weight:800; color:var(--trh-ink); margin:12px 0 6px; }
+  .trh-sheet input[type=text], .trh-sheet textarea{ width:100%; box-sizing:border-box; font-size:16px; font-family:inherit; border:1.5px solid #D9C7A3; border-radius:10px; padding:11px 12px; background:#fff; }
+  .trh-sheet textarea{ min-height:76px; resize:vertical; }
+  .trh-sheet .cnt{ text-align:right; font-size:12px; color:var(--text-light); margin-top:3px; }
+  .trh-sheet .row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .trh-sheet .row .trh-dc-btn{ flex:1; min-width:120px; }
+  .trh-sheet .pv{ margin-top:8px; display:none; position:relative; width:120px; }
+  .trh-sheet .pv img{ width:120px; height:120px; object-fit:cover; border-radius:10px; display:block; }
+  .trh-sheet .pv button{ position:absolute; top:-8px; right:-8px; width:32px; height:32px; border-radius:16px; border:none; background:#1F2A44; color:#fff; font-size:15px; cursor:pointer; }
+  .trh-btn-primary2{ background:#C9803B; color:#fff; }
+  .trh-btn-danger2{ background:#FBE3E0; color:#A5321F; }
+  .trh-pp-mine{ margin-top:14px; background:rgba(255,255,255,.08); border-radius:10px; padding:10px 12px; font-size:13.5px; line-height:1.7; }
   .trh-photobar{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; background:var(--trh-parch); border:1px solid var(--trh-line); border-radius:12px; padding:10px 12px; margin-bottom:18px; font-size:14px; color:var(--text-mid); }
   @media (max-width:600px){
     .trh-jw{ grid-template-columns:1fr; }
@@ -4173,7 +4200,7 @@ function saveSettings(){
 /* ══════════════════ BACKUP / RESTORE ══════════════════ */
 function downloadBlob(blob, name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 800); }
 function stamp(){ const d=new Date(); const p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`; }
-function buildPayload(){ return { app:'noleu-europe', version:1, exportedAt:new Date().toISOString(), addedActs, diary, settings, contacts, related, checklist, expenses, reserve:reserveState, actEdits }; }
+function buildPayload(){ return { app:'noleu-europe', version:1, exportedAt:new Date().toISOString(), addedActs, diary, settings, contacts, related, checklist, expenses, reserve:reserveState, actEdits, trhMine:trhMinePayload() }; }
 function exportData(){
   downloadBlob(new Blob([JSON.stringify(buildPayload(),null,2)], {type:'application/json'}), `noleu-europe-backup-${stamp()}.json`);
   toast('백업 파일을 저장했어요 💾');
@@ -4198,6 +4225,7 @@ function importData(ev){
       if('related' in j && j.related){ related=Object.assign({videos:[],books:[],blogs:[]}, j.related); save(LS.related, related); }
       if('checklist' in j && j.checklist){ checklist=Object.assign({checked:{},custom:[]}, j.checklist); save(LS.checklist, checklist); }
       if('expenses' in j && Array.isArray(j.expenses)){ expenses=j.expenses; save(LS.expenses, expenses); }
+      if(j.trhMine) trhMineMerge(j.trhMine);   // ➕ 내가 찾은 작품(글): 합치기(기존 기록 유지)
       refreshTimelines(); renderDiary(); renderContacts(); renderHotels(); renderRelated(); renderChecklist(); renderExpenses();
       toast('불러오기 완료 ✅');
     }catch(err){ toast('올바른 백업 파일이 아니에요'); }
@@ -4224,6 +4252,7 @@ function mergeData(j){
   if(j.contacts){ contacts=Object.assign({}, contacts, j.contacts); save(LS.contacts, contacts); }
   if(j.reserve){ Object.assign(reserveState, j.reserve); save(LS.reserve, reserveState); }
   if(j.actEdits){ actEdits.overrides=Object.assign(actEdits.overrides||{}, j.actEdits.overrides||{}); actEdits.hidden=Object.assign(actEdits.hidden||{}, j.actEdits.hidden||{}); save(LS.actedit, actEdits); }
+  if(j.trhMine) added += trhMineMerge(j.trhMine);
   return added;
 }
 function rerenderAll(){ refreshTimelines(); renderDiary(); renderContacts(); renderHotels(); renderRelated(); renderChecklist(); renderExpenses(); }
@@ -4594,6 +4623,8 @@ const TRH_LS = {
   audiorate:   'trapble_history_audiorate_v1',   // 0.9 | 1.0 | 1.2
   mom:         'trapble_history_mommode_v1',     // true → 엄마 확인용(factCheck·statusNote) 표시
   offline:     'trapble_history_offline_v1',     // { audioMuseumId: {n,total,ts} }
+  mine:        'trapble_history_mine_v1',        // { museumKey: [{id,title,memo,createdAt,hasPhoto,updatedAt}] } ← ➕ 내가 찾은 작품
+  mineDel:     'trapble_history_mine_del_v1',    // { id: 삭제시각 } ← 기기 간 동기화 때 지운 항목이 되살아나지 않게
 };
 function trhLoad(key, def){ try{ const v=JSON.parse(localStorage.getItem(key)); return (v===null||v===undefined)?def:v; }catch(e){ return def; } }
 function trhSave(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){ toast('저장 공간이 부족해요'); } }
@@ -5288,12 +5319,14 @@ function openMuseum(mk, opt){
     </div>
     ${trhDcMuseumHeader(mk)}
     <div style="margin-bottom:14px">${comboBtn}</div>
+    ${trhMineAddBtn(mk)}
     ${sortToggle}
     ${sort==='route' ? trhDcRouteList(mk) : `<p class="hint">🕰 이 박물관 안에서는 <b>고대 → 중세 → 근대 → 현대</b> 순서로 정리했어요. (소장품이 없는 시대는 생략)</p>${periodHtml}`}
+    ${trhMineSectionHtml(mk)}
     ${trhDcBestHtml(mk)}
   `;
   if(!opt.keep) trhShow('trhMuseum');
-  trhAudioUi(); trhFillCardThumbs(); trhFillPhotoCount();
+  trhAudioUi(); trhFillCardThumbs(); trhFillPhotoCount(); trhFillMineThumbs();
   if(m.docent && m.docent.intro) trhPrepareAudio([m.docent.intro.audio || `audio/${m.docent.audioMuseumId}/intro.mp3`]);
 }
 
@@ -5701,9 +5734,18 @@ async function trhExportPhotos(){
   let all=[]; try{ all=await trhPhotoList(null); }catch(e){ toast('사진 저장소를 열 수 없어요'); return; }
   if(!all.length){ toast('아직 인증 사진이 없어요'); return; }
   const pad=n=>String(n).padStart(2,'0');
+  const used = new Set();
   const files = all.sort((a,b)=>a.ts-b.ts).map((p,i)=>{
     const d=new Date(p.ts);
-    return new File([p.blob], `stamptour_${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}_${p.siteId}_${i+1}.jpg`, {type:'image/jpeg', lastModified:p.ts});
+    let name = `stamptour_${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}_${p.siteId}_${i+1}.jpg`;
+    const mf = String(p.siteId).startsWith('mine:') && trhMineFind(String(p.siteId).slice(5));
+    if(mf){   // ➕ 내가 찾은 작품: 박물관_제목_날짜.jpg
+      const clean = t=>String(t||'').replace(/[\\/:*?"<>|#%]/g,'').replace(/\s+/g,'_').slice(0,40);
+      const base = `${clean(MUSEUMS[mf.mk] ? MUSEUMS[mf.mk].name : mf.mk)}_${clean(mf.item.title)}_${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
+      name = `${base}.jpg`; for(let k=2; used.has(name); k++) name = `${base}_${k}.jpg`;
+    }
+    used.add(name);
+    return new File([p.blob], name, {type:'image/jpeg', lastModified:p.ts});
   });
   if(navigator.canShare && navigator.share){
     try{
@@ -5716,6 +5758,117 @@ async function trhExportPhotos(){
     await new Promise(r=>setTimeout(r, 400));
   }
   toast(`📤 사진 ${files.length}장을 내려받았어요`);
+}
+
+/* ── ➕ 내가 찾은 작품 — 모든 박물관(도슨트 없는 곳 포함)
+   글: localStorage trapble_history_mine_v1 = { museumKey:[{id,title,memo,createdAt,hasPhoto,updatedAt}] }
+   사진: 도슨트 인증 사진과 같은 IndexedDB·같은 압축(trhCompressImage), siteId = 'mine:<id>'
+   기존 도장·퀴즈·도슨트 사진 데이터는 건드리지 않음 ── */
+let trhMine = trhLoad(TRH_LS.mine, {});
+let trhMineDel = trhLoad(TRH_LS.mineDel, {});
+let trhMineEdit = null;   // { mk, id|null, blob|null, removePhoto }
+function trhMineList(mk){ return (trhMine[mk]||[]).slice().sort((a,b)=>a.createdAt-b.createdAt); }
+function trhMineFind(id){ for(const mk of Object.keys(trhMine)){ const item=(trhMine[mk]||[]).find(x=>x.id===id); if(item) return {mk, item}; } return null; }
+function trhMinePersist(){ trhSave(TRH_LS.mine, trhMine); trhSave(TRH_LS.mineDel, trhMineDel); try{ scheduleGdPush(); }catch(e){} }
+function trhMineTime(ts){ const d=new Date(ts), pad=n=>String(n).padStart(2,'0'); return `${d.getMonth()+1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+function trhMineAddBtn(mk){ return `<button class="trh-dc-btn trh-mine-add" onclick="trhMineOpen('${mk}')">➕ 내가 찾은 작품 추가</button>`; }
+function trhMineSectionHtml(mk){
+  const list=trhMineList(mk);
+  const cards=list.map(x=>`<div class="trh-mine-card" onclick="trhMineOpen('${mk}','${x.id}')">
+      <div class="trh-mine-ph" data-mine-photo="mine:${x.id}">${x.hasPhoto?'📷':'🧒'}</div>
+      <div style="flex:1;min-width:0"><div class="trh-mine-t">${esc(x.title)}</div>${x.memo?`<div class="trh-mine-m">${esc(x.memo)}</div>`:''}<div class="trh-mine-d">🕒 ${trhMineTime(x.createdAt)} · 눌러서 고치기</div></div>
+    </div>`).join('');
+  return `<div class="trh-mine"><h4>🧒 타이거가 찾은 작품 (${list.length})</h4>
+    ${list.length ? cards : '<p class="trh-mine-empty">가이드 목록에 없는데 눈에 띈 작품이 있으면 직접 기록해 봐!</p>'}
+    ${trhMineAddBtn(mk)}</div>`;
+}
+async function trhFillMineThumbs(){
+  const els=[...document.querySelectorAll('[data-mine-photo]')]; if(!els.length) return;
+  for(const el of els){
+    let ps=[]; try{ ps=await trhPhotoList(el.dataset.minePhoto); }catch(e){ return; }
+    const p=ps.sort((a,b)=>b.ts-a.ts)[0]; if(!p) continue;
+    el.style.backgroundImage=`url(${trhPhotoUrl(p)})`; el.classList.add('has-photo');
+  }
+}
+function trhMineCount(){ const m=document.getElementById('trhMineMemo'), c=document.getElementById('trhMineCnt'); if(m&&c) c.textContent=`${m.value.length} / 200`; }
+function trhMinePreview(src){ const pv=document.getElementById('trhMinePv'), im=document.getElementById('trhMinePvImg'); if(src){ im.src=src; pv.style.display='block'; } else { im.removeAttribute('src'); pv.style.display='none'; } }
+async function trhMineOpen(mk, id){
+  const item = id ? (trhMine[mk]||[]).find(x=>x.id===id) : null;
+  trhMineEdit = { mk, id:item?item.id:null, blob:null, removePhoto:false };
+  document.getElementById('trhMineHead').textContent = item ? '✏️ 내가 찾은 작품 고치기' : `➕ ${MUSEUMS[mk]?MUSEUMS[mk].name:''}에서 찾은 작품`;
+  document.getElementById('trhMineTitle').value = item ? item.title : '';
+  document.getElementById('trhMineMemo').value = item ? (item.memo||'') : '';
+  document.getElementById('trhMineDelBtn').style.display = item ? 'flex' : 'none';
+  trhMineCount(); trhMinePreview(null);
+  openModal('trhMineModal');
+  if(item){ try{ const ps=await trhPhotoList('mine:'+item.id); const p=ps.sort((a,b)=>b.ts-a.ts)[0]; if(p && trhMineEdit && trhMineEdit.id===item.id) trhMinePreview(trhPhotoUrl(p)); }catch(e){} }
+  else setTimeout(()=>{ const t=document.getElementById('trhMineTitle'); if(t) t.focus(); }, 80);
+}
+function trhMineClose(){ trhMineEdit=null; closeModal('trhMineModal'); }
+async function trhMineOnPhoto(input){
+  const file = input.files && input.files[0]; input.value=''; if(!file || !trhMineEdit) return;
+  const btn=document.getElementById('trhMineSaveBtn'); btn.disabled=true; btn.textContent='📸 사진 줄이는 중…';
+  try{ const blob=await trhCompressImage(file); if(trhMineEdit){ trhMineEdit.blob=blob; trhMineEdit.removePhoto=false; trhMinePreview(URL.createObjectURL(blob)); } }
+  catch(e){ toast('사진을 읽지 못했어요 — '+(e&&e.message||'')); }
+  finally{ btn.disabled=false; btn.textContent='💾 저장'; }
+}
+function trhMineRemovePhoto(){ if(!trhMineEdit) return; trhMineEdit.blob=null; trhMineEdit.removePhoto=true; trhMinePreview(null); }
+async function trhMineDropPhotos(id){ try{ for(const p of await trhPhotoList('mine:'+id)) await trhPhotoDelete(p.id); }catch(e){} }
+async function trhMineSubmit(){
+  const ed=trhMineEdit; if(!ed) return;
+  const title=(document.getElementById('trhMineTitle').value||'').trim().slice(0,40);
+  const memo=(document.getElementById('trhMineMemo').value||'').trim().slice(0,200);
+  if(!title){ toast('제목을 한 단어라도 적어 줘!'); document.getElementById('trhMineTitle').focus(); return; }
+  const now=Date.now();
+  const list=trhMine[ed.mk]=trhMine[ed.mk]||[];
+  let item=ed.id ? list.find(x=>x.id===ed.id) : null;
+  if(!item){ item={ id:'m'+now.toString(36)+Math.random().toString(36).slice(2,6), title, memo, createdAt:now, hasPhoto:false, updatedAt:now }; list.push(item); }
+  else { item.title=title; item.memo=memo; item.updatedAt=now; }
+  let photoFail=false;
+  if(ed.blob || ed.removePhoto){
+    await trhMineDropPhotos(item.id);
+    item.hasPhoto=false;
+    if(ed.blob){ try{ await trhPhotoAdd('mine:'+item.id, ed.blob); item.hasPhoto=true; }catch(e){ photoFail=true; } }
+  }
+  trhMinePersist();
+  trhMineClose();
+  toast(photoFail ? '글은 저장했는데 사진 저장은 실패했어요' : (ed.id ? '✏️ 고쳤어요!' : '🧒 내가 찾은 작품을 저장했어요!'));
+  if(trhVisible('trhMuseum') && trhCurMuseum) openMuseum(trhCurMuseum, {keep:true});
+}
+async function trhMineDelete(){
+  const ed=trhMineEdit; if(!ed || !ed.id) return;
+  if(!confirm('이 작품 기록을 지울까요? (사진도 함께 지워져요)')) return;
+  trhMine[ed.mk]=(trhMine[ed.mk]||[]).filter(x=>x.id!==ed.id);
+  if(!trhMine[ed.mk].length) delete trhMine[ed.mk];
+  trhMineDel[ed.id]=Date.now();
+  await trhMineDropPhotos(ed.id);
+  trhMinePersist(); trhMineClose(); toast('🗑 지웠어요');
+  if(trhVisible('trhMuseum') && trhCurMuseum) openMuseum(trhCurMuseum, {keep:true});
+}
+// 백업·구글 드라이브 동기화용(글만 — 사진은 기존 정책대로 📤 사진 내보내기)
+function trhMinePayload(){ return { items:trhMine, deleted:trhMineDel }; }
+function trhMineMerge(src){
+  if(!src || typeof src!=='object') return 0;
+  let added=0;
+  Object.assign(trhMineDel, src.deleted||{});
+  Object.entries(src.items||{}).forEach(([mk, arr])=>{
+    if(!Array.isArray(arr)) return;
+    const list=trhMine[mk]=trhMine[mk]||[];
+    arr.forEach(x=>{
+      if(!x || !x.id || !x.title || trhMineDel[x.id]) return;
+      const cur=list.find(y=>y.id===x.id);
+      if(!cur){ list.push({ id:x.id, title:String(x.title).slice(0,40), memo:String(x.memo||'').slice(0,200), createdAt:x.createdAt||Date.now(), hasPhoto:!!x.hasPhoto, updatedAt:x.updatedAt||x.createdAt||0 }); added++; }
+      else if((x.updatedAt||0) > (cur.updatedAt||0)){ cur.title=String(x.title).slice(0,40); cur.memo=String(x.memo||'').slice(0,200); cur.updatedAt=x.updatedAt; }
+    });
+  });
+  Object.keys(trhMine).forEach(mk=>{ trhMine[mk]=(trhMine[mk]||[]).filter(x=>!trhMineDel[x.id]); if(!trhMine[mk].length) delete trhMine[mk]; });
+  trhSave(TRH_LS.mine, trhMine); trhSave(TRH_LS.mineDel, trhMineDel);
+  try{ trhRefreshViews(); if(trhVisible('trhPassport')) renderPassport(); }catch(e){}
+  return added;
+}
+function trhMinePassportHtml(){
+  const rows=MUSEUM_ORDER.filter(mk=>(trhMine[mk]||[]).length).map(mk=>`<div>${MUSEUMS[mk].icon} ${esc(MUSEUMS[mk].name)} — 내가 찾은 작품 <b>${trhMine[mk].length}개</b></div>`).join('');
+  return `<div class="trh-pp-mine">🧒 <b>타이거가 직접 찾은 작품</b>${rows || '<div style="opacity:.75">아직 없어요 — 박물관 화면의 ➕ 버튼으로 기록해 봐!</div>'}</div>`;
 }
 
 /* ── 오프라인 저장: manifest의 음성 + 도슨트 JSON을 별도 캐시 버킷에 저장 ── */
@@ -5907,6 +6060,7 @@ function renderPassport(){
       <div class="trh-pp-sub">PASSPORT · 타이거의 유럽 역사 탐험 · ${done}/${total} 스탬프</div>
       ${grand?'<div style="text-align:center;margin-top:12px;background:rgba(255,215,160,.18);border-radius:10px;padding:8px;font-size:12.5px;color:#FFE7C2;font-weight:700">🧭 세계사 탐험가 — 5개 도시 완주!</div>':''}
       ${cityBlocks}
+      ${trhMinePassportHtml()}
     </div>
     <p class="hint">🎫 장소의 퀴즈를 맞히면(🎧 도슨트 작품은 사진 인증으로도) 이 여권에 도장이 찍혀요. 도시별로 도장 색과 모양이 달라요! 도슨트 작품은 힌트를 적게 쓸수록 🥇금·🥈은·🥉동 도장이에요.</p>
     ${trhPhotoBarHtml()}
@@ -5930,6 +6084,29 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
 <!-- 🎫 역사 사이트 상세 MODAL -->
 <div class="modal-back" id="trhSiteModal">
   <div class="modal"><div id="trhSiteBody"></div></div>
+</div>
+
+<!-- ➕ 내가 찾은 작품 (바텀시트) -->
+<div class="modal-back trh-sheet-back" id="trhMineModal" onclick="if(event.target===this)trhMineClose()">
+  <div class="modal trh-sheet">
+    <h3 id="trhMineHead">➕ 내가 찾은 작품</h3>
+    <label class="lb" for="trhMineTitle">① 제목 <small style="font-weight:500;color:var(--text-light)">(꼭 · 40자)</small></label>
+    <input type="text" id="trhMineTitle" maxlength="40" placeholder="예) 황금 가면을 쓴 미라" enterkeyhint="done">
+    <label class="lb">② 사진 <small style="font-weight:500;color:var(--text-light)">(선택)</small></label>
+    <div class="row">
+      <label class="trh-dc-btn trh-btn-ghost2">📷 사진 찍기<input type="file" accept="image/*" capture="environment" hidden onchange="trhMineOnPhoto(this)"></label>
+      <label class="trh-dc-btn trh-btn-ghost2">🖼 앨범에서<input type="file" accept="image/*" hidden onchange="trhMineOnPhoto(this)"></label>
+    </div>
+    <div class="pv" id="trhMinePv"><img id="trhMinePvImg" alt="미리보기"><button type="button" aria-label="사진 빼기" onclick="trhMineRemovePhoto()">✕</button></div>
+    <label class="lb" for="trhMineMemo">③ 짧은 메모 <small style="font-weight:500;color:var(--text-light)">(선택)</small></label>
+    <textarea id="trhMineMemo" maxlength="200" placeholder="왜 눈에 띄었어?" oninput="trhMineCount()"></textarea>
+    <div class="cnt" id="trhMineCnt">0 / 200</div>
+    <div class="row" style="margin-top:14px">
+      <button class="trh-dc-btn trh-btn-primary2" id="trhMineSaveBtn" onclick="trhMineSubmit()">💾 저장</button>
+      <button class="trh-dc-btn trh-btn-ghost2" onclick="trhMineClose()">닫기</button>
+    </div>
+    <button class="trh-dc-btn trh-btn-danger2" id="trhMineDelBtn" style="width:100%;margin-top:10px;display:none" onclick="trhMineDelete()">🗑 이 작품 지우기</button>
+  </div>
 </div>
 
 <!-- 🎫 퀴즈 MODAL -->
