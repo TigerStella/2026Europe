@@ -166,7 +166,8 @@ GitHub Actions가 자동으로 만듭니다 — 배포 브랜치에서 `data/doc
 **자연스럽게 들리도록 하는 처리** (`scripts/generate_audio.py`)
 - 읽기 전 다듬기: 「」『』·따옴표 제거, 줄표(—)→쉼표, `1300~1305년`→`1300년에서 1305년`, 괄호→앞뒤 쉼표
 - 대본을 **문장 단위로 따로 합성**한 뒤 문장 사이 **0.3초**(물음표 뒤 **0.45초**) 쉼을 넣어 ffmpeg로 mp3 하나로 이어 붙임
-- 목소리·속도·쉼 길이는 스크립트 맨 위 상수(`VOICE`, `RATE`, `PAUSE_SENTENCE`, `PAUSE_QUESTION`)
+- 목소리·속도·쉼 길이는 스크립트 맨 위 상수(`VOICE`, `RATE`, `PAUSE_SENTENCE`, `PAUSE_QUESTION`) — 현재 **`ko-KR-HyunsuMultilingualNeural` · 기본 속도(+0%)** (샘플 3번)
+- 목소리를 바꿔 전체를 다시 만들면 `index.html`의 `TRH_AUDIO_CACHE` 버전도 올리세요(폰에 남은 예전 오프라인 저장본이 자동 삭제되고 「오프라인 저장」 버튼이 다시 활성화됨)
 
 **수동 실행**: Actions 탭 → 「도슨트 음성 생성」 → Run workflow
 - `force` 체크 → 전체 다시 생성(대본·목소리를 바꿨을 때)
@@ -183,7 +184,7 @@ python scripts/generate_audio.py --samples                     # 목소리 비�
 ### ✈️ 오프라인
 - 앱 화면·도슨트 JSON은 서비스워커가 자동 저장(한 번 온라인으로 연 뒤).
 - 음성은 용량 때문에 **박물관마다 [📥 이 미술관 오프라인 저장]** 을 와이파이에서 눌러 둬야 합니다(진행률 표시, 완료 시 ✅). 비행기 모드에서도 재생됩니다.
-- 배포할 때마다 `sw.js`의 `CACHE` 버전(현재 `noleu-europe-v82`)을 올리세요. 이전 앱 캐시는 지워지지만 음성 저장본(`trapble-history-audio-*`)은 유지됩니다.
+- 배포할 때마다 `sw.js`의 `CACHE` 버전(현재 `noleu-europe-v83`)을 올리세요. 이전 앱 캐시는 지워지지만 음성 저장본(`trapble-history-audio-*`)은 유지됩니다.
 
 ### 📤 사진 백업
 [📤 사진 내보내기] — 공유 시트(갤러리·드라이브·카톡 등)를 지원하면 공유 시트로, 아니면 jpg 파일로 내려받습니다.

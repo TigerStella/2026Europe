@@ -4890,7 +4890,9 @@ const TRH_DC_FILES = [   // 새 박물관 JSON은 여기에 추가(여행 동선
   'data/docent_rome_vatican.json',
 ];
 const TRH_DC_MANIFEST = 'audio/manifest.json';
-const TRH_AUDIO_CACHE = 'trapble-history-audio-v1';                 // sw.js가 버전업 때 지우지 않는 버킷
+// 음성을 다시 만들면(목소리 변경 등) 버전을 올린다 → 폰에 남은 예전 오프라인 저장본을 자동으로 지움
+// (v2: 현수 목소리 + 문장 단위 합성으로 전체 재생성)
+const TRH_AUDIO_CACHE = 'trapble-history-audio-v2';                 // sw.js가 버전업 때 지우지 않는 버킷
 // { JSON 작품 id: 기존 카드 id } — 기존 카드의 도장·퀴즈 기록을 그대로 이어 쓰기 위한 매핑
 const TRH_DC_MERGE_ID = {
   'orsay-dejeuner':'luncheon-grass', 'orsay-starry-rhone':'starry-rhone',
@@ -5006,6 +5008,8 @@ function trhDcMuseumKey(id){ return TRH_DC_MUSEUM_ALIAS[id] || id; }
 function trhDocentLoad(){
   if(trhDcPromise) return trhDcPromise;
   trhDcPromise = (async ()=>{
+    // 예전 버전 음성 저장본 정리(새 목소리가 가려지지 않게)
+    try{ if('caches' in window){ for(const k of await caches.keys()){ if(k.startsWith('trapble-history-audio') && k!==TRH_AUDIO_CACHE) await caches.delete(k); } } }catch(e){}
     try{
       const r = await fetch(TRH_DC_MANIFEST, {cache:'no-cache'});
       if(r.ok) trhDcManifest = await r.json() || {};
@@ -5674,7 +5678,7 @@ async function trhExportPhotos(){
 let trhOfflineBusy = false;
 function trhOfflineLabel(amid){
   const o=trhOffline[amid], total=(trhDcManifest[amid]||[]).length;
-  if(o && total && o.n>=total) return `✅ 오프라인 저장됨 (${o.n}개)`;
+  if(o && total && o.n>=total && o.cache===TRH_AUDIO_CACHE) return `✅ 오프라인 저장됨 (${o.n}개)`;
   return '📥 이 미술관 오프라인 저장';
 }
 async function trhOfflineSave(mk){
@@ -5689,14 +5693,14 @@ async function trhOfflineSave(mk){
     const cache=await caches.open(TRH_AUDIO_CACHE);
     for(const p of list){
       try{
-        if(!(await cache.match(p))){ const r=await fetch(p, {cache:'no-cache'}); if(!r.ok) throw new Error(r.status); await cache.put(p, r); }
+        if(!(await cache.match(p))){ const r=await fetch(`${p}?v=${TRH_AUDIO_CACHE}`, {cache:'no-cache'}); if(!r.ok) throw new Error(r.status); await cache.put(p, r); }
         done++;
       }catch(e){ fail++; }
       const b=btn(); if(b) b.textContent=`📥 저장 중… ${done+fail}/${list.length}`;
     }
     for(const f of [...TRH_DC_FILES, TRH_DC_MANIFEST]){ try{ const r=await fetch(f, {cache:'no-cache'}); if(r.ok) await cache.put(f, r); }catch(e){} }
   }finally{ trhOfflineBusy=false; }
-  trhOffline[d.audioMuseumId]={ n:done, total:list.length, ts:Date.now() }; trhSave(TRH_LS.offline, trhOffline);
+  trhOffline[d.audioMuseumId]={ n:done, total:list.length, ts:Date.now(), cache:TRH_AUDIO_CACHE }; trhSave(TRH_LS.offline, trhOffline);
   const b=btn();
   if(fail){ if(b) b.textContent=`⚠️ ${done}/${list.length} 저장 — 다시 누르면 이어서 저장`; toast('일부 파일을 저장하지 못했어요. 와이파이에서 다시 눌러 주세요'); }
   else { if(b) b.textContent=`✅ 오프라인 저장됨 (${done}개)`; toast('✅ 비행기 모드에서도 음성을 들을 수 있어요!'); }

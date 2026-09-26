@@ -27,9 +27,9 @@ from pathlib import Path
 
 import edge_tts
 
-# ── 목소리 설정(샘플 비교 후 고른 값으로 고정) ──
-VOICE = "ko-KR-InJoonNeural"
-RATE = "-5%"
+# ── 목소리 설정(샘플 비교 후 고른 값으로 고정: 3번 현수 · 기본 속도) ──
+VOICE = "ko-KR-HyunsuMultilingualNeural"
+RATE = "+0%"
 PAUSE_SENTENCE = 0.30   # 문장 사이 무음(초)
 PAUSE_QUESTION = 0.45   # 물음표 뒤 무음(초)
 SAMPLE_RATE = 24000     # edge-tts 기본 출력과 동일
