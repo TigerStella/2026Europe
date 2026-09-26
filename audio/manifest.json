@@ -106,5 +106,43 @@
     "audio/vatican/vatican-last-judgment_2.mp3",
     "audio/vatican/vatican-pieta_1.mp3",
     "audio/vatican/vatican-pieta_2.mp3"
+  ],
+  "british": [
+    "audio/british/intro.mp3",
+    "audio/british/british-great-court_1.mp3",
+    "audio/british/british-great-court_2.mp3",
+    "audio/british/british-rosetta_1.mp3",
+    "audio/british/british-rosetta_2.mp3",
+    "audio/british/british-assyria_1.mp3",
+    "audio/british/british-assyria_2.mp3",
+    "audio/british/british-mummy_1.mp3",
+    "audio/british/british-mummy_2.mp3",
+    "audio/british/british-parthenon_1.mp3",
+    "audio/british/british-parthenon_2.mp3",
+    "audio/british/british-korea_1.mp3",
+    "audio/british/british-korea_2.mp3",
+    "audio/british/british-cradle-grave_1.mp3",
+    "audio/british/british-cradle-grave_2.mp3",
+    "audio/british/british-moai_1.mp3",
+    "audio/british/british-moai_2.mp3"
+  ],
+  "greenwich": [
+    "audio/greenwich/intro.mp3",
+    "audio/greenwich/greenwich-shepherd-clock_1.mp3",
+    "audio/greenwich/greenwich-shepherd-clock_2.mp3",
+    "audio/greenwich/greenwich-meridian_1.mp3",
+    "audio/greenwich/greenwich-meridian_2.mp3",
+    "audio/greenwich/greenwich-time-ball_1.mp3",
+    "audio/greenwich/greenwich-time-ball_2.mp3",
+    "audio/greenwich/greenwich-octagon-room_1.mp3",
+    "audio/greenwich/greenwich-octagon-room_2.mp3",
+    "audio/greenwich/greenwich-harrison_1.mp3",
+    "audio/greenwich/greenwich-harrison_2.mp3",
+    "audio/greenwich/greenwich-great-equatorial_1.mp3",
+    "audio/greenwich/greenwich-great-equatorial_2.mp3",
+    "audio/greenwich/greenwich-nelson-coat_1.mp3",
+    "audio/greenwich/greenwich-nelson-coat_2.mp3",
+    "audio/greenwich/greenwich-cutty-sark_1.mp3",
+    "audio/greenwich/greenwich-cutty-sark_2.mp3"
   ]
 }
