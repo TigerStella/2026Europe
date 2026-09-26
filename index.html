@@ -4605,6 +4605,7 @@ let trhMuseumQuiz = trhLoad(TRH_LS.museumquiz, {});
 // 여행 동선 순서(런던 2관 → 파리 2관 → 피렌체 → 로마·바티칸) 그대로 배열.
 const MUSEUMS = {
   british:  { key:'british',  name:'영국박물관',   en:'British Museum',     city:'london',   country:'영국',   flag:'🇬🇧', icon:'🏺' },
+  greenwich:{ key:'greenwich',name:'그리니치 왕립 천문대', en:'Royal Observatory Greenwich', city:'london', country:'영국', flag:'🇬🇧', icon:'🔭' },
   national: { key:'national', name:'내셔널 갤러리', en:'National Gallery',   city:'london',   country:'영국',   flag:'🇬🇧', icon:'🖼' },
   louvre:   { key:'louvre',   name:'루브르박물관',  en:'Musée du Louvre',    city:'paris',    country:'프랑스', flag:'🇫🇷', icon:'🔺' },
   orsay:    { key:'orsay',    name:'오르세미술관',  en:"Musée d'Orsay",      city:'paris',    country:'프랑스', flag:'🇫🇷', icon:'🕰' },
@@ -4612,10 +4613,10 @@ const MUSEUMS = {
   uffizi:   { key:'uffizi',   name:'우피치미술관',  en:'Uffizi Gallery',     city:'florence', country:'이탈리아', flag:'🇮🇹', icon:'🎨' },
   vatican:  { key:'vatican',  name:'바티칸미술관',  en:'Vatican Museums',    city:'rome',     country:'바티칸(세계에서 가장 작은 나라)', flag:'🇻🇦', icon:'⛪' },
 };
-const MUSEUM_ORDER = ['british','national','louvre','orsay','orangerie','uffizi','vatican'];
+const MUSEUM_ORDER = ['british','greenwich','national','louvre','orsay','orangerie','uffizi','vatican'];
 // 나라별 그룹(여행 동선 순서)
 const MUSEUM_COUNTRY_GROUPS = [
-  { country:'영국',   flag:'🇬🇧', museums:['british','national'] },
+  { country:'영국',   flag:'🇬🇧', museums:['british','greenwich','national'] },
   { country:'프랑스', flag:'🇫🇷', museums:['louvre','orsay','orangerie'] },
   { country:'이탈리아', flag:'🇮🇹', museums:['uffizi'] },
   { country:'바티칸',  flag:'🇻🇦', museums:['vatican'] },
@@ -4883,6 +4884,8 @@ function trhMuseumGrad(mk){ return trhGrad(MUSEUMS[mk].city); }
    - 새 작품은 카드로 추가(JSON에 없는 요약·이모지·시대·퀴즈 해설은 TRH_DC_SUPPLEMENT)
    - 실패해도 기존 카드·도장·퀴즈는 그대로 동작 */
 const TRH_DC_FILES = [   // 새 박물관 JSON은 여기에 추가(여행 동선 순)
+  'data/docent_london_british_museum.json',
+  'data/docent_london_greenwich.json',
   'data/docent_london_national_gallery.json',
   'data/docent_paris_louvre.json',
   'data/docent_paris_orsay_orangerie.json',
@@ -4895,6 +4898,7 @@ const TRH_DC_MANIFEST = 'audio/manifest.json';
 const TRH_AUDIO_CACHE = 'trapble-history-audio-v2';                 // sw.js가 버전업 때 지우지 않는 버킷
 // { JSON 작품 id: 기존 카드 id } — 기존 카드의 도장·퀴즈 기록을 그대로 이어 쓰기 위한 매핑
 const TRH_DC_MERGE_ID = {
+  'british-rosetta':'rosetta', 'british-assyria':'lamassu', 'british-mummy':'mummy', 'british-parthenon':'parthenon',
   'orsay-dejeuner':'luncheon-grass', 'orsay-starry-rhone':'starry-rhone',
   'ng-arnolfini':'arnolfini', 'ng-hay-wain':'haywain', 'ng-temeraire':'temeraire', 'ng-sunflowers-absent':'sunflowers',
   'louvre-venus-milo':'venus-milo', 'louvre-nike':'nike', 'louvre-mona-lisa':'mona-lisa', 'louvre-liberty':'liberty', 'louvre-hammurabi':'hammurabi',
@@ -4944,6 +4948,46 @@ const TRH_DC_SUPPLEMENT = {
     kid:'가족이 마차를 타고 나들이 가는 모습을 기념사진처럼 그린 그림이야. 화가 루소는 세관에서 일하며 혼자 그림을 배웠어. 사람들은 어린애 그림 같다고 비웃었지만, 젊은 피카소는 루소에게 반해 파티까지 열어줬대. 마차 밑의 강아지를 찾아봐!',
     sig:'학교 없이 독학한 화가가 새 미술의 길을 연 이야기 — 같은 해 조선에서는 최남선이 잡지 <b>『소년』</b>을 만들었어요.',
     why:['루소는 파리 세관에서 일해서 「세관원」이라는 별명이 붙었어.'] },
+
+  /* ── 영국박물관 (내용은 JSON audioScripts·joseon·world에서만 발췌) ── */
+  'british-great-court': { emoji:'🏛', era:'2000년 개장', periodCat:'contemporary',
+    kid:'유리 지붕은 유리판 3,312장으로 만들어졌어. 2000년 12월에 문을 연, 유럽에서 가장 큰 지붕 덮인 광장이야. 150년 넘게 책장과 도서관이 꽉 채우던 숨은 마당이었는데, 도서관이 1997년에 옮겨 가면서 모두의 광장이 됐지.',
+    why:['이 유리 지붕은 유리판 3,312장으로 만들어졌어.'] },
+  'british-korea': { emoji:'🏺', era:'고려청자 12세기 · 달항아리 17~18세기', periodCat:'medieval',
+    kid:'런던에서 만나는 우리나라! 2000년에 문을 연 한국관엔 한국 장인들이 직접 와서 만든 사랑방과 12세기 고려청자가 있어. 조선 달항아리는 위아래 반쪽을 따로 만들어 붙여서 가운데 이음 자국이 있고, 모양이 살짝 삐뚤어.',
+    why:['큰 항아리는 한 번에 빚기 어려워서 위아래 반쪽을 따로 만들어 가운데를 붙였어.'] },
+  'british-cradle-grave': { emoji:'💊', era:'2003년 · 현대 미술', periodCat:'contemporary',
+    kid:'영국의 평범한 남자 한 명과 여자 한 명이 태어나서 죽을 때까지 먹는 약을 천에 하나하나 꿰매 붙인 작품이야. 한 사람이 평생 처방받는 약이 1만 4천 개가 넘고, 길이는 14미터야.',
+    why:['한 사람이 평생 처방받는 약이 무려 1만 4천 개가 넘는대.'] },
+  'british-moai': { emoji:'🗿', era:'1000~1200년경 · 라파누이', periodCat:'medieval',
+    kid:'태평양 한가운데 작은 섬 라파누이(이스터섬)에서 온 석상이야. 키 2미터 42센티, 무게 4톤이 넘어. 이름 호아 하카나나이아는 잃어버린 친구, 또는 도둑맞은 친구라는 뜻이야. 등 뒤엔 새 머리를 한 사람이 새겨져 있어.',
+    why:['호아 하카나나이아는 잃어버린 친구, 또는 도둑맞은 친구라는 뜻이야.'] },
+
+  /* ── 그리니치 왕립 천문대 (내용은 JSON audioScripts·joseon·world에서만 발췌) ── */
+  'greenwich-shepherd-clock': { emoji:'🕐', era:'1852년 · 산업혁명',
+    kid:'숫자가 24까지 있는 시계야. 하루 24시간을 한 바퀴에 다 보여 줘서, 낮 12시에 바늘이 위가 아니라 아래를 가리켜. 1852년에 달린 이 시계는 그리니치 표준시(GMT)를 일반 사람들에게 처음 보여 준 시계야.',
+    why:['하루 24시간을 한 바퀴에 보여 줘서, 낮 12시가 되면 시곗바늘이 아래를 가리켜.'] },
+  'greenwich-meridian': { emoji:'🌐', era:'1851년 기준선 · 1884년 세계 표준',
+    kid:'이 선이 경도 0도, 본초 자오선이야. 1884년 워싱턴에 25개 나라 대표가 모여 세계가 같이 쓸 기준선으로 그리니치를 뽑았어. 비밀 — 휴대폰 GPS 기준 진짜 0도 선은 여기서 동쪽으로 약 102미터 떨어져 있어.',
+    why:['진짜 GPS 기준 0도 선은 여기서 동쪽으로 약 102미터 떨어져 있어.'] },
+  'greenwich-time-ball': { emoji:'🔴', era:'1833년부터',
+    kid:'지붕 위 빨간 공은 1833년부터 매일 오후 1시 정각에 툭 떨어졌어. 템스강 위 선원들은 망원경으로 이 공을 보다가, 떨어지는 순간 배의 시계를 맞췄지.',
+    why:['12시 55분에 중간, 58분에 꼭대기까지 올라가고, 딱 1시 정각에 떨어져.'] },
+  'greenwich-octagon-room': { emoji:'🏛', era:'1675~1676년',
+    kid:'350년 된 천문대의 심장, 팔각형 방이야. 찰스 2세 왕이 첫 번째 왕실 천문관 플램스티드에게 준 임무는 딱 하나 — 별 지도를 아주 정확하게 만들어서 배들이 길을 찾게 하라! 설계자는 세인트 폴 대성당을 지은 크리스토퍼 렌이야.',
+    why:['임무는 딱 하나 — 별 지도를 정확하게 만들어서 배들이 길을 찾게 하는 것.'] },
+  'greenwich-harrison': { emoji:'⏱', era:'1730~1759년',
+    kid:'1714년 영국 정부가 바다에서 경도를 재는 방법에 상금 2만 파운드를 걸었어. 목수 출신 존 해리슨은 흔들리는 배 위에서도 정확한 시계를 만들어 풀었지. 세 번째 시계 H3 하나에만 19년이 걸렸어. 그러다 작은 시계가 더 정확할 수 있다는 걸 깨닫고 만든 게 제일 작은 H4야.',
+    why:['출발한 항구의 시간과 지금 있는 곳의 시간 차이를 알면 얼마나 왔는지 계산할 수 있거든.'] },
+  'greenwich-great-equatorial': { emoji:'🔭', era:'1893년',
+    kid:'영국에서 가장 큰 굴절 망원경이야. 렌즈 지름 71센티미터, 몸통 길이 8미터가 넘어. 2차 세계대전 때 바로 옆에 폭탄이 떨어졌지만, 1939년에 미리 분해해 숨겨 둬서 살아남았어. 지금도 작동해!',
+    why:['전쟁이 시작된 1939년에 이미 분해해서 안전한 곳에 숨겨 뒀어.'] },
+  'greenwich-nelson-coat': { emoji:'⚓', era:'1805년 · 트라팔가르 해전', place:'국립해양박물관(그리니치)',
+    kid:'1805년 트라팔가르 해전에서 넬슨 제독이 입었던 진짜 제복이야. 왼쪽 어깨의 작은 구멍은 프랑스 저격수의 총알 자리야. 오른쪽 소매의 고리는 8년 전 오른팔을 잃은 넬슨이 빈 소매를 걸어 두려고 단 거야.',
+    why:['왼쪽 어깨의 작은 구멍이 프랑스 저격수의 총알이 뚫고 들어간 자리야.'] },
+  'greenwich-cutty-sark': { emoji:'⛵', era:'1869년 · 범선의 시대', place:'커티삭(그리니치 부두)',
+    kid:'1869년 스코틀랜드에서 만든 차 운반선이야. 중국에서 영국까지 찻잎을 누가 제일 빨리 실어 오나 배들끼리 경주를 했거든. 이름은 시 속 마녀 나니의 짧은 잠옷이라는 뜻이고, 뱃머리 조각상이 바로 그 마녀야.',
+    why:['중국에서 영국까지 찻잎을 실어 오는 차 운반선이었어.'] },
 
   /* ── 내셔널 갤러리 (내용은 JSON audioScripts·joseon·world에서만 발췌) ── */
   'ng-virgin-rocks': { emoji:'⛰', era:'르네상스',
@@ -5923,6 +5967,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 07-46 · 도슨트 6관</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 09-26 · 도슨트 8관</div>
 </body>
 </html>
