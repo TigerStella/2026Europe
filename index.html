@@ -4669,7 +4669,8 @@ const TRH_LS = {
   mom:         'trapble_history_mommode_v1',     // true → 엄마 확인용(factCheck·statusNote) 표시
   offline:     'trapble_history_offline_v1',     // { audioMuseumId: {n,total,ts} }
   mine:        'trapble_history_mine_v1',        // { museumKey: [{id,title,memo,createdAt,hasPhoto,updatedAt}] } ← ➕ 내가 찾은 작품
-  mineDel:     'trapble_history_mine_del_v1',    // { id: 삭제시각 } ← 기기 간 동기화 때 지운 항목이 되살아나지 않게
+  mineDel:     'trapble_history_mine_del_v1',
+  lastview:    'trapble_history_lastview_v1',    // { tab, view, city, museum, siteId, sort, scrollY, siteScroll, ts } ← 끄기 직전 화면 복원    // { id: 삭제시각 } ← 기기 간 동기화 때 지운 항목이 되살아나지 않게
 };
 function trhLoad(key, def){ try{ const v=JSON.parse(localStorage.getItem(key)); return (v===null||v===undefined)?def:v; }catch(e){ return def; } }
 function trhSave(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){ toast('저장 공간이 부족해요'); } }
@@ -5197,6 +5198,7 @@ function trhMuseumHasDocent(mk){ return !!(MUSEUMS[mk] && MUSEUMS[mk].docent) &&
 
 /* ── 뷰 전환 ── */
 function trhShow(view){
+  setTimeout(trhLastSave, 0);
   ['trhHome','trhCity','trhMuseumList','trhMuseum','trhPassport'].forEach(v=>{ const el=document.getElementById(v); if(el) el.style.display = (v===view)?'block':'none'; });
   const h=document.getElementById('history'); if(h) window.scrollTo({top: h.offsetTop-60<0?0:0, behavior:'smooth'});
   window.scrollTo({top:0, behavior:'smooth'});
@@ -5456,6 +5458,7 @@ function openSiteDetail(id, opt){
   trhAudioUi();
   if(dc) trhRenderThumbs(s.id);
   if(dc) trhPrepareAudio(Object.keys(dc.audioScripts).map(t=>trhDcAudioPath(dc,t)));
+  if(!opt.refresh) setTimeout(trhLastSave, 0);
 }
 
 /* ── 사이트 퀴즈 (통과 시 스탬프) ── */
@@ -5748,7 +5751,7 @@ function trhSaveMemory(id){
   trhRefreshDetail();
 }
 function trhToggleMom(){ trhMom=!trhMom; trhSave(TRH_LS.mom, trhMom); trhRefreshViews(); trhRefreshDetail(); }
-function trhSetMuseumSort(mk, v){ trhMuseumSort[mk]=v; openMuseum(mk, {keep:true}); }
+function trhSetMuseumSort(mk, v){ trhMuseumSort[mk]=v; openMuseum(mk, {keep:true}); trhLastSave(); }
 function trhSaveBest(mk){
   const sel=document.getElementById('trhBestSel'), note=document.getElementById('trhBestNote');
   if(!sel || !sel.value){ toast('제일 좋았던 작품을 골라 줘!'); return; }
@@ -5764,7 +5767,7 @@ function trhRefreshViews(){
   if(trhVisible('trhMuseum') && trhCurMuseum) openMuseum(trhCurMuseum, {keep:true});
   if(trhVisible('trhCity') && trhCurCity) openHistoryCity(trhCurCity, {keep:true});
 }
-function trhCloseSite(){ trhAudioStop(); closeModal('trhSiteModal'); }
+function trhCloseSite(){ trhAudioStop(); closeModal('trhSiteModal'); trhLastSave(); }
 // 연결 단서: 같은 앱 안 박물관이면 해당 작품(없으면 박물관)으로 이동, external은 텍스트만
 function trhDcNorm(t){ return String(t||'').replace(/\([^)]*\)/g,'').replace(/[\s·,.'"「」『』!?\-—~:]/g,'').toLowerCase(); }
 function trhDcResolveLink(l){
@@ -5930,6 +5933,63 @@ function trhMineMerge(src){
 function trhMinePassportHtml(){
   const rows=MUSEUM_ORDER.filter(mk=>(trhMine[mk]||[]).length).map(mk=>`<div>${MUSEUMS[mk].icon} ${esc(MUSEUMS[mk].name)} — 내가 찾은 작품 <b>${trhMine[mk].length}개</b></div>`).join('');
   return `<div class="trh-pp-mine">🧒 <b>타이거가 직접 찾은 작품</b>${rows || '<div style="opacity:.75">아직 없어요 — 박물관 화면의 ➕ 버튼으로 기록해 봐!</div>'}</div>`;
+}
+
+/* ── 🔁 앱을 껐다 켜도 끄기 직전 화면으로 — trapble_history_lastview_v1
+   메인 탭은 앱 전체, 역사 탭은 화면(도시·박물관·여권)·정렬·열려 있던 작품 상세·스크롤까지.
+   12시간이 지났거나 대상이 없으면 조용히 첫 화면. 음성 자동 재생·입력 중 모달 복원은 하지 않음 ── */
+const TRH_LAST_MAX_AGE = 12*3600*1000;
+let trhLastRestoring = false, trhLastScrollT = null;
+function trhActiveTab(){ const sec=document.querySelector('.tab-section.active'); return sec ? sec.id : null; }
+function trhLastSave(){
+  if(trhLastRestoring) return;
+  try{
+    const tab=trhActiveTab(); if(!tab) return;
+    const st={ tab, ts:Date.now(), scrollY:Math.round(window.scrollY||0) };
+    if(tab==='history'){
+      const v=['trhHome','trhCity','trhMuseumList','trhMuseum','trhPassport'].find(x=>trhVisible(x)) || 'trhHome';
+      st.view={trhHome:'home',trhCity:'city',trhMuseumList:'museumList',trhMuseum:'museum',trhPassport:'passport'}[v];
+      if(st.view==='city') st.city=trhCurCity;
+      if(st.view==='museum'){ st.museum=trhCurMuseum; st.sort=trhMuseumSort[trhCurMuseum]||''; }
+      const sm=document.getElementById('trhSiteModal'), qm=document.getElementById('trhQuizModal');
+      if(sm && sm.classList.contains('open') && trhCurSite){ st.siteId=trhCurSite; const md=sm.querySelector('.modal'); st.siteScroll=md?Math.round(md.scrollTop):0; }
+      else if(qm && qm.classList.contains('open') && trhQuizState && trhQuizState.mode==='site') st.siteId=trhQuizState.siteId;   // 퀴즈 중이면 그 작품 상세까지만
+    }
+    localStorage.setItem(TRH_LS.lastview, JSON.stringify(st));
+  }catch(e){}
+}
+function trhLastSaveSoon(){ clearTimeout(trhLastScrollT); trhLastScrollT=setTimeout(trhLastSave, 400); }
+async function trhLastRestore(){
+  let st=null; try{ st=JSON.parse(localStorage.getItem(TRH_LS.lastview)); }catch(e){}
+  if(!st || !st.tab || !st.ts || Date.now()-st.ts > TRH_LAST_MAX_AGE) return;
+  const sec=document.getElementById(st.tab); if(!sec || !sec.classList.contains('tab-section')) return;
+  trhLastRestoring=true;
+  try{
+    const btn=[...document.querySelectorAll('.nav-tab')].find(b=>(b.getAttribute('onclick')||'').includes(`'${st.tab}'`));
+    if(!sec.classList.contains('active')) showTab(st.tab, btn||null);
+    if(st.tab==='history'){
+      await trhDocentLoad();
+      if(st.view==='city' && CITIES[st.city]) openHistoryCity(st.city);
+      else if(st.view==='museumList') openMuseumList();
+      else if(st.view==='museum' && MUSEUMS[st.museum]){ if(st.sort) trhMuseumSort[st.museum]=st.sort; openMuseum(st.museum); }
+      else if(st.view==='passport') openHistoryPassport();
+      if(st.siteId && trhSite(st.siteId)) openSiteDetail(st.siteId);
+    }
+    await new Promise(r=>setTimeout(r, 500));
+    window.scrollTo({top:st.scrollY||0, behavior:'instant'});
+    if(st.siteId && st.siteScroll){ const md=document.querySelector('#trhSiteModal .modal'); if(md) md.scrollTop=st.siteScroll; }
+  }catch(e){ console.warn('[화면 복원] 건너뜀', e); }
+  finally{ setTimeout(()=>{ trhLastRestoring=false; }, 700); }
+}
+function trhLastViewInit(){
+  // 메인 탭 전환도 기록(기존 showTab 동작은 그대로 두고 뒤에 저장만 추가)
+  const origShowTab = showTab;
+  showTab = function(){ const r=origShowTab.apply(this, arguments); setTimeout(trhLastSave, 0); return r; };
+  window.addEventListener('scroll', trhLastSaveSoon, {passive:true});
+  document.addEventListener('scroll', e=>{ if(e.target && e.target.closest && e.target.closest('#trhSiteModal')) trhLastSaveSoon(); }, {capture:true, passive:true});
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') trhLastSave(); });
+  window.addEventListener('pagehide', trhLastSave);
+  trhLastRestore();
 }
 
 /* ── 오프라인 저장: manifest의 음성 + 도슨트 JSON을 별도 캐시 버킷에 저장 ── */
@@ -6144,6 +6204,7 @@ function renderPassport(){
 
 init();
 try{ gdriveInit(); }catch(e){}
+try{ trhLastViewInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
 <!-- 흥미로운 이야기 MODAL -->
