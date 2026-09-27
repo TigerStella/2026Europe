@@ -1756,11 +1756,11 @@ const DAYS = [
   { d:4, date:'9/28', wd:'월', city:'london', badges:['런던'],
     title:'자연사박물관 · 내셔널갤러리 도슨트투어',
     story:'런던 자연사박물관엔 거대한 <b>공룡 뼈</b>가 가득해. 특히 힌츠홀 천장엔 <b>진짜 대왕고래(블루웨일) 뼈</b>가 매달려 있는데, 지구에서 <b>가장 큰 동물</b>이라 심장만 해도 자동차만 하대!',
-    foot:'🎟️ <b>내셔널갤러리 도슨트투어</b> 월 <b>14:10 미팅</b>(정면 맨 오른쪽 George Washington 동상 앞) · 자연사박물관 사전예약 시간슬롯 확인 필요<br>🧳 <b>준비할 것</b> ☐ 자연사박물관 시간슬롯 예약 ☐ 모임 10분 전 도착 ☐ 컨택리스 카드(현금 불가) ☐ 취소규정 사전 확인',
+    foot:'🎟️ <b>내셔널갤러리 도슨트투어</b> 월 <b>14:10 미팅</b>(정면 맨 오른쪽 George Washington 동상 앞) · 자연사박물관 10:00 슬롯 예약 확정<br>🧳 <b>준비할 것</b> ☑ 자연사박물관 시간슬롯 예약(10:00 확정) ☐ 모임 10분 전 도착 ☐ 컨택리스 카드(현금 불가) ☐ 취소규정 사전 확인',
     acts:[
       {ic:'🚇', t:'숙소 출발→Russell Square역→Piccadilly line (South Kensington역, 약 15분)', time:'09:50', endTime:'10:05',
         nav:{from:'Russell Square Underground Station, London', to:'South Kensington Underground Station, London', mode:'walking'} },
-      {ic:'🦕', t:'자연사박물관 관람 · 사전예약 시간슬롯 확인 필요', time:'10:30', endTime:'12:30'},
+      {ic:'🦕', t:'자연사박물관 관람 · 10:00 슬롯 예약 확정', time:'10:00', endTime:'12:30'},
       {ic:'🍽️', t:'점심', time:'12:30', endTime:'13:15'},
       {ic:'🚇', t:'Piccadilly line 탑승 (South Kensington→Piccadilly Circus)', time:'13:15', endTime:'13:50',
         nav:{from:'South Kensington Underground Station, London', to:'Piccadilly Circus Underground Station, London', mode:'walking'} },
@@ -2166,7 +2166,7 @@ const PREP_TODO = {
     {t:'대영박물관 도슨트투어 (9/26 토 10:10)', a:'모임 10분 전 도착·수신기 대여 £2(컨택리스만)'},
     {t:'Uber Boat 예약 (9/26 토 14:00 Embankment→Greenwich)', a:'thamesclippers.com/booking · 예약 필수'},
     {t:'내셔널갤러리 도슨트투어 (9/28 월 14:10)', a:'모임 10분 전 도착·컨택리스만 결제'},
-    {t:'자연사박물관 (9/28 월 10:30)', a:'사전예약 시간슬롯 확인 필요'},
+    {t:'자연사박물관 (9/28 월 10:00)', a:'10:00 슬롯 예약 확정'},
     {t:'피카딜리선 운행', a:'9월 중순 TfL 재확인'},
     {t:'해리포터 귀로 기차', a:'당일 소요 20분 이하 열차만'},
   ],
@@ -4690,6 +4690,7 @@ const MUSEUMS = {
   british:  { key:'british',  name:'영국박물관',   en:'British Museum',     city:'london',   country:'영국',   flag:'🇬🇧', icon:'🏺' },
   greenwich:{ key:'greenwich',name:'그리니치 왕립 천문대', en:'Royal Observatory Greenwich', city:'london', country:'영국', flag:'🇬🇧', icon:'🔭' },
   hpstudio: { key:'hpstudio', name:'해리포터 스튜디오', en:'Warner Bros. Studio Tour London', city:'london', country:'영국', flag:'🇬🇧', icon:'🧙' },
+  nhm:      { key:'nhm',      name:'자연사박물관', en:'Natural History Museum', city:'london', country:'영국', flag:'🇬🇧', icon:'🦕' },
   national: { key:'national', name:'내셔널 갤러리', en:'National Gallery',   city:'london',   country:'영국',   flag:'🇬🇧', icon:'🖼' },
   louvre:   { key:'louvre',   name:'루브르박물관',  en:'Musée du Louvre',    city:'paris',    country:'프랑스', flag:'🇫🇷', icon:'🔺' },
   orsay:    { key:'orsay',    name:'오르세미술관',  en:"Musée d'Orsay",      city:'paris',    country:'프랑스', flag:'🇫🇷', icon:'🕰' },
@@ -4697,10 +4698,10 @@ const MUSEUMS = {
   uffizi:   { key:'uffizi',   name:'우피치미술관',  en:'Uffizi Gallery',     city:'florence', country:'이탈리아', flag:'🇮🇹', icon:'🎨' },
   vatican:  { key:'vatican',  name:'바티칸미술관',  en:'Vatican Museums',    city:'rome',     country:'바티칸(세계에서 가장 작은 나라)', flag:'🇻🇦', icon:'⛪' },
 };
-const MUSEUM_ORDER = ['british','greenwich','hpstudio','national','louvre','orsay','orangerie','uffizi','vatican'];
+const MUSEUM_ORDER = ['british','greenwich','hpstudio','nhm','national','louvre','orsay','orangerie','uffizi','vatican'];
 // 나라별 그룹(여행 동선 순서)
 const MUSEUM_COUNTRY_GROUPS = [
-  { country:'영국',   flag:'🇬🇧', museums:['british','greenwich','hpstudio','national'] },
+  { country:'영국',   flag:'🇬🇧', museums:['british','greenwich','hpstudio','nhm','national'] },
   { country:'프랑스', flag:'🇫🇷', museums:['louvre','orsay','orangerie'] },
   { country:'이탈리아', flag:'🇮🇹', museums:['uffizi'] },
   { country:'바티칸',  flag:'🇻🇦', museums:['vatican'] },
@@ -4971,6 +4972,7 @@ const TRH_DC_FILES = [   // 새 박물관 JSON은 여기에 추가(여행 동선
   'data/docent_london_british_museum.json',
   'data/docent_london_greenwich.json',
   'data/docent_london_hpstudio.json',
+  'data/docent_london_natural_history.json',
   'data/docent_london_national_gallery.json',
   'data/docent_paris_louvre.json',
   'data/docent_paris_orsay_orangerie.json',
@@ -6314,6 +6316,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 09-27a · 도슨트 9관</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 09-27b · 도슨트 10관</div>
 </body>
 </html>
