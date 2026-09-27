@@ -958,6 +958,12 @@
   .trh-chip-absent{ background:#E4E4E4; color:#5E5E5E; }
   .trh-chip-check{ background:#FFF0B3; color:#8A6A00; }
   .trh-chip-medal{ background:#FFF4DA; color:#9A6A1B; }
+  .trh-chip-time{ background:#E8F1FB; color:#1F4F86; }
+  .trh-chip-oaudio{ background:#FFE7D1; color:#B04A00; font-weight:800; }
+  .trh-chip-badge{ background:#EAF6EC; color:#236B34; }
+  .trh-time-group{ font-size:14px; font-weight:800; color:#1F4F86; background:#E8F1FB; border-radius:10px; padding:7px 12px; margin:14px 0 8px; }
+  .trh-dc-warn{ background:#FFF1E6; border:1.5px solid #F2B27A; color:#8A3B00; border-radius:12px; padding:10px 12px; font-size:15px; font-weight:800; margin-bottom:10px; }
+  .trh-dc-next{ color:#1F4F86 !important; font-weight:700; }
   .trh-dc{ font-size:16px; line-height:1.7; }
   .trh-dc-sec{ margin:0 0 16px; }
   .trh-dc-sec h4{ font-size:14px; font-weight:800; color:var(--trh-accent); margin-bottom:8px; letter-spacing:.3px; }
@@ -4676,6 +4682,7 @@ let trhMuseumQuiz = trhLoad(TRH_LS.museumquiz, {});
 const MUSEUMS = {
   british:  { key:'british',  name:'영국박물관',   en:'British Museum',     city:'london',   country:'영국',   flag:'🇬🇧', icon:'🏺' },
   greenwich:{ key:'greenwich',name:'그리니치 왕립 천문대', en:'Royal Observatory Greenwich', city:'london', country:'영국', flag:'🇬🇧', icon:'🔭' },
+  hpstudio: { key:'hpstudio', name:'해리포터 스튜디오', en:'Warner Bros. Studio Tour London', city:'london', country:'영국', flag:'🇬🇧', icon:'🧙' },
   national: { key:'national', name:'내셔널 갤러리', en:'National Gallery',   city:'london',   country:'영국',   flag:'🇬🇧', icon:'🖼' },
   louvre:   { key:'louvre',   name:'루브르박물관',  en:'Musée du Louvre',    city:'paris',    country:'프랑스', flag:'🇫🇷', icon:'🔺' },
   orsay:    { key:'orsay',    name:'오르세미술관',  en:"Musée d'Orsay",      city:'paris',    country:'프랑스', flag:'🇫🇷', icon:'🕰' },
@@ -4683,10 +4690,10 @@ const MUSEUMS = {
   uffizi:   { key:'uffizi',   name:'우피치미술관',  en:'Uffizi Gallery',     city:'florence', country:'이탈리아', flag:'🇮🇹', icon:'🎨' },
   vatican:  { key:'vatican',  name:'바티칸미술관',  en:'Vatican Museums',    city:'rome',     country:'바티칸(세계에서 가장 작은 나라)', flag:'🇻🇦', icon:'⛪' },
 };
-const MUSEUM_ORDER = ['british','greenwich','national','louvre','orsay','orangerie','uffizi','vatican'];
+const MUSEUM_ORDER = ['british','greenwich','hpstudio','national','louvre','orsay','orangerie','uffizi','vatican'];
 // 나라별 그룹(여행 동선 순서)
 const MUSEUM_COUNTRY_GROUPS = [
-  { country:'영국',   flag:'🇬🇧', museums:['british','greenwich','national'] },
+  { country:'영국',   flag:'🇬🇧', museums:['british','greenwich','hpstudio','national'] },
   { country:'프랑스', flag:'🇫🇷', museums:['louvre','orsay','orangerie'] },
   { country:'이탈리아', flag:'🇮🇹', museums:['uffizi'] },
   { country:'바티칸',  flag:'🇻🇦', museums:['vatican'] },
@@ -4956,6 +4963,7 @@ function trhMuseumGrad(mk){ return trhGrad(MUSEUMS[mk].city); }
 const TRH_DC_FILES = [   // 새 박물관 JSON은 여기에 추가(여행 동선 순)
   'data/docent_london_british_museum.json',
   'data/docent_london_greenwich.json',
+  'data/docent_london_hpstudio.json',
   'data/docent_london_national_gallery.json',
   'data/docent_paris_louvre.json',
   'data/docent_paris_orsay_orangerie.json',
@@ -5150,7 +5158,8 @@ function trhDcMerge(data){
     }
     MUSEUMS[mk].docent = { audioMuseumId:m.id, visit:m.visit||null, caseTitle:m.caseTitle||'', caseBrief:m.caseBrief||'',
       rules:m.rules||[], routeNote:m.routeNote||'', intro:m.intro||null,
-      tourMode:(m.tourMode && m.tourMode.on!==false) ? m.tourMode : null };
+      tourMode:(m.tourMode && m.tourMode.on!==false) ? m.tourMode : null,
+      tracks:(data && data.meta && data.meta.tracks) || null, warning:m.warning||'', routeMap:m.routeMap||'' };
     const city = MUSEUMS[mk].city;
     const mSeq = trhDcMuseumSeq++;   // 도시 뷰 정렬용(박물관마다 겹치지 않게)
     (m.works || []).forEach(w=>{
@@ -5158,18 +5167,31 @@ function trhDcMerge(data){
         status:w.status||'on_display', statusNote:w.statusNote||'', location:w.location||'',
         hints:(w.hints||[]).filter(h=>h && String(h).trim()), howToSee:w.howToSee||[], audioScripts:w.audioScripts||{},
         photoMission:w.photoMission||'', memoryMission:w.memoryMission||'',
-        joseon:w.joseon||'', world:w.world||'', links:w.links||[], factCheck:w.factCheck||'', bonus:!!w.bonus };
+        joseon:w.joseon||'', world:w.world||'', links:w.links||[], factCheck:w.factCheck||'', bonus:!!w.bonus,
+        tracks:MUSEUMS[mk].docent.tracks, targetTime:w.targetTime||'', officialAudio:w.officialAudio==null?'':String(w.officialAudio),
+        officialAudioLen:w.officialAudioLen||'', toNext:w.toNext||'', badge:[].concat(w.badge||[]) };
       const existing = trhSite(TRH_DC_MERGE_ID[w.id] || w.id);
       if(existing){ existing.docent = dc; return; }   // 기존 필드 유지 + 신규 필드만 추가
       const sup = TRH_DC_SUPPLEMENT[w.id] || {};
       const quiz = (w.quiz||[]).filter(q=>q && Array.isArray(q.options) && typeof q.answer==='number')
-        .map((q,i)=>({ q:q.q, opts:q.options, a:q.answer, why:(sup.why && sup.why[i]) || '' }));
-      HISTORY_SITES.push({ id:w.id, city, order:200 + mSeq*20 + (w.order||0), era:sup.era || '근대 미술',
-        name:w.title, by:[w.artist, w.year].filter(Boolean).join(' · '), place:sup.place || MUSEUMS[mk].name,
-        emoji:sup.emoji || '🖼', museum:mk, periodCat:sup.periodCat || 'modern',
-        sig:sup.sig || '', kid:sup.kid || '', quiz, docent:dc });
+        .map((q,i)=>({ q:q.q, opts:q.options, a:q.answer, why:(sup.why && sup.why[i]) || q.why || '' }));
+      // 보충(TRH_DC_SUPPLEMENT)이 우선, 없으면 JSON의 emoji·kid·era·periodCat·place 사용(새 JSON은 자체 완결)
+      HISTORY_SITES.push({ id:w.id, city, order:200 + mSeq*20 + (w.order||0), era:sup.era || w.era || m.era || '근대 미술',
+        name:w.title, by:[w.artist, w.year].filter(Boolean).join(' · '), place:sup.place || w.place || MUSEUMS[mk].name,
+        emoji:sup.emoji || w.emoji || '🖼', museum:mk, periodCat:sup.periodCat || w.periodCat || m.periodCat || 'modern',
+        sig:sup.sig || '', kid:sup.kid || w.kid || '', quiz, docent:dc });
     });
   });
+}
+function trhDcTrackLabel(dc, t){ return (dc.tracks && dc.tracks[t]) || TRH_DC_TRACKS[t] || ('트랙 '+t); }
+const TRH_DC_BADGE = { 'only-here':'🌍 여기서만', 'icon':'👑 대표작', 'story':'📜 역사 스토리' };
+// 동선 카드·상세 공통 칩: 배지 · ⏰ 목표 시각 · 🎧 공식 오디오 번호 (필드가 있을 때만)
+function trhDcExtraChips(dc){
+  let h = (dc.badge||[]).filter(b=>TRH_DC_BADGE[b]).map(b=>`<span class="trh-chip trh-chip-badge">${TRH_DC_BADGE[b]}</span>`).join('');
+  if(dc.targetTime) h += `<span class="trh-chip trh-chip-time">⏰ ${esc(dc.targetTime)}</span>`;
+  if(dc.officialAudio){ const q=/\?$/.test(dc.officialAudio), n=dc.officialAudio.replace(/\?$/,''), len=dc.officialAudioLen && dc.officialAudioLen!=='-' ? ` · ${esc(dc.officialAudioLen)}` : '';
+    h += `<span class="trh-chip trh-chip-oaudio">🎧 공식 오디오 ${esc(n)}번${q?'?':''}${len}</span>`; }
+  return h;
 }
 function trhMuseumHasDocent(mk){ return !!(MUSEUMS[mk] && MUSEUMS[mk].docent) && trhMuseumSites(mk).some(s=>s.docent); }
 
@@ -5955,6 +5977,8 @@ function trhDcMuseumHeader(mk){
       ${visitTxt?`<div class="trh-visit">${esc(visitTxt)}</div>`:''}
       ${d.intro && d.intro.script ? `<div class="trh-case-audio">${trhAudioBtn(introPath, '인트로 — 도슨트 형의 첫인사')}</div>` : ''}
     </div>
+    ${d.warning ? `<div class="trh-dc-warn">⚠️ ${esc(d.warning)}</div>` : ''}
+    ${d.routeMap ? `<button class="trh-dc-btn trh-btn-ghost2" style="width:100%;margin-bottom:10px" onclick="trhShowImg('${d.routeMap}')">🗺 동선 지도 보기</button>` : ''}
     ${d.tourMode && d.tourMode.note ? `<div class="trh-dc-note trh-tourmode"><b>🎧 투어 모드</b> — ${esc(d.tourMode.note)}</div>` : ''}
     ${(d.routeNote || d.rules.length) ? `<div class="trh-dc-note">${d.routeNote?`<div>🧭 <b>동선</b> ${esc(d.routeNote)}</div>`:''}${d.rules.map(r=>`<div>⚠️ ${esc(r)}</div>`).join('')}</div>` : ''}
     ${trhMom && d.intro && d.intro.factCheck ? `<div class="trh-fact">🔍 인트로 사실 확인: ${esc(d.intro.factCheck)}</div>` : ''}
@@ -5979,7 +6003,8 @@ function trhDocentCard(s){
       ${eff!=='absent' && dc.location ? `<div class="trh-dc-loc">📍 ${esc(dc.location)}</div>` : ''}
       ${dc.joseon ? `<div class="trh-dc-line">🇰🇷 ${esc(dc.joseon)}</div>` : ''}
       ${dc.world ? `<div class="trh-dc-line">🌍 ${esc(dc.world)}</div>` : ''}
-      <div class="trh-site-foot">${bonus}${st}${stamp}${qchip}</div>
+      ${dc.toNext ? `<div class="trh-dc-line trh-dc-next">➡️ 다음: ${esc(dc.toNext)}</div>` : ''}
+      <div class="trh-site-foot">${trhDcExtraChips(dc)}${bonus}${st}${stamp}${qchip}</div>
     </div>
   </div>`;
 }
@@ -5987,8 +6012,17 @@ function trhDcRouteList(mk){
   const sites=trhMuseumSites(mk);
   const route=sites.filter(s=>s.docent).sort((a,b)=>a.docent.order-b.docent.order);
   const rest=sites.filter(s=>!s.docent);
+  // 같은 목표 시각이 이어지는 카드는 "⏰ 시간대 · n~m번" 소제목으로 묶음(targetTime이 있는 박물관만)
+  let body='';
+  for(let i=0;i<route.length;){
+    const tt=route[i].docent.targetTime; let j=i+1;
+    if(tt) while(j<route.length && route[j].docent.targetTime===tt) j++;
+    const grp=route.slice(i,j);
+    if(tt) body += `<div class="trh-time-group">⏰ ${esc(tt)} · ${grp.length>1?`${grp[0].docent.order}~${grp[grp.length-1].docent.order}번`:`${grp[0].docent.order}번`}</div>`;
+    body += grp.map(trhDocentCard).join(''); i=j;
+  }
   return `<p class="hint" style="font-size:14px">🚶 도슨트 형이 짠 <b>관람 순서</b>예요. 번호대로 찾아가며 도장을 모아요!</p>`
-    + route.map(trhDocentCard).join('')
+    + body
     + (rest.length ? `<div class="trh-section-label" style="margin-top:18px">➕ 시간이 남으면 더 볼 작품</div>${rest.map(trhSiteCard).join('')}` : '');
 }
 function trhDcBestHtml(mk){
@@ -6028,16 +6062,17 @@ function trhDcPanel(s){
   }
   if(trhMom && dc.statusNote) h += `<div class="trh-fact">📌 상태 메모: ${esc(dc.statusNote)}</div>`;
   // 위치 · 힌트
-  if(eff!=='absent' && dc.location) h += `<div class="trh-dc-sec"><h4>📍 어디에 있을까?</h4><p>${esc(dc.location)}</p></div>`;
+  const xc=trhDcExtraChips(dc); if(xc) h += `<div class="trh-site-foot" style="margin:0 0 10px">${xc}</div>`;
+  if(eff!=='absent' && dc.location) h += `<div class="trh-dc-sec"><h4>📍 어디에 있을까?</h4><p>${esc(dc.location)}</p>${dc.toNext?`<p class="trh-dc-next">➡️ 다음 장소: ${esc(dc.toNext)}</p>`:''}</div>`;
   if(eff!=='absent' && dc.hints.length) h += trhDcHints(s);
   // 음성(absent는 1트랙만)
   const tracks = Object.keys(dc.audioScripts).filter(k=>String(dc.audioScripts[k]||'').trim()).filter(k=>eff!=='absent' || k==='1');
   if(tracks.length){
     const anyReady = tracks.some(t=>trhDcAudioSet.has(trhDcAudioPath(dc,t)));
     h += `<div class="trh-dc-sec"><h4>🎧 도슨트 형의 이야기</h4>
-      ${tracks.map(t=>trhAudioBtn(trhDcAudioPath(dc,t), TRH_DC_TRACKS[t] || ('트랙 '+t))).join('')}
+      ${tracks.map(t=>trhAudioBtn(trhDcAudioPath(dc,t), trhDcTrackLabel(dc,t))).join('')}
       ${anyReady ? `<div class="trh-rate">속도 ${[0.9,1,1.2].map(r=>`<button data-rate="${r}" onclick="trhSetRate(${r})">${r===1?'1.0':r}×</button>`).join('')}</div>` : `<p class="trh-small">🔇 음성 파일을 준비하고 있어요. 그동안 아래 대본을 엄마가 읽어 줘도 좋아요.</p>`}
-      <details class="trh-script"><summary>📄 대본 읽기</summary>${tracks.map(t=>`<p><b>${esc(TRH_DC_TRACKS[t]||('트랙 '+t))}</b><br>${esc(dc.audioScripts[t])}</p>`).join('')}</details>
+      <details class="trh-script"><summary>📄 대본 읽기</summary>${tracks.map(t=>`<p><b>${esc(trhDcTrackLabel(dc,t))}</b><br>${esc(dc.audioScripts[t])}</p>`).join('')}</details>
     </div>`;
   }
   // 감상법
@@ -6183,6 +6218,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 09-26b · 도슨트 8관</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 09-27a · 도슨트 9관</div>
 </body>
 </html>
