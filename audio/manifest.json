@@ -144,5 +144,27 @@
     "audio/greenwich/greenwich-nelson-coat_2.mp3",
     "audio/greenwich/greenwich-cutty-sark_1.mp3",
     "audio/greenwich/greenwich-cutty-sark_2.mp3"
+  ],
+  "hpstudio": [
+    "audio/hpstudio/intro.mp3",
+    "audio/hpstudio/hp-lobby_1.mp3",
+    "audio/hpstudio/hp-great-hall_1.mp3",
+    "audio/hpstudio/hp-gryffindor-dorm_1.mp3",
+    "audio/hpstudio/hp-wands_1.mp3",
+    "audio/hpstudio/hp-common-room_1.mp3",
+    "audio/hpstudio/hp-dumbledore-office_1.mp3",
+    "audio/hpstudio/hp-potions_1.mp3",
+    "audio/hpstudio/hp-hagrid-hut_1.mp3",
+    "audio/hpstudio/hp-quidditch_1.mp3",
+    "audio/hpstudio/hp-burrow_1.mp3",
+    "audio/hpstudio/hp-death-eaters_1.mp3",
+    "audio/hpstudio/hp-ministry_1.mp3",
+    "audio/hpstudio/hp-forbidden-forest_1.mp3",
+    "audio/hpstudio/hp-hogwarts-express_1.mp3",
+    "audio/hpstudio/hp-backlot_1.mp3",
+    "audio/hpstudio/hp-creatures_1.mp3",
+    "audio/hpstudio/hp-diagon-alley_1.mp3",
+    "audio/hpstudio/hp-hogwarts-model_1.mp3",
+    "audio/hpstudio/hp-shop_1.mp3"
   ]
 }
