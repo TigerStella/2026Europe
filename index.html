@@ -993,6 +993,12 @@
   .trh-dc-check .bx{ font-size:20px; line-height:1.2; }
   .trh-dc-check.on{ background:#EDF6EE; border-color:#9CC9A5; }
   .trh-photo-btn{ width:100%; background:linear-gradient(135deg,var(--sunset-gold),var(--dusk-coral)); color:#fff; }
+  .trh-photo-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .trh-photo-row .trh-dc-btn{ flex:1; min-width:150px; width:auto; }
+  .trh-gal-btn{ background:#EEF0FA; color:#2F3877; border:1.5px solid #B9C0EA; }
+  .trh-gal-btn.full{ opacity:.5; pointer-events:none; }
+  .trh-photo-thumbs .ph{ position:relative; }
+  .trh-photo-thumbs .ph .gal{ position:absolute; left:4px; bottom:4px; font-size:13px; background:rgba(255,255,255,.85); border-radius:6px; padding:0 3px; }
   .trh-photo-thumbs{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
   .trh-photo-thumbs .ph{ position:relative; }
   .trh-photo-thumbs img{ width:84px; height:84px; object-fit:cover; border-radius:10px; cursor:pointer; display:block; }
@@ -5578,7 +5584,7 @@ function trhAwardStamp(siteId, opt){
   let gradeTxt='';
   if(s.docent && !trhGrade[siteId]){ trhGrade[siteId]=trhGradeFor(trhHints[siteId]||0); trhSave(TRH_LS.grade, trhGrade); }
   if(s.docent && trhGrade[siteId]){ const g=TRH_GRADE[trhGrade[siteId]]; gradeTxt=`<br><b>${g.icon} ${g.label}</b>${trhGrade[siteId]==='gold'?' — 힌트 없이 찾았어!':''}`; }
-  const viaTxt = opt.via==='photo' ? '📸 사진 인증 완료!<br>' : (opt.via==='memory' ? '✍️ 기억 미션 완료!<br>' : '');
+  const viaTxt = opt.via==='photo' ? '📸 사진 인증 완료!<br>' : (opt.via==='gallery' ? '🖼 갤러리 사진 인증 완료!<br>' : (opt.via==='memory' ? '✍️ 기억 미션 완료!<br>' : ''));
   const cityComplete = trhCityComplete(s.city);
   const museumComplete = s.museum && trhMuseumComplete(s.museum);
   const grand = trhAllCitiesComplete();
@@ -5690,9 +5696,9 @@ function trhDb(){
   trhDbP.catch(()=>{ trhDbP=null; });
   return trhDbP;
 }
-async function trhPhotoAdd(siteId, blob){
+async function trhPhotoAdd(siteId, blob, extra){   // extra: {src:'gallery'} 등 레코드에 필드만 추가(DB 버전·인덱스 변경 없음)
   const db = await trhDb();
-  return new Promise((res, rej)=>{ const tx=db.transaction('photos','readwrite'); tx.objectStore('photos').add({siteId, blob, ts:Date.now()}); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); });
+  return new Promise((res, rej)=>{ const tx=db.transaction('photos','readwrite'); tx.objectStore('photos').add(Object.assign({siteId, blob, ts:Date.now()}, extra||{})); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); });
 }
 async function trhPhotoList(siteId){
   const db = await trhDb();
@@ -5727,7 +5733,33 @@ async function trhOnPhoto(siteId, input){
 async function trhRenderThumbs(siteId){
   const box = document.getElementById('trhThumbs'); if(!box) return;
   let ps=[]; try{ ps = await trhPhotoList(siteId); }catch(e){ return; }
-  box.innerHTML = ps.sort((a,b)=>a.ts-b.ts).map(p=>`<div class="ph"><img src="${trhPhotoUrl(p)}" alt="인증 사진" onclick="trhShowImg(this.src)"><button class="rm" aria-label="사진 삭제" onclick="trhDelPhoto(${p.id})">✕</button></div>`).join('');
+  box.innerHTML = ps.sort((a,b)=>a.ts-b.ts).map(p=>`<div class="ph"><img src="${trhPhotoUrl(p)}" alt="인증 사진" onclick="trhShowImg(this.src)">${p.src==='gallery'?'<span class="gal">🖼</span>':''}<button class="rm" aria-label="사진 삭제" onclick="trhDelPhoto(${p.id})">✕</button></div>`).join('');
+  trhGalleryUi(ps.filter(p=>p.src==='gallery').length);
+}
+// 🖼 갤러리 업로드 — 작품당 최대 3장, 도장은 현장 촬영·갤러리 중 하나만 해도 획득
+const TRH_GALLERY_MAX = 3;
+function trhGalleryUi(n){
+  const btn=document.getElementById('trhGalBtn'), cnt=document.getElementById('trhGalCnt'); if(!btn) return;
+  if(cnt) cnt.textContent=`(${n}/${TRH_GALLERY_MAX})`;
+  const full = n>=TRH_GALLERY_MAX, inp=btn.querySelector('input');
+  btn.classList.toggle('full', full); if(inp) inp.disabled=full;
+}
+let trhGalleryBusy=false;
+async function trhOnGallery(siteId, input){
+  const files=[...(input.files||[])]; input.value=''; if(!files.length || trhGalleryBusy) return;
+  let have=0; try{ have=(await trhPhotoList(siteId)).filter(p=>p.src==='gallery').length; }catch(e){ toast('사진 저장소를 열 수 없어요'); return; }
+  const remain=TRH_GALLERY_MAX-have;
+  if(remain<=0){ toast(`갤러리 사진은 작품당 최대 ${TRH_GALLERY_MAX}장까지 올릴 수 있어요`); return; }
+  const pick=files.slice(0, remain);
+  if(files.length>remain) toast(`최대 ${TRH_GALLERY_MAX}장까지 올릴 수 있어요 — ${pick.length}장만 저장할게요`);
+  trhGalleryBusy=true; let ok=0;
+  try{
+    for(const f of pick){ try{ await trhPhotoAdd(siteId, await trhCompressImage(f), {src:'gallery'}); ok++; }catch(e){} }
+  } finally { trhGalleryBusy=false; }
+  if(!ok){ toast('사진을 저장하지 못했어요'); return; }
+  if(!trhVisited[siteId]) trhAwardStamp(siteId, {via:'gallery'});
+  else { if(files.length<=remain) toast(`🖼 사진 ${ok}장을 저장했어요!`); trhRefreshViews(); }
+  trhRefreshDetail();
 }
 async function trhDelPhoto(id){ if(!confirm('이 사진을 지울까요? (도장은 그대로 남아요)')) return; try{ await trhPhotoDelete(id); }catch(e){} trhRenderThumbs(trhCurSite); trhRefreshViews(); }
 function trhShowImg(src){ const im=document.getElementById('imgModalImg'), md=document.getElementById('imgModal'); if(im&&md){ im.src=src; md.classList.add('open'); } }
@@ -6147,8 +6179,11 @@ function trhDcPanel(s){
       <button class="trh-dc-btn trh-btn-gold" style="width:100%" onclick="trhSaveMemory('${s.id}')">✍️ 기록하고 도장 받기</button></div>`;
   } else if(dc.photoMission && !/^없음/.test(dc.photoMission.trim()) && eff!=='absent'){
     h += `<div class="trh-dc-sec"><h4>📸 사진 미션</h4><p>${esc(dc.photoMission)}</p>
-      <label class="trh-dc-btn trh-photo-btn">📷 사진 찍어 인증하기<input type="file" accept="image/*" capture="environment" style="display:none" onchange="trhOnPhoto('${s.id}',this)"></label>
-      <p class="trh-small">사진을 올리면 도장이 바로 찍혀요! (플래시는 끄기)</p>
+      <div class="trh-photo-row">
+        <label class="trh-dc-btn trh-photo-btn">📷 사진 찍어 인증하기<input type="file" accept="image/*" capture="environment" style="display:none" onchange="trhOnPhoto('${s.id}',this)"></label>
+        <label class="trh-dc-btn trh-gal-btn" id="trhGalBtn">🖼 갤러리에서 올리기 <span id="trhGalCnt">(0/${TRH_GALLERY_MAX})</span><input type="file" accept="image/*" multiple style="display:none" onchange="trhOnGallery('${s.id}',this)"></label>
+      </div>
+      <p class="trh-small">현장에서 찍기 또는 갤러리에서 올리기 — <b>둘 중 하나만 해도 도장</b>이 찍혀요! 갤러리는 작품당 최대 ${TRH_GALLERY_MAX}장. (플래시는 끄기)</p>
       <div class="trh-photo-thumbs" id="trhThumbs"></div></div>`;
   } else if(dc.photoMission){
     h += `<p class="trh-small" style="margin-bottom:14px">🔗 ${esc(dc.photoMission)}</p>`;
