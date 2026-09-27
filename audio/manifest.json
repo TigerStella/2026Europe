@@ -166,5 +166,28 @@
     "audio/hpstudio/hp-diagon-alley_1.mp3",
     "audio/hpstudio/hp-hogwarts-model_1.mp3",
     "audio/hpstudio/hp-shop_1.mp3"
+  ],
+  "nhm": [
+    "audio/nhm/intro.mp3",
+    "audio/nhm/nhm-fern_1.mp3",
+    "audio/nhm/nhm-fern_2.mp3",
+    "audio/nhm/nhm-hope_1.mp3",
+    "audio/nhm/nhm-hope_2.mp3",
+    "audio/nhm/nhm-trex_1.mp3",
+    "audio/nhm/nhm-trex_2.mp3",
+    "audio/nhm/nhm-mary-anning_1.mp3",
+    "audio/nhm/nhm-mary-anning_2.mp3",
+    "audio/nhm/nhm-treasures_1.mp3",
+    "audio/nhm/nhm-treasures_2.mp3",
+    "audio/nhm/nhm-sequoia_1.mp3",
+    "audio/nhm/nhm-sequoia_2.mp3",
+    "audio/nhm/nhm-vault_1.mp3",
+    "audio/nhm/nhm-vault_2.mp3",
+    "audio/nhm/nhm-cheddar-man_1.mp3",
+    "audio/nhm/nhm-cheddar-man_2.mp3",
+    "audio/nhm/nhm-sophie-earth_1.mp3",
+    "audio/nhm/nhm-sophie-earth_2.mp3",
+    "audio/nhm/nhm-earthquake_1.mp3",
+    "audio/nhm/nhm-earthquake_2.mp3"
   ]
 }
