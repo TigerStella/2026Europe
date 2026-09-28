@@ -4251,7 +4251,7 @@ function saveSettings(){
 /* ══════════════════ BACKUP / RESTORE ══════════════════ */
 function downloadBlob(blob, name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 800); }
 function stamp(){ const d=new Date(); const p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`; }
-function buildPayload(){ return { app:'noleu-europe', version:1, exportedAt:new Date().toISOString(), addedActs, diary, settings, contacts, related, checklist, expenses, reserve:reserveState, actEdits, trhMine:trhMinePayload() }; }
+function buildPayload(){ return { app:'noleu-europe', version:1, exportedAt:new Date().toISOString(), addedActs, diary, settings, contacts, related, checklist, expenses, reserve:reserveState, actEdits, trhMine:trhMinePayload(), trhStamps:trhStampPayload() }; }
 function exportData(){
   downloadBlob(new Blob([JSON.stringify(buildPayload(),null,2)], {type:'application/json'}), `noleu-europe-backup-${stamp()}.json`);
   toast('백업 파일을 저장했어요 💾');
@@ -4277,6 +4277,7 @@ function importData(ev){
       if('checklist' in j && j.checklist){ checklist=Object.assign({checked:{},custom:[]}, j.checklist); save(LS.checklist, checklist); }
       if('expenses' in j && Array.isArray(j.expenses)){ expenses=j.expenses; save(LS.expenses, expenses); }
       if(j.trhMine) trhMineMerge(j.trhMine);   // ➕ 내가 찾은 작품(글): 합치기(기존 기록 유지)
+      if(j.trhStamps) trhStampMerge(j.trhStamps);   // 🎫 도장·퀴즈: 합치기(기존 기록 유지, 덮어쓰지 않음)
       refreshTimelines(); renderDiary(); renderContacts(); renderHotels(); renderRelated(); renderChecklist(); renderExpenses();
       toast('불러오기 완료 ✅');
     }catch(err){ toast('올바른 백업 파일이 아니에요'); }
@@ -4304,6 +4305,7 @@ function mergeData(j){
   if(j.reserve){ Object.assign(reserveState, j.reserve); save(LS.reserve, reserveState); }
   if(j.actEdits){ actEdits.overrides=Object.assign(actEdits.overrides||{}, j.actEdits.overrides||{}); actEdits.hidden=Object.assign(actEdits.hidden||{}, j.actEdits.hidden||{}); save(LS.actedit, actEdits); }
   if(j.trhMine) added += trhMineMerge(j.trhMine);
+  if(j.trhStamps) added += trhStampMerge(j.trhStamps);
   return added;
 }
 function rerenderAll(){ refreshTimelines(); renderDiary(); renderContacts(); renderHotels(); renderRelated(); renderChecklist(); renderExpenses(); }
@@ -5961,6 +5963,35 @@ function trhMineMerge(src){
   });
   Object.keys(trhMine).forEach(mk=>{ trhMine[mk]=(trhMine[mk]||[]).filter(x=>!trhMineDel[x.id]); if(!trhMine[mk].length) delete trhMine[mk]; });
   trhSave(TRH_LS.mine, trhMine); trhSave(TRH_LS.mineDel, trhMineDel);
+  try{ trhRefreshViews(); if(trhVisible('trhPassport')) renderPassport(); }catch(e){}
+  return added;
+}
+
+// 🎫 도장·퀴즈 등 스탬프 진행 상황 — 백업 파일(💾 백업 → 🔀 합치기)·구글 드라이브 동기화로 다른 기기/브라우저에 옮기기 위함
+// (예: 네이버 앱으로 연 것과 홈 화면에 설치한 것은 저장 공간이 서로 달라 자동으로 합쳐지지 않음)
+function trhStampPayload(){
+  return { visited:trhVisited, cityQuiz:trhCityQuiz, museumQuiz:trhMuseumQuiz, hints:trhHints, grade:trhGrade,
+    checklist:trhChecklist, checkResult:trhCheckRes, memory:trhMemory, best:trhBest };
+}
+function trhStampMerge(src){
+  if(!src || typeof src!=='object') return 0;
+  let added=0;
+  // 이미 있는 기록은 절대 덮어쓰지 않고, 저쪽에만 있는 것만 채워 넣음(현재 기기의 도장·등급이 최우선)
+  const fillMissing=(dst,obj)=>{ Object.keys(obj||{}).forEach(k=>{ if(!(k in dst)){ dst[k]=obj[k]; added++; } }); };
+  // 종합 퀴즈 최고점은 둘 중 더 높은 점수를 인정
+  const fillBest=(dst,obj)=>{ Object.keys(obj||{}).forEach(k=>{ const v=obj[k]; if(typeof v!=='number') return; if(!(k in dst)){ dst[k]=v; added++; } else if(v>dst[k]) dst[k]=v; }); };
+  fillMissing(trhVisited, src.visited);
+  fillBest(trhCityQuiz, src.cityQuiz);
+  fillBest(trhMuseumQuiz, src.museumQuiz);
+  fillMissing(trhHints, src.hints);
+  fillMissing(trhGrade, src.grade);
+  fillMissing(trhChecklist, src.checklist);
+  fillMissing(trhCheckRes, src.checkResult);
+  fillMissing(trhMemory, src.memory);
+  fillMissing(trhBest, src.best);
+  trhSave(TRH_LS.visited, trhVisited); trhSave(TRH_LS.cityquiz, trhCityQuiz); trhSave(TRH_LS.museumquiz, trhMuseumQuiz);
+  trhSave(TRH_LS.hints, trhHints); trhSave(TRH_LS.grade, trhGrade); trhSave(TRH_LS.checklist, trhChecklist);
+  trhSave(TRH_LS.checkresult, trhCheckRes); trhSave(TRH_LS.memory, trhMemory); trhSave(TRH_LS.best, trhBest);
   try{ trhRefreshViews(); if(trhVisible('trhPassport')) renderPassport(); }catch(e){}
   return added;
 }
