@@ -3283,7 +3283,7 @@ function renderBudgetGuide(){
   wrap.innerHTML=html;
 }
 
-/* ── 총예산(환전 지갑): 카드별·통화별 환전총액·사용·잔액 + 환전 내역 펼침 ── */
+/* ── 총예산(환전 지갑): 통화별로 합산 표시(카드는 내부적으로 신한/하나 구분해 잔액만 정확히 계산) + 환전 내역 펼침 ── */
 let walletOpen={};
 function toggleWallet(k){ walletOpen[k]=!walletOpen[k]; renderWallet(); }
 function fmtCur(n){ return (+n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
@@ -3292,27 +3292,34 @@ function renderWallet(){
   const won=n=>Math.round(n).toLocaleString('ko-KR');
   const sym={EUR:'€',GBP:'£'}, emo={EUR:'💶',GBP:'💷'};
   let totKrwLeft=0, cards='';
-  WALLET_CARDS.forEach(card=>{
-    const cardData=EXCHANGE[card]; if(!cardData) return;
-    WALLET_CCY.forEach(c=>{
-      const entry=cardData[c]; if(!entry || !entry.records || !entry.records.length) return;
-      const key=card+':'+c;
-      const tot=exTotal(card,c), krwEx=exKrwTotal(card,c), rate=exRate(card,c);
-      const left=walletLeft(card,c), leftKrw=left*rate;
-      totKrwLeft+=leftKrw;
-      const open=walletOpen[key];
-      cards+=`<div class="wl-card">
-        <div class="wl-top" onclick="toggleWallet('${key}')">
-          <div class="wl-cur">${emo[c]} ${esc(cardData.label)} · ${c} <span class="wl-cur-sub">${sym[c]}${fmtCur(tot)}</span></div>
-          <div class="wl-bal"><span class="wl-left">잔액 ${sym[c]}${fmtCur(left)}</span><span class="wl-left-krw">약 ₩${won(leftKrw)}</span></div>
-        </div>
-        <div class="wl-meta" onclick="toggleWallet('${key}')"><span>사용 ${sym[c]}${fmtCur(spentIn(card,c))} · 환전 원화 ₩${won(krwEx)}</span><span class="wl-caret">${open?'▲ 내역 접기':'▼ 환전 내역'}</span></div>
-        ${open?`<div class="wl-recs">${entry.records.map(r=>`<div class="wl-rec"><span class="wl-rec-d">${r.date?isoLabel(r.date):'날짜 미상'}</span><span class="wl-rec-r">환율 ${r.rate.toLocaleString('en-US')}</span><span class="wl-rec-a">${sym[c]}${fmtCur(r.amt)}</span><span class="wl-rec-k">₩${won(r.krw)}</span></div>`).join('')}<div class="wl-rec wl-rec-sum"><span class="wl-rec-d">환전 합계</span><span class="wl-rec-r"></span><span class="wl-rec-a">${sym[c]}${fmtCur(tot)}</span><span class="wl-rec-k">₩${won(krwEx)}</span></div>${entry.balance!=null?`<div class="wl-rec" style="opacity:.7"><span class="wl-rec-d">${entry.balanceAsOf?isoLabel(entry.balanceAsOf):''} 앱 확인 잔액</span><span class="wl-rec-r"></span><span class="wl-rec-a">${sym[c]}${fmtCur(entry.balance)}</span><span class="wl-rec-k"></span></div>`:''}</div>`:''}
-      </div>`;
+  WALLET_CCY.forEach(c=>{
+    const cardsWithCur=WALLET_CARDS.filter(card=> EXCHANGE[card] && EXCHANGE[card][c] && EXCHANGE[card][c].records && EXCHANGE[card][c].records.length);
+    if(!cardsWithCur.length) return;
+    const tot=cardsWithCur.reduce((a,card)=>a+exTotal(card,c),0);
+    const krwEx=cardsWithCur.reduce((a,card)=>a+exKrwTotal(card,c),0);
+    const rate=tot? krwEx/tot : 0;
+    const left=cardsWithCur.reduce((a,card)=>a+walletLeft(card,c),0);
+    const spent=cardsWithCur.reduce((a,card)=>a+spentIn(card,c),0);
+    const leftKrw=left*rate;
+    totKrwLeft+=leftKrw;
+    const open=walletOpen[c];
+    let recRows='';
+    cardsWithCur.forEach(card=>{
+      const label=EXCHANGE[card].label, entry=EXCHANGE[card][c];
+      entry.records.forEach(r=>{ recRows+=`<div class="wl-rec"><span class="wl-rec-d">${r.date?isoLabel(r.date):'날짜 미상'} · ${esc(label)}</span><span class="wl-rec-r">환율 ${r.rate.toLocaleString('en-US')}</span><span class="wl-rec-a">${sym[c]}${fmtCur(r.amt)}</span><span class="wl-rec-k">₩${won(r.krw)}</span></div>`; });
+      if(entry.balance!=null) recRows+=`<div class="wl-rec" style="opacity:.7"><span class="wl-rec-d">${entry.balanceAsOf?isoLabel(entry.balanceAsOf):''} · ${esc(label)} 앱 확인 잔액</span><span class="wl-rec-r"></span><span class="wl-rec-a">${sym[c]}${fmtCur(entry.balance)}</span><span class="wl-rec-k"></span></div>`;
     });
+    cards+=`<div class="wl-card">
+      <div class="wl-top" onclick="toggleWallet('${c}')">
+        <div class="wl-cur">${emo[c]} ${c} 환전 <span class="wl-cur-sub">${sym[c]}${fmtCur(tot)}</span></div>
+        <div class="wl-bal"><span class="wl-left">잔액 ${sym[c]}${fmtCur(left)}</span><span class="wl-left-krw">약 ₩${won(leftKrw)}</span></div>
+      </div>
+      <div class="wl-meta" onclick="toggleWallet('${c}')"><span>사용 ${sym[c]}${fmtCur(spent)} · 환전 원화 ₩${won(krwEx)}</span><span class="wl-caret">${open?'▲ 내역 접기':'▼ 환전 내역'}</span></div>
+      ${open?`<div class="wl-recs">${recRows}<div class="wl-rec wl-rec-sum"><span class="wl-rec-d">환전 합계</span><span class="wl-rec-r"></span><span class="wl-rec-a">${sym[c]}${fmtCur(tot)}</span><span class="wl-rec-k">₩${won(krwEx)}</span></div></div>`:''}
+    </div>`;
   });
   wrap.innerHTML=`<div class="section-header" style="margin-top:4px"><span class="section-icon">🎒</span><span class="section-title" style="font-size:13px">총예산 (환전 지갑)</span><span class="section-sub">남은 예산 약 ₩${won(totKrwLeft)}</span></div>`+cards
-    +`<div class="hint" style="padding:4px 4px 0;font-size:11px">💡 <strong>＋ 비용 추가</strong>에서 지불방식을 신한트래블/하나트래블로 선택해 EUR·GBP 지출을 기록하면 위 <strong>잔액</strong>과 아래 <strong>일별 사용·잔액</strong>이 자동으로 줄어들어요.</div>`;
+    +`<div class="hint" style="padding:4px 4px 0;font-size:11px">💡 <strong>＋ 비용 추가</strong>에서 지불방식을 신한트래블/하나트래블로 선택해 EUR·GBP 지출을 기록하면 위 <strong>잔액</strong>과 아래 <strong>일별 사용·잔액</strong>이 자동으로 줄어들어요. 환전 내역을 펼치면 카드별로 구분해서 볼 수 있어요.</div>`;
 }
 
 /* ══════════════════ CHECKLIST (준비물) ══════════════════ */
@@ -6342,6 +6349,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 09-27c · 도슨트 10관</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 09-28 · 도슨트 10관</div>
 </body>
 </html>
