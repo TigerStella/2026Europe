@@ -1495,7 +1495,7 @@
     <div class="row">
       <div class="field" style="flex:1"><label>날짜</label><input type="date" id="exDate"></div>
       <div class="field" style="flex:1"><label>지불 방식</label>
-        <select id="exPay"><option>신용카드</option><option>체크/트래블카드</option><option>현금</option></select>
+        <select id="exPay"><option>신용카드</option><option>신한트래블</option><option>하나트래블</option><option>현금</option></select>
       </div>
     </div>
     <div class="field" style="margin:10px 0"><label>메모 (지출 내역)</label><input id="exMemo" placeholder="예: 에펠탑 입장권, 점심 파스타"></div>
@@ -2278,6 +2278,9 @@ const COSTS = [
   { cat:'💳 하나트래블카드 충전', items:[
       ['EUR 80 충전 (9/25, 환율 1,550.09원)', 124007],
       ['GBP 20 충전 (9/25, 환율 1,800.62원)', 36012],
+  ] },
+  { cat:'💳 신한트래블카드 충전', items:[
+      ['GBP 50 충전 (9/27, 환율 1,800.13원)', 90006],
   ] },
 ];
 
@@ -3073,25 +3076,44 @@ const BUDGET_PAID = [
 ];
 // 예산 버퍼(여유자금) 권장치 — 현지통화
 const BUDGET_BUFFER = { GBP:160, EUR:1000 };
-// ── 환전 지갑(총예산) — 실제 환전 내역 seed. 잔액 = 환전총액 − 현지통화 지출 ──
+// ── 환전 지갑(총예산) — 카드별 실제 환전 내역 seed. 잔액 = 환전총액 − 해당 카드 지출 (또는 balance 스냅샷 − 스냅샷 이후 지출) ──
 const EXCHANGE = {
-  EUR: { records:[
-    { date:'2026-05-08', rate:1717.94, amt:291.05, krw:500006 },
-    { date:'2026-05-08', rate:1716.27, amt:58.26,  krw:99989  },
-    { date:'',           rate:1746.04, amt:0.01,   krw:17     },
-    { date:'2026-07-29', rate:1647.07, amt:435.00, krw:716475 },
-    { date:'2026-09-25', rate:1550.09, amt:80.00,  krw:124007 },
-  ] },
-  GBP: { records:[
-    { date:'2026-07-29', rate:1922.24, amt:145.00, krw:278724 },
-    { date:'2026-09-25', rate:1800.62, amt:20.00,  krw:36012  },
-  ] },
+  hana: { label:'하나트래블',
+    EUR: { records:[
+      { date:'2026-05-08', rate:1717.94, amt:291.05, krw:500006 },
+      { date:'2026-05-08', rate:1716.27, amt:58.26,  krw:99989  },
+      { date:'',           rate:1746.04, amt:0.01,   krw:17     },
+      { date:'2026-07-29', rate:1647.07, amt:435.00, krw:716475 },
+      { date:'2026-09-25', rate:1550.09, amt:80.00,  krw:124007 },
+    ] },
+    GBP: { records:[
+      { date:'2026-07-29', rate:1922.24, amt:145.00, krw:278724 },
+      { date:'2026-09-25', rate:1800.62, amt:20.00,  krw:36012  },
+    ], balance:4.00, balanceAsOf:'2026-09-27' },
+  },
+  shinhan: { label:'신한트래블',
+    GBP: { records:[
+      { date:'2026-09-27', rate:1800.13, amt:50.00, krw:90006 },
+    ], balance:54.20, balanceAsOf:'2026-09-27' },
+  },
 };
+const WALLET_CARDS = ['hana','shinhan'];
 const WALLET_CCY = ['EUR','GBP'];
-function exTotal(cur){ return (EXCHANGE[cur]?EXCHANGE[cur].records:[]).reduce((a,r)=>a+r.amt,0); }
-function exKrwTotal(cur){ return (EXCHANGE[cur]?EXCHANGE[cur].records:[]).reduce((a,r)=>a+r.krw,0); }
-function exRate(cur){ const t=exTotal(cur); return t? exKrwTotal(cur)/t : 0; } // 평균 환전환율(원/1단위)
-function spentIn(cur){ return expenses.filter(e=>e.ccy===cur).reduce((a,e)=>a+(+e.amount||0),0); }
+function exRecs(card,cur){ return (EXCHANGE[card]&&EXCHANGE[card][cur]&&EXCHANGE[card][cur].records)||[]; }
+function exTotal(card,cur){ return exRecs(card,cur).reduce((a,r)=>a+r.amt,0); }
+function exKrwTotal(card,cur){ return exRecs(card,cur).reduce((a,r)=>a+r.krw,0); }
+function exRate(card,cur){ const t=exTotal(card,cur); return t? exKrwTotal(card,cur)/t : 0; } // 평균 환전환율(원/1단위)
+function exTotalAllCards(cur){ return WALLET_CARDS.reduce((a,card)=>a+exTotal(card,cur),0); }
+function cardOfPay(pay){ return pay==='신한트래블' ? 'shinhan' : (pay==='하나트래블' ? 'hana' : null); }
+function spentIn(card,cur){ return expenses.filter(e=>e.ccy===cur && cardOfPay(e.pay)===card).reduce((a,e)=>a+(+e.amount||0),0); }
+function walletLeft(card,cur){
+  const entry=(EXCHANGE[card]&&EXCHANGE[card][cur])||{};
+  if(entry.balance!=null){
+    const since=expenses.filter(e=>e.ccy===cur && cardOfPay(e.pay)===card && (!entry.balanceAsOf || (e.date||'')>=entry.balanceAsOf)).reduce((a,e)=>a+(+e.amount||0),0);
+    return entry.balance - since;
+  }
+  return exTotal(card,cur) - spentIn(card,cur);
+}
 const EXP_CATS = [['🧾','기타비용'],['🍽','식비'],['🚕','교통비'],['🛍','쇼핑'],['🎫','티켓'],['🏨','숙박비'],['✈️','항공권'],['⛱','투어'],['🎉','유흥'],['🏃','액티비티'],['💵','팁'],['🎁','선물']];
 const CCY_SYM = { KRW:'₩', EUR:'€', GBP:'£', USD:'$' };
 let expenses = load(LS.expenses, []);
@@ -3197,7 +3219,7 @@ function renderExpenses(){
         let chips='';
         WALLET_CCY.forEach(c=>{
           const daySpent=list.filter(e=>e.ccy===c).reduce((a,e)=>a+(+e.amount||0),0);
-          if(daySpent>0){ cum[c]+=daySpent; const left=exTotal(c)-cum[c];
+          if(daySpent>0){ cum[c]+=daySpent; const left=exTotalAllCards(c)-cum[c];
             chips+=`<span class="wl-day-chip ${left<0?'neg':''}">${emo[c]} 사용 ${sym[c]}${fmtCur(daySpent)} · 잔액 ${sym[c]}${fmtCur(left)}</span>`; }
         });
         if(chips) html+=`<div class="wl-day-bal">${chips}</div>`;
@@ -3261,9 +3283,9 @@ function renderBudgetGuide(){
   wrap.innerHTML=html;
 }
 
-/* ── 총예산(환전 지갑): 통화별 환전총액·사용·잔액 + 환전 내역 펼침 ── */
-let walletOpen={EUR:false,GBP:false};
-function toggleWallet(c){ walletOpen[c]=!walletOpen[c]; renderWallet(); }
+/* ── 총예산(환전 지갑): 통화별로 합산 표시(카드는 내부적으로 신한/하나 구분해 잔액만 정확히 계산) + 환전 내역 펼침 ── */
+let walletOpen={};
+function toggleWallet(k){ walletOpen[k]=!walletOpen[k]; renderWallet(); }
 function fmtCur(n){ return (+n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function renderWallet(){
   const wrap=document.getElementById('walletWrap'); if(!wrap) return;
@@ -3271,22 +3293,33 @@ function renderWallet(){
   const sym={EUR:'€',GBP:'£'}, emo={EUR:'💶',GBP:'💷'};
   let totKrwLeft=0, cards='';
   WALLET_CCY.forEach(c=>{
-    const recs=(EXCHANGE[c]&&EXCHANGE[c].records)||[]; if(!recs.length) return;
-    const tot=exTotal(c), krwEx=exKrwTotal(c), rate=exRate(c);
-    const spent=spentIn(c), left=tot-spent, leftKrw=left*rate;
+    const cardsWithCur=WALLET_CARDS.filter(card=> EXCHANGE[card] && EXCHANGE[card][c] && EXCHANGE[card][c].records && EXCHANGE[card][c].records.length);
+    if(!cardsWithCur.length) return;
+    const tot=cardsWithCur.reduce((a,card)=>a+exTotal(card,c),0);
+    const krwEx=cardsWithCur.reduce((a,card)=>a+exKrwTotal(card,c),0);
+    const rate=tot? krwEx/tot : 0;
+    const left=cardsWithCur.reduce((a,card)=>a+walletLeft(card,c),0);
+    const spent=cardsWithCur.reduce((a,card)=>a+spentIn(card,c),0);
+    const leftKrw=left*rate;
     totKrwLeft+=leftKrw;
     const open=walletOpen[c];
+    let recRows='';
+    cardsWithCur.forEach(card=>{
+      const label=EXCHANGE[card].label, entry=EXCHANGE[card][c];
+      entry.records.forEach(r=>{ recRows+=`<div class="wl-rec"><span class="wl-rec-d">${r.date?isoLabel(r.date):'날짜 미상'} · ${esc(label)}</span><span class="wl-rec-r">환율 ${r.rate.toLocaleString('en-US')}</span><span class="wl-rec-a">${sym[c]}${fmtCur(r.amt)}</span><span class="wl-rec-k">₩${won(r.krw)}</span></div>`; });
+      if(entry.balance!=null) recRows+=`<div class="wl-rec" style="opacity:.7"><span class="wl-rec-d">${entry.balanceAsOf?isoLabel(entry.balanceAsOf):''} · ${esc(label)} 앱 확인 잔액</span><span class="wl-rec-r"></span><span class="wl-rec-a">${sym[c]}${fmtCur(entry.balance)}</span><span class="wl-rec-k"></span></div>`;
+    });
     cards+=`<div class="wl-card">
       <div class="wl-top" onclick="toggleWallet('${c}')">
         <div class="wl-cur">${emo[c]} ${c} 환전 <span class="wl-cur-sub">${sym[c]}${fmtCur(tot)}</span></div>
         <div class="wl-bal"><span class="wl-left">잔액 ${sym[c]}${fmtCur(left)}</span><span class="wl-left-krw">약 ₩${won(leftKrw)}</span></div>
       </div>
       <div class="wl-meta" onclick="toggleWallet('${c}')"><span>사용 ${sym[c]}${fmtCur(spent)} · 환전 원화 ₩${won(krwEx)}</span><span class="wl-caret">${open?'▲ 내역 접기':'▼ 환전 내역'}</span></div>
-      ${open?`<div class="wl-recs">${recs.map(r=>`<div class="wl-rec"><span class="wl-rec-d">${r.date?isoLabel(r.date):'날짜 미상'}</span><span class="wl-rec-r">환율 ${r.rate.toLocaleString('en-US')}</span><span class="wl-rec-a">${sym[c]}${fmtCur(r.amt)}</span><span class="wl-rec-k">₩${won(r.krw)}</span></div>`).join('')}<div class="wl-rec wl-rec-sum"><span class="wl-rec-d">환전 합계</span><span class="wl-rec-r"></span><span class="wl-rec-a">${sym[c]}${fmtCur(tot)}</span><span class="wl-rec-k">₩${won(krwEx)}</span></div></div>`:''}
+      ${open?`<div class="wl-recs">${recRows}<div class="wl-rec wl-rec-sum"><span class="wl-rec-d">환전 합계</span><span class="wl-rec-r"></span><span class="wl-rec-a">${sym[c]}${fmtCur(tot)}</span><span class="wl-rec-k">₩${won(krwEx)}</span></div></div>`:''}
     </div>`;
   });
   wrap.innerHTML=`<div class="section-header" style="margin-top:4px"><span class="section-icon">🎒</span><span class="section-title" style="font-size:13px">총예산 (환전 지갑)</span><span class="section-sub">남은 예산 약 ₩${won(totKrwLeft)}</span></div>`+cards
-    +`<div class="hint" style="padding:4px 4px 0;font-size:11px">💡 여행지에서 <strong>＋ 비용 추가</strong>로 EUR·GBP 지출을 기록하면 위 <strong>잔액</strong>과 아래 <strong>일별 사용·잔액</strong>이 자동으로 줄어들어요.</div>`;
+    +`<div class="hint" style="padding:4px 4px 0;font-size:11px">💡 <strong>＋ 비용 추가</strong>에서 지불방식을 신한트래블/하나트래블로 선택해 EUR·GBP 지출을 기록하면 위 <strong>잔액</strong>과 아래 <strong>일별 사용·잔액</strong>이 자동으로 줄어들어요. 환전 내역을 펼치면 카드별로 구분해서 볼 수 있어요.</div>`;
 }
 
 /* ══════════════════ CHECKLIST (준비물) ══════════════════ */
@@ -6347,6 +6380,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 09-27b · 도슨트 10관</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 09-28 · 도슨트 10관</div>
 </body>
 </html>
