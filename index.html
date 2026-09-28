@@ -4285,9 +4285,17 @@ function saveSettings(){
 function downloadBlob(blob, name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 800); }
 function stamp(){ const d=new Date(); const p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`; }
 function buildPayload(){ return { app:'noleu-europe', version:1, exportedAt:new Date().toISOString(), addedActs, diary, settings, contacts, related, checklist, expenses, reserve:reserveState, actEdits, trhMine:trhMinePayload(), trhStamps:trhStampPayload() }; }
-function exportData(){
-  downloadBlob(new Blob([JSON.stringify(buildPayload(),null,2)], {type:'application/json'}), `noleu-europe-backup-${stamp()}.json`);
-  toast('백업 파일을 저장했어요 💾');
+async function exportData(){
+  // 네이버 등 인앱 브라우저는 <a download> 저장이 씹히는 경우가 있어, 되면 공유 시트(파일 앱·카톡 등)로 먼저 시도
+  const name = `noleu-europe-backup-${stamp()}.json`;
+  const file = new File([JSON.stringify(buildPayload(),null,2)], name, {type:'application/json'});
+  if(navigator.canShare && navigator.share){
+    try{
+      if(navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:'노을·타이거 유럽여행 백업'}); toast('📤 공유 창에서 저장할 곳(파일 앱 등)을 골라 주세요'); return; }
+    }catch(e){ if(e && e.name==='AbortError') return; }
+  }
+  downloadBlob(file, name);
+  toast('백업 파일을 저장했어요 💾 — 안 보이면 네이버 등 앱 안의 브라우저 대신 Safari에서 다시 시도해보세요');
 }
 function importData(ev){
   const file=ev.target.files[0]; if(!file) return;
