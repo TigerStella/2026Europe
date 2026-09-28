@@ -1321,6 +1321,8 @@
       <button class="btn btn-ghost" onclick="exportData()" title="일기·사진·추가일정 백업">💾 백업</button>
       <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()" title="이 파일로 전체 교체(덮어쓰기)">📥 복원(덮어쓰기)</button>
       <button class="btn btn-ghost" onclick="document.getElementById('mergeFile').click()" title="다른 기기 백업을 합쳐서 누적">🔀 합치기(누적)</button>
+      <button class="btn btn-ghost" onclick="openCopyBackup()" title="파일 다운로드가 안 될 때 — 같은 폰의 다른 앱으로 복사·붙여넣기">📋 복사해서 옮기기</button>
+      <button class="btn btn-ghost" onclick="openPasteMerge()" title="복사한 백업 글을 붙여넣어 합치기">📋 붙여넣기로 합치기</button>
       <button class="btn btn-ghost" onclick="openSync()" title="구글 드라이브 자동 동기화">☁️ 동기화</button>
       <button class="btn btn-ghost" onclick="openSettings()" title="브런치 문체·서명 설정">⚙️ 설정</button>
       <input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(event)">
@@ -4367,6 +4369,34 @@ function importMerge(ev){
   reader.readAsText(file);
 }
 
+// 📋 파일 다운로드·공유 시트가 모두 막힌 브라우저(일부 인앱 브라우저)를 위한 마지막 수단:
+// 같은 폰 안의 다른 앱(아이콘)으로 글자 그대로 복사→붙여넣기해서 옮기기
+function openCopyBackup(){
+  document.getElementById('copyBackupText').value = JSON.stringify(buildPayload());
+  document.getElementById('copyBackupStatus').textContent = '';
+  openModal('copyBackupModal');
+}
+async function copyBackupToClipboard(){
+  const ta=document.getElementById('copyBackupText'), status=document.getElementById('copyBackupStatus');
+  ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length);
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(ta.value); status.textContent='✅ 복사했어요! 이제 다른 앱에서 붙여넣기 해주세요.'; return; }
+    if(document.execCommand('copy')){ status.textContent='✅ 복사했어요! 이제 다른 앱에서 붙여넣기 해주세요.'; return; }
+    throw new Error('copy 실패');
+  }catch(e){ status.textContent='자동 복사가 안 돼요 — 위 글상자를 손가락으로 길게 눌러 "전체 선택" → "복사"를 직접 눌러 주세요.'; }
+}
+function openPasteMerge(){ document.getElementById('pasteMergeText').value=''; openModal('pasteMergeModal'); }
+function submitPasteMerge(){
+  const raw=(document.getElementById('pasteMergeText').value||'').trim();
+  if(!raw){ toast('붙여넣은 내용이 없어요'); return; }
+  let j; try{ j=JSON.parse(raw); }catch(e){ toast('올바른 백업 글이 아니에요 — 전체를 다 복사했는지 확인해 주세요'); return; }
+  if(!j || j.app!=='noleu-europe'){ toast('올바른 백업 글이 아니에요'); return; }
+  const added=mergeData(j);
+  rerenderAll();
+  closeModal('pasteMergeModal');
+  toast(`합쳤어요 · 새 항목 ${added}개 추가 ✅`);
+}
+
 /* ══════════════════ 구글 드라이브 동기화 ══════════════════ */
 const GD_FILE='noleu-europe-backup.json';
 const GD_CLIENT_ID_DEFAULT='937846650902-0utpnn5io9upe2tckbk93q6ue1k67e8c.apps.googleusercontent.com';
@@ -6316,6 +6346,33 @@ try{ gdriveInit(); }catch(e){}
 try{ trhLastViewInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
+<!-- 📋 백업 복사(다운로드가 안 될 때) MODAL -->
+<div class="modal-back" id="copyBackupModal" onclick="if(event.target===this)closeModal('copyBackupModal')">
+  <div class="modal" style="max-width:520px">
+    <h3>📋 복사해서 옮기기</h3>
+    <p class="hint" style="margin-bottom:10px">파일 다운로드가 안 될 때 쓰는 방법이에요. 아래 글상자를 <b>길게 눌러 전체 선택 → 복사</b>한 뒤, 옮겨 갈 앱(같은 폰의 다른 아이콘)에서 <b>📋 붙여넣기로 합치기</b>를 열어 붙여넣어 주세요.</p>
+    <textarea id="copyBackupText" readonly style="width:100%;box-sizing:border-box;min-height:160px;font-family:monospace;font-size:11px;padding:10px;border:1.5px solid var(--border);border-radius:10px" onclick="this.select()"></textarea>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="copyBackupToClipboard()">📋 복사하기</button>
+      <button class="btn btn-ghost" onclick="closeModal('copyBackupModal')">닫기</button>
+    </div>
+    <p class="hint" id="copyBackupStatus" style="margin-top:8px"></p>
+  </div>
+</div>
+
+<!-- 📋 붙여넣기로 합치기 MODAL -->
+<div class="modal-back" id="pasteMergeModal" onclick="if(event.target===this)closeModal('pasteMergeModal')">
+  <div class="modal" style="max-width:520px">
+    <h3>📋 붙여넣기로 합치기</h3>
+    <p class="hint" style="margin-bottom:10px">다른 앱(같은 폰의 다른 아이콘)에서 복사해 온 백업 글을 아래 상자에 <b>길게 눌러 붙여넣기</b>한 뒤 합치기를 눌러 주세요. 기존 기록은 지워지지 않고, 없는 것만 채워져요.</p>
+    <textarea id="pasteMergeText" placeholder="여기에 붙여넣기" style="width:100%;box-sizing:border-box;min-height:160px;font-family:monospace;font-size:11px;padding:10px;border:1.5px solid var(--border);border-radius:10px"></textarea>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="submitPasteMerge()">🔀 합치기</button>
+      <button class="btn btn-ghost" onclick="closeModal('pasteMergeModal')">닫기</button>
+    </div>
+  </div>
+</div>
+
 <!-- 흥미로운 이야기 MODAL -->
 <div class="modal-back" id="storyModal" onclick="if(event.target===this)closeModal('storyModal')">
   <div class="modal story-modal">
