@@ -865,6 +865,10 @@
   .trh-site.visited{ border-color:#C9803B; background:linear-gradient(180deg,#FFFBF0,#FFF6E4); }
   .trh-thumb{ flex:0 0 92px; width:92px; height:92px; border-radius:11px; overflow:hidden; display:flex; align-items:center; justify-content:center; text-align:center; color:#fff; position:relative; }
   .trh-thumb-emoji{ font-size:38px; filter:drop-shadow(0 2px 4px rgba(0,0,0,.25)); }
+  .trh-thumb img{ width:100%; height:100%; object-fit:cover; }
+  .trh-story-card .trh-site-desc{ display:none; }
+  .trh-story-imgs{ display:flex; gap:8px; overflow-x:auto; margin:4px 0 14px; -webkit-overflow-scrolling:touch; }
+  .trh-story-imgs img{ height:150px; border-radius:12px; flex:0 0 auto; cursor:zoom-in; }
   .trh-thumb-ph{ position:absolute; bottom:0; left:0; right:0; font-size:8px; line-height:1.2; padding:2px 3px; background:rgba(0,0,0,.32); color:#fff; }
   .trh-site-body{ flex:1; min-width:0; }
   .trh-site-name{ font-size:15px; font-weight:800; color:var(--trh-ink); line-height:1.25; }
@@ -5241,7 +5245,9 @@ function trhDcMerge(data){
     MUSEUMS[mk].docent = { audioMuseumId:m.id, visit:m.visit||null, caseTitle:m.caseTitle||'', caseBrief:m.caseBrief||'',
       rules:m.rules||[], routeNote:m.routeNote||'', intro:m.intro||null,
       tourMode:(m.tourMode && m.tourMode.on!==false) ? m.tourMode : null,
-      tracks:(data && data.meta && data.meta.tracks) || null, warning:m.warning||'', routeMap:m.routeMap||'' };
+      tracks:(data && data.meta && data.meta.tracks) || null, warning:m.warning||'', routeMap:m.routeMap||'',
+      stories:(m.stories||[]).map(s=>({ id:s.id, emoji:s.emoji||'📖', title:s.title||'', images:s.images||[],
+        audioScripts:s.audioScripts||{}, factCheck:s.factCheck||'' })) };
     const city = MUSEUMS[mk].city;
     const mSeq = trhDcMuseumSeq++;   // 도시 뷰 정렬용(박물관마다 겹치지 않게)
     (m.works || []).forEach(w=>{
@@ -5451,8 +5457,9 @@ function openMuseum(mk, opt){
   const comboBtn = `<button class="trh-btn ${allVisited?'trh-btn-gold':'trh-btn-ghost2'}" style="${allVisited?'':'opacity:.55'}" onclick="${allVisited?`startMuseumQuiz('${mk}')`:`toast('이 박물관의 모든 작품을 방문하면 종합 미션이 열려요!')`}">🧠 ${esc(m.name)} 종합 미션${best!==undefined?` · 최고 ${best}/${qn}`:''}</button>`;
   // 도슨트 박물관: [동선순 / 시대순] 토글(기본 동선순). 시대순은 기존 화면 그대로
   const hasDc = trhMuseumHasDocent(mk);
+  const hasStories = hasDc && MUSEUMS[mk].docent.stories && MUSEUMS[mk].docent.stories.length;
   const sort = hasDc ? (trhMuseumSort[mk] || 'route') : 'era';
-  const sortToggle = hasDc ? `<div class="trh-toggle"><button class="${sort==='route'?'on':''}" onclick="trhSetMuseumSort('${mk}','route')">🚶 동선순</button><button class="${sort==='era'?'on':''}" onclick="trhSetMuseumSort('${mk}','era')">🕰 시대순</button></div>` : '';
+  const sortToggle = hasDc ? `<div class="trh-toggle"><button class="${sort==='route'?'on':''}" onclick="trhSetMuseumSort('${mk}','route')">🚶 동선순</button><button class="${sort==='era'?'on':''}" onclick="trhSetMuseumSort('${mk}','era')">🕰 시대순</button>${hasStories?`<button class="${sort==='story'?'on':''}" onclick="trhSetMuseumSort('${mk}','story')">📚 더 자세한 이야기</button>`:''}</div>` : '';
 
   document.getElementById('trhMuseum').innerHTML = `
     <button class="trh-btn trh-btn-back" onclick="backToMuseumList()">← 박물관 목록으로</button>
@@ -5465,8 +5472,8 @@ function openMuseum(mk, opt){
     <div style="margin-bottom:14px">${comboBtn}</div>
     ${trhMineAddBtn(mk)}
     ${sortToggle}
-    ${sort==='route' ? trhDcRouteList(mk) : `<p class="hint">🕰 이 박물관 안에서는 <b>고대 → 중세 → 근대 → 현대</b> 순서로 정리했어요. (소장품이 없는 시대는 생략)</p>${periodHtml}`}
-    ${trhMineSectionHtml(mk)}
+    ${sort==='story' ? trhDcStoryList(mk) : (sort==='route' ? trhDcRouteList(mk) : `<p class="hint">🕰 이 박물관 안에서는 <b>고대 → 중세 → 근대 → 현대</b> 순서로 정리했어요. (소장품이 없는 시대는 생략)</p>${periodHtml}`)}
+    ${sort!=='story' ? trhMineSectionHtml(mk) : ''}
     ${trhDcBestHtml(mk)}
   `;
   if(!opt.keep) trhShow('trhMuseum');
@@ -5757,6 +5764,44 @@ function trhAudioBtn(path, label){
   if(!trhDcAudioSet.has(path)) return `<button class="trh-dc-btn trh-audio-btn" disabled><span>🔇 ${esc(label)}</span><span class="st">음성 준비 중</span></button>`;
   return `<button class="trh-dc-btn trh-audio-btn" data-audio="${esc(path)}" onclick="event.stopPropagation();trhAudioToggle('${path}')"><span>🎧 ${esc(label)}</span><span class="st">▶ 듣기</span></button>`;
 }
+
+/* ── 📚 더 자세한 이야기 — 미션·도장과 별개, 박물관 현장에서 읽은 안내판을 아이 눈높이로 풀어 준 읽을거리 ── */
+function trhStoryAudioPath(mk, storyId, track){ const amid=MUSEUMS[mk].docent.audioMuseumId; return `audio/${amid}/${storyId}_${track}.mp3`; }
+function trhDcStoryList(mk){
+  const stories = (MUSEUMS[mk].docent.stories) || [];
+  if(!stories.length) return '<p class="hint">아직 이 박물관의 더 자세한 이야기가 없어요.</p>';
+  return `<p class="hint" style="font-size:14px">📚 미션 카드와는 별개예요 — 도장이나 퀴즈는 없고, 그냥 읽고 들으면서 더 깊이 알아보는 코너예요.</p>`
+    + stories.map(s=>`<div class="trh-site trh-story-card" onclick="trhOpenStory('${mk}','${s.id}')">
+        <div class="trh-thumb" style="background:${trhGrad(MUSEUMS[mk].city)}">${s.images && s.images[0] ? `<img src="${esc(s.images[0])}" alt="" loading="lazy">` : `<span class="trh-thumb-emoji">${s.emoji}</span>`}</div>
+        <div class="trh-site-body">
+          <div class="trh-site-name">${s.emoji} ${esc(s.title)}</div>
+          <div class="trh-site-foot"><span class="trh-chip trh-chip-badge">📖 읽고 듣기</span></div>
+        </div>
+      </div>`).join('');
+}
+let trhCurStory = null;
+function trhOpenStory(mk, storyId){
+  const s = (MUSEUMS[mk].docent.stories||[]).find(x=>x.id===storyId); if(!s) return;
+  trhCurStory = {mk, storyId};
+  const tracks = Object.keys(s.audioScripts).filter(k=>String(s.audioScripts[k]||'').trim());
+  const imgs = (s.images||[]).map(src=>`<img src="${esc(src)}" alt="" onclick="event.stopPropagation();viewImage(this.src)">`).join('');
+  const anyReady = tracks.some(t=>trhDcAudioSet.has(trhStoryAudioPath(mk, s.id, t)));
+  document.getElementById('trhStoryBody').innerHTML = `
+    <button class="story-x" onclick="trhCloseStory()" aria-label="닫기">✕</button>
+    <h3>${s.emoji} ${esc(s.title)}</h3>
+    ${imgs ? `<div class="trh-story-imgs">${imgs}</div>` : ''}
+    <div class="trh-dc-sec">
+      ${tracks.map(t=>trhAudioBtn(trhStoryAudioPath(mk, s.id, t), trhDcTrackLabel({tracks:MUSEUMS[mk].docent.tracks}, t))).join('')}
+      ${anyReady ? `<div class="trh-rate">속도 ${[0.9,1,1.2].map(r=>`<button data-rate="${r}" onclick="trhSetRate(${r})">${r===1?'1.0':r}×</button>`).join('')}</div>` : `<p class="trh-small">🔇 음성을 준비하고 있어요. 그동안 아래 글을 읽어 줘도 좋아요</p>`}
+      <details class="trh-script" ${anyReady?'':'open'}><summary>📄 이야기 읽기</summary>${tracks.map(t=>`<p>${esc(s.audioScripts[t]).replace(/\n/g,'<br>')}</p>`).join('')}</details>
+    </div>
+    ${trhMom && s.factCheck ? `<div class="trh-fact">🔍 사실 확인(엄마용): ${esc(s.factCheck)}</div>` : ''}
+  `;
+  openModal('trhStoryModal');
+  trhAudioUi();
+  trhPrepareAudio(tracks.map(t=>trhStoryAudioPath(mk, s.id, t)));
+}
+function trhCloseStory(){ trhAudioStop(); closeModal('trhStoryModal'); trhCurStory=null; }
 
 /* ── 사진: IndexedDB(trapble_history_photos) ── */
 let trhDbP = null; const trhPhotoUrls = {};
@@ -6346,6 +6391,11 @@ try{ gdriveInit(); }catch(e){}
 try{ trhLastViewInit(); }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
+<!-- 📚 더 자세한 이야기(미션과 별개) MODAL -->
+<div class="modal-back" id="trhStoryModal" onclick="if(event.target===this)trhCloseStory()">
+  <div class="modal story-modal" id="trhStoryBody"></div>
+</div>
+
 <!-- 📋 백업 복사(다운로드가 안 될 때) MODAL -->
 <div class="modal-back" id="copyBackupModal" onclick="if(event.target===this)closeModal('copyBackupModal')">
   <div class="modal" style="max-width:520px">

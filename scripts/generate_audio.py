@@ -166,6 +166,10 @@ async def run_all(files: list[str], force: bool) -> None:
                 for track, text in w.get("audioScripts", {}).items():
                     if text.strip():
                         jobs.append((text, OUT / mid / f"{w['id']}_{track}.mp3"))
+            for s in m.get("stories", []):   # 📚 더 자세한 이야기(미션과 별개) — 같은 규칙으로 생성
+                for track, text in s.get("audioScripts", {}).items():
+                    if text.strip():
+                        jobs.append((text, OUT / mid / f"{s['id']}_{track}.mp3"))
             await asyncio.gather(*(job(t, p) for t, p in jobs))
             manifest[mid] = [str(p).replace("\\", "/") for _, p in jobs]
 
