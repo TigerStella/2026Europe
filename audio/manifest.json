@@ -1,21 +1,21 @@
 {
   "orsay": [
     "audio/orsay/intro.mp3",
-    "audio/orsay/orsay-clock_1.mp3",
-    "audio/orsay/orsay-clock_2.mp3",
+    "audio/orsay/orsay-renoir-absent_1.mp3",
     "audio/orsay/orsay-saint-lazare_1.mp3",
     "audio/orsay/orsay-saint-lazare_2.mp3",
-    "audio/orsay/orsay-dejeuner_1.mp3",
-    "audio/orsay/orsay-dejeuner_2.mp3",
-    "audio/orsay/orsay-little-dancer_1.mp3",
-    "audio/orsay/orsay-little-dancer_2.mp3",
-    "audio/orsay/orsay-vangogh-selfportrait_1.mp3",
-    "audio/orsay/orsay-vangogh-selfportrait_2.mp3",
     "audio/orsay/orsay-starry-rhone_1.mp3",
     "audio/orsay/orsay-starry-rhone_2.mp3",
+    "audio/orsay/orsay-vangogh-selfportrait_1.mp3",
+    "audio/orsay/orsay-vangogh-selfportrait_2.mp3",
+    "audio/orsay/orsay-dejeuner_1.mp3",
+    "audio/orsay/orsay-dejeuner_2.mp3",
+    "audio/orsay/orsay-clock_1.mp3",
+    "audio/orsay/orsay-clock_2.mp3",
+    "audio/orsay/orsay-little-dancer_1.mp3",
+    "audio/orsay/orsay-little-dancer_2.mp3",
     "audio/orsay/orsay-pompon-bear_1.mp3",
-    "audio/orsay/orsay-pompon-bear_2.mp3",
-    "audio/orsay/orsay-renoir-absent_1.mp3"
+    "audio/orsay/orsay-pompon-bear_2.mp3"
   ],
   "orangerie": [
     "audio/orangerie/intro.mp3",
