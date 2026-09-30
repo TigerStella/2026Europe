@@ -966,6 +966,7 @@
   .trh-chip-oaudio{ background:#FFE7D1; color:#B04A00; font-weight:800; }
   .trh-chip-badge{ background:#EAF6EC; color:#236B34; }
   .trh-time-group{ font-size:14px; font-weight:800; color:#1F4F86; background:#E8F1FB; border-radius:10px; padding:7px 12px; margin:14px 0 8px; }
+  .trh-floor-group{ font-size:15px; font-weight:900; color:#7A3E1D; background:#FBE9D6; border-radius:10px; padding:9px 12px; margin:18px 0 8px; }
   .trh-dc-warn{ background:#FFF1E6; border:1.5px solid #F2B27A; color:#8A3B00; border-radius:12px; padding:10px 12px; font-size:15px; font-weight:800; margin-bottom:10px; }
   .trh-dc-next{ color:#1F4F86 !important; font-weight:700; }
   .trh-dc{ font-size:16px; line-height:1.7; }
@@ -5071,6 +5072,7 @@ const TRH_AUDIO_CACHE = 'trapble-history-audio-v2';                 // sw.js가 
 const TRH_DC_MERGE_ID = {
   'british-rosetta':'rosetta', 'british-assyria':'lamassu', 'british-mummy':'mummy', 'british-parthenon':'parthenon',
   'orsay-dejeuner':'luncheon-grass', 'orsay-starry-rhone':'starry-rhone',
+  'orsay-millet-gleaners':'gleaners', 'orsay-millet-angelus':'angelus', 'orsay-degas-dance-class':'ballet',
   'ng-arnolfini':'arnolfini', 'ng-hay-wain':'haywain', 'ng-temeraire':'temeraire', 'ng-sunflowers-absent':'sunflowers',
   'louvre-venus-milo':'venus-milo', 'louvre-nike':'nike', 'louvre-mona-lisa':'mona-lisa', 'louvre-liberty':'liberty', 'louvre-hammurabi':'hammurabi',
   'uffizi-annunciation':'annunciation', 'uffizi-duke-urbino':'duke-urbino', 'uffizi-primavera':'primavera', 'uffizi-birth-venus':'birth-venus',
@@ -5264,7 +5266,7 @@ function trhDcMerge(data){
         photoMission:w.photoMission||'', memoryMission:w.memoryMission||'',
         joseon:w.joseon||'', world:w.world||'', links:w.links||[], factCheck:w.factCheck||'', bonus:!!w.bonus,
         tracks:MUSEUMS[mk].docent.tracks, targetTime:w.targetTime||'', officialAudio:w.officialAudio==null?'':String(w.officialAudio),
-        officialAudioLen:w.officialAudioLen||'', toNext:w.toNext||'', badge:[].concat(w.badge||[]) };
+        officialAudioLen:w.officialAudioLen||'', toNext:w.toNext||'', badge:[].concat(w.badge||[]), floorLabel:w.floorLabel||'' };
       const existing = trhSite(TRH_DC_MERGE_ID[w.id] || w.id);
       if(existing){ existing.docent = dc; return; }   // 기존 필드 유지 + 신규 필드만 추가
       const sup = TRH_DC_SUPPLEMENT[w.id] || {};
@@ -6261,8 +6263,12 @@ function trhDcRouteList(mk){
   const route=sites.filter(s=>s.docent).sort((a,b)=>a.docent.order-b.docent.order);
   const rest=sites.filter(s=>!s.docent);
   // 같은 목표 시각이 이어지는 카드는 "⏰ 시간대 · n~m번" 소제목으로 묶음(targetTime이 있는 박물관만)
-  let body='';
+  // 같은 floorLabel이 이어지는 카드는 층 구분 제목줄로 묶음(floorLabel이 있는 박물관만)
+  let body='', lastFloor=null;
   for(let i=0;i<route.length;){
+    const fl=route[i].docent.floorLabel;
+    if(fl && fl!==lastFloor){ body += `<div class="trh-floor-group">${esc(fl)}</div>`; }
+    if(fl) lastFloor=fl;
     const tt=route[i].docent.targetTime; let j=i+1;
     if(tt) while(j<route.length && route[j].docent.targetTime===tt) j++;
     const grp=route.slice(i,j);
@@ -6502,6 +6508,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 09-29 · 도슨트 10관</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 09-30 · 오르세 동선 개편</div>
 </body>
 </html>
