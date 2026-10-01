@@ -6296,8 +6296,8 @@ function trhDocentCard(s){
   const stamp = visited ? `<span class="trh-chip trh-chip-stamp">✓ 방문 완료</span>${g?`<span class="trh-chip trh-chip-medal">${TRH_GRADE[g].icon} ${TRH_GRADE[g].label}</span>`:''}` : `<span class="trh-chip trh-chip-todo">🎫 도장 미획득</span>`;
   const qchip = (s.quiz && s.quiz.length) ? `<span class="trh-chip trh-chip-quiz">❓ 퀴즈 ${s.quiz.length}문제</span>` : '';
   const bonus = dc.bonus ? `<span class="trh-chip trh-chip-medal">⭐ 보너스 단서</span>` : '';
-  return `<div class="trh-site trh-dcard ${visited?'visited':''} ${eff==='absent'?'dc-absent':''}" onclick="openSiteDetail('${s.id}')">
-    ${dc.tip ? `<div class="trh-dc-note" style="margin:0 0 6px">💡 ${esc(dc.tip)}</div>` : ''}
+  return `${dc.tip ? `<div class="trh-dc-note" style="margin:10px 0 6px">💡 ${esc(dc.tip)}</div>` : ''}
+  <div class="trh-site trh-dcard ${visited?'visited':''} ${eff==='absent'?'dc-absent':''}" onclick="openSiteDetail('${s.id}')">
     <div class="trh-thumb" data-photo-site="${s.id}" style="background:${trhGrad(s.city)}"><span class="trh-order">${dc.order}</span><span class="trh-thumb-emoji">${s.emoji}</span></div>
     <div class="trh-site-body">
       <div class="trh-site-name">${esc(s.name)}</div>
