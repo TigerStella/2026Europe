@@ -1870,7 +1870,7 @@ const DAYS = [
       {ic:'🚇', t:'1호선으로 콩코드 이동', time:'10:45', endTime:'11:00',
         nav:{from:'Charles de Gaulle–Étoile, Paris', to:'Concorde, Paris', mode:'walking'} },
       {ic:'🌳', t:'튈르리 정원 산책', time:'11:00', endTime:'11:55'},
-      {ic:'🖼️', t:'★오랑주리 미술관 — 모네 특별전 "Peindre le temps" 포함', time:'12:00', endTime:'12:45', status:'confirmed'},
+      {ic:'🖼️', t:'★오랑주리 미술관 — 모네 특별전 "Peindre le temps" 포함', time:'12:00', endTime:'13:20', status:'confirmed'},
       {ic:'🚶', t:'도보 이동 (오르세역 방향)', time:'12:45', endTime:'13:05',
         nav:{from:"Musée de l'Orangerie, Paris", to:"Gare d'Orsay, Paris", mode:'walking'} },
       {ic:'🚆', t:'RER C로 숙소 복귀', time:'13:05', endTime:'13:20',
@@ -5253,6 +5253,7 @@ function trhDcMerge(data){
       rules:m.rules||[], routeNote:m.routeNote||'', intro:m.intro||null,
       tourMode:(m.tourMode && m.tourMode.on!==false) ? m.tourMode : null,
       tracks:(data && data.meta && data.meta.tracks) || null, warning:m.warning||'', routeMap:m.routeMap||'',
+      schedule:m.schedule||null, progressTotal:m.progressTotal||0, bestPrompt:m.bestPrompt||'',
       stories:(m.stories||[]).map(s=>({ id:s.id, emoji:s.emoji||'📖', title:s.title||'', images:s.images||[],
         audioScripts:s.audioScripts||{}, factCheck:s.factCheck||'' })) };
     const city = MUSEUMS[mk].city;
@@ -5264,7 +5265,8 @@ function trhDcMerge(data){
         photoMission:w.photoMission||'', memoryMission:w.memoryMission||'',
         joseon:w.joseon||'', world:w.world||'', links:w.links||[], factCheck:w.factCheck||'', bonus:!!w.bonus,
         tracks:MUSEUMS[mk].docent.tracks, targetTime:w.targetTime||'', officialAudio:w.officialAudio==null?'':String(w.officialAudio),
-        officialAudioLen:w.officialAudioLen||'', toNext:w.toNext||'', badge:[].concat(w.badge||[]) };
+        officialAudioLen:w.officialAudioLen||'', toNext:w.toNext||'', badge:[].concat(w.badge||[]),
+        groupLabel:w.groupLabel||'', guideApp:w.guideApp||'', tip:w.tip||'' };
       const existing = trhSite(TRH_DC_MERGE_ID[w.id] || w.id);
       if(existing){ existing.docent = dc; return; }   // 기존 필드 유지 + 신규 필드만 추가
       const sup = TRH_DC_SUPPLEMENT[w.id] || {};
@@ -6218,11 +6220,23 @@ function trhDcMuseumHeader(mk){
   const v=d.visit;
   const visitTxt = v ? `🗓 방문 ${trhFmtDate(v.date)} ${v.time||''}${v.type?` · ${v.type}`:''}${v.budgetMin?` · 약 ${v.budgetMin}분`:''}` : '';
   const introPath = d.intro ? (d.intro.audio || `audio/${d.audioMuseumId}/intro.mp3`) : '';
+  const schedTxt = (d.schedule||[]).map(s=>`${esc(s.label)} ${esc(s.time)}`).join(' · ');
+  let progHtml = '';
+  if(d.progressTotal){
+    const done = trhMuseumSites(mk).filter(s=>s.docent && !s.docent.bonus && trhVisited[s.id]).length;
+    const pct = Math.round(done/d.progressTotal*100);
+    progHtml = `<div class="trh-overall" style="margin:10px 0">
+      <div class="trh-overall-head"><span>🧭 미션 진행</span><span>${done} / ${d.progressTotal}점 · ${pct}%</span></div>
+      <div class="trh-bar"><div class="trh-bar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }
   return `<div class="trh-case">
       <div class="trh-case-label">🕵️ 사건 파일 · CASE FILE</div>
       <div class="trh-case-title">${esc(d.caseTitle)}</div>
       <div class="trh-case-brief">${esc(d.caseBrief)}</div>
       ${visitTxt?`<div class="trh-visit">${esc(visitTxt)}</div>`:''}
+      ${schedTxt?`<div class="trh-visit">⏰ ${schedTxt}</div>`:''}
+      ${progHtml}
       ${d.intro && d.intro.script ? `<div class="trh-case-audio">${trhAudioBtn(introPath, '인트로 — 도슨트 형의 첫인사')}</div>` : ''}
     </div>
     ${d.warning ? `<div class="trh-dc-warn">⚠️ ${esc(d.warning)}</div>` : ''}
@@ -6244,6 +6258,7 @@ function trhDocentCard(s){
   const qchip = (s.quiz && s.quiz.length) ? `<span class="trh-chip trh-chip-quiz">❓ 퀴즈 ${s.quiz.length}문제</span>` : '';
   const bonus = dc.bonus ? `<span class="trh-chip trh-chip-medal">⭐ 보너스 단서</span>` : '';
   return `<div class="trh-site trh-dcard ${visited?'visited':''} ${eff==='absent'?'dc-absent':''}" onclick="openSiteDetail('${s.id}')">
+    ${dc.tip ? `<div class="trh-dc-note" style="margin:0 0 6px">💡 ${esc(dc.tip)}</div>` : ''}
     <div class="trh-thumb" data-photo-site="${s.id}" style="background:${trhGrad(s.city)}"><span class="trh-order">${dc.order}</span><span class="trh-thumb-emoji">${s.emoji}</span></div>
     <div class="trh-site-body">
       <div class="trh-site-name">${esc(s.name)}</div>
@@ -6251,6 +6266,7 @@ function trhDocentCard(s){
       ${eff!=='absent' && dc.location ? `<div class="trh-dc-loc">📍 ${esc(dc.location)}</div>` : ''}
       ${dc.joseon ? `<div class="trh-dc-line">🇰🇷 ${esc(dc.joseon)}</div>` : ''}
       ${dc.world ? `<div class="trh-dc-line">🌍 ${esc(dc.world)}</div>` : ''}
+      ${dc.guideApp ? `<div class="trh-dc-line">🎧 오디오 가이드 앱: ${esc(dc.guideApp)}</div>` : ''}
       ${dc.toNext ? `<div class="trh-dc-line trh-dc-next">➡️ 다음: ${esc(dc.toNext)}</div>` : ''}
       <div class="trh-site-foot">${trhDcExtraChips(dc)}${bonus}${st}${stamp}${qchip}</div>
     </div>
@@ -6260,18 +6276,21 @@ function trhDcRouteList(mk){
   const sites=trhMuseumSites(mk);
   const route=sites.filter(s=>s.docent).sort((a,b)=>a.docent.order-b.docent.order);
   const rest=sites.filter(s=>!s.docent);
-  // 같은 목표 시각이 이어지는 카드는 "⏰ 시간대 · n~m번" 소제목으로 묶음(targetTime이 있는 박물관만)
+  // 묶음 소제목: groupLabel(커스텀 문구)이 있으면 그대로 표시, 없으면 기존처럼 targetTime으로 "⏰ 시간대 · n~m번" 자동 생성
   let body='';
   for(let i=0;i<route.length;){
-    const tt=route[i].docent.targetTime; let j=i+1;
-    if(tt) while(j<route.length && route[j].docent.targetTime===tt) j++;
+    const gl=route[i].docent.groupLabel, tt=route[i].docent.targetTime; const key=gl||tt; let j=i+1;
+    if(key) while(j<route.length && (route[j].docent.groupLabel||route[j].docent.targetTime)===key) j++;
     const grp=route.slice(i,j);
-    if(tt) body += `<div class="trh-time-group">⏰ ${esc(tt)} · ${grp.length>1?`${grp[0].docent.order}~${grp[grp.length-1].docent.order}번`:`${grp[0].docent.order}번`}</div>`;
+    if(gl) body += `<div class="trh-time-group">${esc(gl)}</div>`;
+    else if(tt) body += `<div class="trh-time-group">⏰ ${esc(tt)} · ${grp.length>1?`${grp[0].docent.order}~${grp[grp.length-1].docent.order}번`:`${grp[0].docent.order}번`}</div>`;
     body += grp.map(trhDocentCard).join(''); i=j;
   }
+  const bp = MUSEUMS[mk].docent.bestPrompt;
   return `<p class="hint" style="font-size:14px">🚶 도슨트 형이 짠 <b>관람 순서</b>예요. 번호대로 찾아가며 도장을 모아요!</p>`
     + body
-    + (rest.length ? `<div class="trh-section-label" style="margin-top:18px">➕ 시간이 남으면 더 볼 작품</div>${rest.map(trhSiteCard).join('')}` : '');
+    + (rest.length ? `<div class="trh-section-label" style="margin-top:18px">➕ 시간이 남으면 더 볼 작품</div>${rest.map(trhSiteCard).join('')}` : '')
+    + (bp ? `<div class="trh-dc-note" style="margin-top:14px">🏆 ${esc(bp)}</div>` : '');
 }
 function trhDcBestHtml(mk){
   if(!(MUSEUMS[mk] && MUSEUMS[mk].docent) || !trhDcRouteComplete(mk)) return '';
@@ -6309,9 +6328,10 @@ function trhDcPanel(s){
     h += `<div class="trh-dc-status absent"><b>🧳 이 그림은 지금 출장 중!</b><p>${esc(dc.hints[0] || '음성으로 사라진 이유를 들어 보고, 퀴즈로 도장을 받아요.')}</p></div>`;
   }
   if(trhMom && dc.statusNote) h += `<div class="trh-fact">📌 상태 메모: ${esc(dc.statusNote)}</div>`;
+  if(dc.tip) h += `<div class="trh-dc-note">💡 ${esc(dc.tip)}</div>`;
   // 위치 · 힌트
   const xc=trhDcExtraChips(dc); if(xc) h += `<div class="trh-site-foot" style="margin:0 0 10px">${xc}</div>`;
-  if(eff!=='absent' && dc.location) h += `<div class="trh-dc-sec"><h4>📍 어디에 있을까?</h4><p>${esc(dc.location)}</p>${dc.toNext?`<p class="trh-dc-next">➡️ 다음 장소: ${esc(dc.toNext)}</p>`:''}</div>`;
+  if(eff!=='absent' && dc.location) h += `<div class="trh-dc-sec"><h4>📍 어디에 있을까?</h4><p>${esc(dc.location)}</p>${dc.guideApp?`<p class="trh-dc-line">🎧 오디오 가이드 앱: ${esc(dc.guideApp)}</p>`:''}${dc.toNext?`<p class="trh-dc-next">➡️ 다음 장소: ${esc(dc.toNext)}</p>`:''}</div>`;
   if(eff!=='absent' && dc.hints.length) h += trhDcHints(s);
   // 음성(absent는 1트랙만)
   const tracks = Object.keys(dc.audioScripts).filter(k=>String(dc.audioScripts[k]||'').trim()).filter(k=>eff!=='absent' || k==='1');
