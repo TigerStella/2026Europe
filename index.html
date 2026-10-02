@@ -4835,12 +4835,26 @@ const PERIOD_CAT_LABEL = { ancient:'🏺 고대', medieval:'🏰 중세', modern
 const TRH_CITY_ERA = {
   london:   '고대 문명 컬렉션 · 산업혁명 · 대영제국',
   paris:    '르네상스 · 절대왕정 · 프랑스혁명 · 나폴레옹',
-  munich:   '바이에른 왕국 · 중세 도시 · 20세기의 기억',
+  munich:   '옥토버페스트 · 구시가지 셀프 워킹투어',
   florence: '르네상스의 요람',
   rome:     '고대 로마 제국 · 르네상스의 정점',
 };
 // 도시별 스탬프 모티프(여권 도장 느낌)
 const TRH_CITY_STAMP = { london:'🎡', paris:'🗼', munich:'🍺', florence:'🌸', rome:'🏛' };
+// 셀프 워킹투어 코스가 있는 도시만(현재 뮌헨) — 축제 카드 분리 표시·코스 띠·갈림길 박스·➕ 내가 찾은 장소를 켠다
+const TRH_CITY_WALKROUTE = {
+  munich: {
+    banner: '🗺 셀프 워킹투어 코스: 칼스플라츠 → 성 미하엘 교회 → 성모 성당 → 마리엔 광장 → 오데온 광장 → 국립극장 → 호프브로이하우스 (총 약 2.5시간, 순수 도보 약 30분)',
+    festivalIds: ['oktoberfest'],
+    fork: {
+      title: '🧭 오늘의 갈림길',
+      options: [
+        'A) 컨디션 좋으면 → 호프브로이하우스 뒤 레지덴츠 정원(호프가르텐) 산책',
+        'B) 지치면 → Marienplatz역(U3/U6)으로 숙소 복귀',
+      ],
+    },
+  },
+};
 
 // ── 사이트 데이터 (city → order=시대순) ──
 // fields: id, city, order(시대순), era, name, by(작가/건립), place, sig(교과서 연결·HTML), kid(11세 설명),
@@ -4945,29 +4959,74 @@ const HISTORY_SITES = [
     kid:'발레 공연이 아니라, 무대 뒤 「연습 시간」의 발레리나들을 그린 그림이야. 드가는 완벽한 공연 대신, 지치고 자세를 고치고 하품하는 진짜 연습 장면을 즐겨 그렸어. 마치 몰래 훔쳐본 것처럼 자연스럽지. 인상주의 화가들은 이렇게 「평범한 일상의 한순간」을 좋아했어.',
     quiz:[{q:'드가가 이 그림에서 그린 장면은?', opts:['화려한 공연','발레 연습','전쟁'], a:1, why:'무대 뒤 발레 연습의 자연스러운 순간을 그렸어.'}] },
 
-  /* ════════ 뮌헨 (동선 3) · 전량 신규 리서치 ════════ */
-  { id:'marienplatz', city:'munich', order:10, era:'중세~근대 독일 도시', name:'마리엔플라츠 & 신 시청사', by:'광장 1158년 · 신 시청사 1867~1908년', place:'뮌헨 (장소)', emoji:'🏙',
-    source:'https://ko.wikipedia.org/wiki/마리엔_광장',
+  /* ════════ 뮌헨 (동선 3) · 셀프 워킹투어 7곳 + 옥토버페스트 ════════ */
+  { id:'oktoberfest', city:'munich', order:5, era:'옥토버페스트 · 구시가지 셀프 워킹투어', name:'옥토버페스트 (테레지엔비제)', by:'1810년 시작 · 2026년 제191회 (9/19~10/4)', place:'테레지엔비제, 뮌헨 (장소)', emoji:'🎡',
+    festival:true,
+    source:'https://www.oktoberfest.de/en',
+    sig:'세계 최대 민속 축제, <b>바이에른 왕실 결혼식</b>에서 시작 — 「근대 유럽·왕정과 민속 문화」와 연결돼요.',
+    kid:'1810년, 바이에른의 루트비히 왕세자와 테레제 공주의 결혼을 축하하려고 뮌헨 시민 모두를 초대한 큰 잔치가 있었어. 그때 경마 경기를 연 들판에 공주 이름을 붙여 「테레지엔비제(테레제의 풀밭)」라고 불렀지. 잔치가 너무 즐거워서 해마다 다시 열렸고, 지금은 전 세계에서 수백만 명이 오는 축제가 됐어. 맥주 텐트 말고도 대관람차, 회전목마, 진저브레드 하트 과자가 가득해!',
+    tip:'입장 무료 · 놀이기구·음식 개별 요금 · 대형 텐트 정문은 오후 4~6시 예약 교대로 닫히는 경우 많음(공식) · 사람 많으니 만날 장소 미리 정하기 · 2026년 축제 마지막 날은 10/4(일)',
+    nav:{to:'Theresienwiese, München', mode:'transit'},
+    quiz:[{q:'테레지엔비제라는 이름은 누구에게서 왔을까?', opts:['테레제 공주','맥주 회사','축구 선수'], a:0, why:'1810년 결혼한 테레제 공주의 이름을 딴 거야.'}] },
+  { id:'karlsplatz', city:'munich', order:10, era:'옥토버페스트 · 구시가지 셀프 워킹투어', name:'칼스플라츠 (카를스토어)', by:'중세 성문 · 1791년 광장 조성', place:'뮌헨 (장소)', emoji:'🚪',
+    walk:'출발점', stay:'10분',
+    source:'https://de.wikipedia.org/wiki/Karlstor',
+    sig:'중세 뮌헨을 둘러싼 <b>성벽의 성문</b> — 「중세 유럽 도시·성곽」과 연결돼요.',
+    kid:'옛날 뮌헨은 적을 막으려고 도시 전체를 높은 성벽으로 둘렀어. 카를스토어는 그 성벽에 난 문 중 하나야. 이 문을 지나면 바로 보행자 거리가 시작되는데, 중세 사람들도 이 길로 시장에 물건을 팔러 들어왔대. 문을 지나가면서 "지금 성 안으로 들어간다!"라고 상상해 봐.',
+    tip:'투어 시작점. 근처 분수 앞에서 출발 인증샷 찍기.',
+    nav:{to:'Karlsplatz, München', mode:'walking'},
+    quiz:[{q:'카를스토어는 원래 무엇의 일부였을까?', opts:['도시 성벽','기차역','궁전 정원'], a:0, why:'중세 뮌헨을 둘러싼 도시 성벽의 성문이었어.'}] },
+  { id:'st-michael', city:'munich', order:20, era:'옥토버페스트 · 구시가지 셀프 워킹투어', name:'성 미하엘 교회', by:'1583~1597년 · 예수회 교회', place:'뮌헨 (장소)', emoji:'⛪',
+    walk:'도보 3분', stay:'20분',
+    source:'https://www.muenchen.de/en/sights/churches/jesuit-church-st-michael-germanys-first-renaissance-church',
+    note:'지하 묘소 개방 시간은 일요일·공휴일 휴무를 포함해 변동이 있어 현장 확인이 필요해요.',
+    sig:'알프스 북쪽 <b>최대 규모의 르네상스 교회</b>, 비텔스바흐 왕가 지하 묘소 — 「종교개혁과 반종교개혁」과 연결돼요.',
+    kid:'약 450년 전, 유럽은 종교 때문에 크게 갈라졌어. 바이에른 공작은 가톨릭을 지키겠다는 뜻으로 이 거대한 교회를 지었지. 천장이 기둥 없이 둥글게 이어진 게 특징이라 안에 들어가면 엄청 넓게 느껴져. 지하에는 「동화 속 성」 노이슈반슈타인을 지은 루트비히 2세 왕이 잠들어 있어.',
+    tip:'정면 벽에 바이에른 통치자 조각상 15개가 있어요. 함께 세어 보세요. 지하 묘소는 성인 €3 / 11~17세 €1이고, 일요일·공휴일에는 닫아요(10/3 독일 통일의 날 포함). 묘소 개방 시간은 확인이 필요해요(현장 안내판).',
+    nav:{from:'Karlsplatz, München', to:'St. Michael, Neuhauser Str. 6, München', mode:'walking'},
+    quiz:[{q:'이 교회 지하에 잠든, 노이슈반슈타인 성을 지은 왕은?', opts:['루트비히 2세','나폴레옹','카를 대제'], a:0, why:'동화 속 성 노이슈반슈타인을 지은 루트비히 2세 왕이 이곳에 잠들어 있어.'}] },
+  { id:'frauenkirche', city:'munich', order:30, era:'옥토버페스트 · 구시가지 셀프 워킹투어', name:'성모 성당 (프라우엔키르헤)', by:'1468~1488년 · 쌍둥이 탑', place:'뮌헨 (장소)', emoji:'🕍',
+    walk:'도보 5분', stay:'30분',
+    source:'https://de.wikipedia.org/wiki/Frauenkirche_(München)',
+    sig:'뮌헨의 상징인 <b>양파 모양 쌍둥이 탑</b>, 후기 고딕 붉은 벽돌 성당 — 「중세 유럽 크리스트교 문화」와 연결돼요.',
+    kid:'뮌헨 어디서나 보이는 초록 둥근 지붕 두 개가 바로 이 성당의 탑이야. 그래서 뮌헨에서는 이 탑보다 높은 건물을 짓지 않기로 정한 적도 있대. 입구 바닥에는 「악마의 발자국」이 찍혀 있다는 전설이 있어. 악마가 창문이 하나도 안 보이는 자리에 서서 "창문 없는 성당이네!" 하고 비웃다가, 앞으로 나와 보고 창문이 가득한 걸 알자 화가 나서 발을 굴렀다는 이야기야.',
+    tip:'입구 안쪽 바닥에서 「악마의 발자국」을 찾아보세요.',
+    nav:{from:'St. Michael, Neuhauser Str. 6, München', to:'Frauenkirche, München', mode:'walking'},
+    quiz:[{q:'입구 바닥에 남아 있다는 전설의 자국은?', opts:['악마의 발자국','용의 발톱','왕의 손도장'], a:0, why:'악마가 화가 나서 발을 굴렀다는 전설 속 발자국이야.'}] },
+  { id:'marienplatz', city:'munich', order:40, era:'옥토버페스트 · 구시가지 셀프 워킹투어', name:'마리엔 광장 & 신 시청사', by:'광장 1158년 · 신 시청사 1867~1908년', place:'뮌헨 (장소)', emoji:'🏙',
+    walk:'도보 3분', stay:'30분',
+    source:'https://www.muenchen.de/en/sights/munich-glockenspiel',
     note:'광장·시청사의 건립 연도는 자료마다 다르게 표기돼요.',
-    sig:'뮌헨의 중심 광장, <b>중세 도시</b>의 발전과 글로켄슈필 — 「중세 유럽 도시·상업」과 연결돼요.',
-    kid:'뮌헨의 심장 같은 중앙 광장이야. 800여 년 전 중세 때부터 시장과 축제가 열리던 곳이지. 광장에 우뚝 선 「신 시청사」는 뾰족뾰족한 고딕 양식으로 지어졌는데, 매일 정해진 시간에 시계탑의 인형들이 음악에 맞춰 빙글빙글 도는 「글로켄슈필」 공연을 해. 중세 도시가 어떻게 사람들이 모이는 중심이 됐는지 느낄 수 있어.',
+    sig:'뮌헨의 중심 광장과 <b>글로켄슈필</b> — 「중세 유럽 도시·상업」과 연결돼요.',
+    kid:'뮌헨의 심장 같은 중앙 광장이야. 800여 년 전 중세 때부터 시장과 축제가 열리던 곳이지. 광장에 우뚝 선 「신 시청사」는 뾰족뾰족한 고딕 양식으로 지어졌는데, 매일 정해진 시간에 시계탑의 인형들이 음악에 맞춰 빙글빙글 도는 「글로켄슈필」 공연을 해. 중세 도시가 어떻게 사람들이 모이는 중심이 됐는지 느낄 수 있어. 인형 공연 중에는 통 만드는 사람들의 춤 「쉐플러탄츠」가 나와. 옛날 무서운 전염병이 지나간 뒤 \'이제 밖에 나와도 괜찮아요\' 하고 사람들을 기운 나게 하려고 춘 춤이라는 이야기가 전해져.',
+    tip:'글로켄슈필 공연은 매일 11:00 · 12:00 · 21:00이고, 3~10월에는 17:00에도 한 번 더 해요(muenchen.de). 공연 5분 전에 광장 중앙에 자리 잡기.',
+    nav:{from:'Frauenkirche, München', to:'Marienplatz, München', mode:'walking'},
     quiz:[{q:'신 시청사 시계탑에서 매일 열리는 인형 공연의 이름은?', opts:['글로켄슈필','카니발','올림픽'], a:0, why:'시계탑 인형들이 음악에 맞춰 도는 글로켄슈필 공연이야.'}] },
-  { id:'residenz', city:'munich', order:20, era:'중세~근대 바이에른', name:'뮌헨 레지덴츠', by:'1385년~ · 비텔스바흐 왕가', place:'뮌헨 (장소)', emoji:'👑',
-    source:'https://ko.wikipedia.org/wiki/뮌헨_레지덴츠',
-    sig:'바이에른을 다스린 <b>비텔스바흐 가문</b>의 궁전 — 「중세~근대 독일·제후국」과 연결돼요.',
-    kid:'뮌헨 시내 한복판에 있는, 바이에른을 다스린 「비텔스바흐」 가문의 거대한 궁전이야. 600년 넘게 왕과 제후들이 여기서 살며 나라를 다스렸어. 방이 어찌나 많고 화려한지, 금과 보석으로 꾸민 「보물의 방」도 있어. 독일이 하나의 나라가 되기 전, 바이에른이 독립된 왕국이었다는 걸 보여주는 곳이야.',
-    quiz:[{q:'레지덴츠에 살며 바이에른을 다스린 가문은?', opts:['합스부르크','비텔스바흐','메디치'], a:1, why:'바이에른의 비텔스바흐 가문이 600년 넘게 이곳에서 다스렸어.'}] },
-  { id:'nymphenburg', city:'munich', order:30, era:'17~18세기 바이에른', name:'님펜부르크 궁전', by:'1675년~ · 여름 별궁', place:'뮌헨 (장소)', emoji:'🏰',
-    source:'https://ko.wikipedia.org/wiki/님펜부르크_궁전',
-    sig:'바이에른 통치자의 <b>여름 궁전</b>, 바로크 양식 — 「근대 유럽·궁정 문화」와 연결돼요.',
-    kid:'뮌헨 서쪽에 있는 새하얀 여름 별궁이야. 바이에른 통치자 부부가 아들이 태어난 걸 기뻐하며 짓기 시작했대. 넓은 정원과 호수, 분수가 어우러진 아름다운 곳이지. 화려한 바로크 양식으로 지어져, 왕족들이 여름에 쉬며 잔치를 벌이던 모습을 상상할 수 있어.',
-    quiz:[{q:'님펜부르크 궁전은 어떤 용도로 지어졌을까?', opts:['감옥','여름 별궁','시장'], a:1, why:'왕족이 여름에 쉬던 여름 별궁이야.'}] },
-  { id:'dachau', city:'munich', order:40, era:'20세기 · 기억의 장소', name:'다하우 강제수용소 기념관', by:'1933년 설립 · 1965년 기념관', place:'뮌헨 근교 다하우 (장소)', emoji:'🕯',
-    source:'https://ko.wikipedia.org/wiki/다하우_강제_수용소',
-    note:'이곳의 역사는 무겁고 슬퍼요. 어른과 함께 이야기 나누며 「왜 기억해야 하는지」 생각해보면 좋아요.',
-    sig:'20세기 나치 시대의 아픈 역사, <b>인권과 평화를 기억하는 장소</b> — 「제2차 세계대전·전체주의」와 연결돼요.',
-    kid:'여기는 즐거운 관광지가 아니라, 조용히 기억하기 위한 장소야. 지금으로부터 약 90년 전, 독일을 지배한 나치 정권은 생각이 다르거나 특정 민족이라는 이유만으로 수많은 사람들을 이곳에 가두고 큰 고통을 주었어. 다하우는 그런 수용소 중 처음 세워진 곳이야. 지금은 기념관이 되어, "다시는 이런 일이 일어나선 안 된다"는 걸 온 세계가 기억하도록 지키고 있어. 슬픈 역사지만, 잊지 않는 것이 바로 그분들을 기리는 방법이란다.',
-    quiz:[{q:'이곳을 지금 기념관으로 남겨둔 가장 큰 이유는?', opts:['재미로','다시는 이런 일이 없도록 기억하려고','관광 수입 때문에'], a:1, why:'같은 비극이 되풀이되지 않도록 기억하고 배우기 위해서야.'}] },
+  { id:'odeonsplatz', city:'munich', order:50, era:'옥토버페스트 · 구시가지 셀프 워킹투어', name:'오데온 광장 · 펠트헤른할레 · 테아티너 성당', by:'펠트헤른할레 1841~1844년 · 테아티너 1663년~', place:'뮌헨 (장소)', emoji:'🦁',
+    walk:'도보 8분', stay:'30분',
+    source:'https://de.wikipedia.org/wiki/Feldherrnhalle',
+    note:'펠트헤른할레는 20세기에 아픈 역사도 지닌 곳이에요 — 아이 질문이 있을 때만 짧게 이야기하면 좋아요.',
+    sig:'바이에른 군대를 기리는 <b>펠트헤른할레</b>와 노란 바로크 <b>테아티너 성당</b> — 「근대 유럽·바로크 문화」, 「20세기 독일사」와 연결돼요.',
+    kid:'계단 위 사자 동상이 지키는 큰 아치 건물이 펠트헤른할레야. 바이에른 군대의 장군들을 기리려고 지었어. 옆의 노란 성당은 테아티너 성당인데, 바이에른 통치자 부부가 오랫동안 기다리던 아들이 태어나자 감사하는 마음으로 지었대. 성당 안은 하얀 조각으로 가득해서 눈이 부셔. 의자에 앉아 잠깐 쉬어 가자.',
+    tip:'아이 휴식 포인트(성당 안 착석). 펠트헤른할레의 아픈 20세기 역사는 아이 질문이 있을 때만 짧게 이야기하세요.',
+    nav:{from:'Marienplatz, München', to:'Odeonsplatz, München', mode:'walking'},
+    quiz:[{q:'테아티너 성당은 어떤 기쁜 일에 감사하며 지었을까?', opts:['왕자의 탄생','전쟁 승리','축구 우승'], a:0, why:'바이에른 통치자 부부가 오랫동안 기다리던 왕자가 태어나자 감사하며 지었어.'}] },
+  { id:'national-theatre', city:'munich', order:60, era:'옥토버페스트 · 구시가지 셀프 워킹투어', name:'바이에른 국립 오페라 (국립극장)', by:'1818년 개관 · 1963년 재건', place:'뮌헨 (장소)', emoji:'🎭',
+    walk:'도보 5분', stay:'20분(외관)',
+    source:'https://de.wikipedia.org/wiki/Nationaltheater_München',
+    sig:'유럽을 대표하는 오페라 극장, <b>전쟁으로 무너졌다 다시 지은</b> 건물 — 「근대 유럽 문화·제2차 세계대전」과 연결돼요.',
+    kid:'신전처럼 큰 기둥이 줄지어 선 이 건물은 바이에른 국립 오페라 극장이야. 200년 넘는 역사 동안 불이 나고, 전쟁 때 폭격으로 무너지기도 했어. 그래도 뮌헨 사람들은 포기하지 않고 예전 모습 그대로 다시 지었지. 무너져도 다시 세우는 마음을 보여 주는 건물이야.',
+    tip:'외관만 봐요. 앞 막스요제프 광장에서 사진 찍기.',
+    nav:{from:'Odeonsplatz, München', to:'Bayerische Staatsoper, München', mode:'walking'},
+    quiz:[{q:'이 극장이 전쟁으로 무너진 뒤 뮌헨 사람들은?', opts:['옛 모습대로 다시 지었다','공원으로 만들었다','그대로 두었다'], a:0, why:'포기하지 않고 예전 모습 그대로 다시 지었어.'}] },
+  { id:'hofbraeuhaus', city:'munich', order:70, era:'옥토버페스트 · 구시가지 셀프 워킹투어', name:'호프브로이하우스', by:'1589년 왕실 양조장 설립', place:'뮌헨 (장소)', emoji:'🍺',
+    walk:'도보 5분', stay:'점심/휴식',
+    source:'https://de.wikipedia.org/wiki/Hofbräuhaus_am_Platzl',
+    sig:'1589년 <b>바이에른 공작의 왕실 양조장</b>에서 시작 — 「근대 유럽 생활사·음식 문화」와 연결돼요.',
+    kid:'약 430년 전 바이에른 공작이 궁전에서 마실 음료를 직접 만들려고 세운 양조장이 시작이야. 지금은 커다란 홀에 긴 나무 탁자가 줄지어 있고, 전통 옷을 입은 악단이 음악을 연주해. 어른은 맥주, 아이는 프레첼과 소시지, 사과주스를 먹을 수 있어.',
+    tip:'점심 겸 투어 마무리. 아이 메뉴는 프레첼·바이스부어스트(흰 소시지)·사과주스 숄레 추천. 단골 전용 테이블(Stammtisch 표시)에는 앉지 않기.',
+    nav:{from:'Bayerische Staatsoper, München', to:'Hofbräuhaus München, Platzl 9', mode:'walking'},
+    quiz:[{q:'호프브로이하우스를 처음 세운 사람은?', opts:['바이에른 공작','로마 황제','영국 여왕'], a:0, why:'1589년 바이에른 공작이 왕실 양조장으로 세웠어.'}] },
 
   /* ════════ 피렌체 (+피사) (동선 4) ════════ */
   { id:'pisa-tower', city:'florence', order:10, era:'중세 · 로마네스크', name:'피사의 사탑', by:'1173년 착공~1372년 완공', place:'피사 (장소)', emoji:'🗼',
@@ -5417,13 +5476,20 @@ function openHistoryCity(city, opt){
   opt=opt||{}; trhCurCity=city;
   const ci=CITIES[city];
   const sites=trhCitySites(city);
+  const wr = TRH_CITY_WALKROUTE[city];
+  const festivalSites = wr ? sites.filter(s=>wr.festivalIds.includes(s.id)) : [];
+  const routeSites = wr ? sites.filter(s=>!wr.festivalIds.includes(s.id)) : sites;
   // 시대(era)별 그룹핑 — order 순서 유지
   const groups=[]; const seen={};
-  sites.forEach(s=>{ if(!seen[s.era]){ seen[s.era]=1; groups.push(s.era); } });
+  routeSites.forEach(s=>{ if(!seen[s.era]){ seen[s.era]=1; groups.push(s.era); } });
   const groupHtml = groups.map(era=>{
-    const items = sites.filter(s=>s.era===era).map(s=>trhSiteCard(s)).join('');
-    return `<div class="trh-era-group"><div class="trh-era-title" style="color:${ci.color}">${esc(era)} <span>· ${sites.filter(s=>s.era===era).length}곳</span></div>${items}</div>`;
+    const items = routeSites.filter(s=>s.era===era).map(s=>trhSiteCard(s)).join('');
+    return `<div class="trh-era-group"><div class="trh-era-title" style="color:${ci.color}">${esc(era)} <span>· ${routeSites.filter(s=>s.era===era).length}곳</span></div>${items}</div>`;
   }).join('');
+  const festivalHtml = festivalSites.length ? `<div class="trh-section-label" style="margin-top:14px">🎡 축제 카드</div>${festivalSites.map(trhSiteCard).join('')}` : '';
+  const routeBannerHtml = wr && wr.banner ? `<div class="trh-dc-note" style="margin:14px 0">${esc(wr.banner)}</div>` : '';
+  const forkHtml = wr && wr.fork ? `<div class="trh-dc-note" style="margin-top:18px"><h4 style="margin:0 0 6px">${esc(wr.fork.title)}</h4>${wr.fork.options.map(o=>`<div>${esc(o)}</div>`).join('')}</div>` : '';
+  const mineHtml = wr ? trhMineSectionHtml(city) : '';
 
   const d=trhCityDone(city), t=trhCityTotal(city);
   const allVisited = trhCityComplete(city);
@@ -5439,10 +5505,14 @@ function openHistoryCity(city, opt){
     </div>
     <div style="margin-bottom:14px">${comboBtn}</div>
     <p class="hint">🕰 아래는 <b>시대(연대)순</b>이에요. 장소를 눌러 이야기를 읽고, 퀴즈를 맞혀 도장을 찍어요!</p>
+    ${festivalHtml}
+    ${routeBannerHtml}
     ${groupHtml}
+    ${forkHtml}
+    ${mineHtml}
   `;
   if(!opt.keep) trhShow('trhCity');
-  trhFillCardThumbs();
+  trhFillCardThumbs(); trhFillMineThumbs();
 }
 function backToHistoryHome(){ renderHistoryHome(); trhShow('trhHome'); }
 
@@ -5541,8 +5611,9 @@ function trhSiteCard(s){
     <div class="trh-site-body">
       <div class="trh-site-name">${esc(s.name)}</div>
       <div class="trh-site-meta">${esc(s.by)} · ${esc(s.place)}</div>
+      ${(s.walk || s.stay) ? `<div class="trh-dc-line">${s.walk?`🚶 ${esc(s.walk)}`:''}${s.walk&&s.stay?' · ':''}${s.stay?`⏱ ${esc(s.stay)}`:''}</div>` : ''}
       <div class="trh-site-desc">${esc(s.kid)}</div>
-      <div class="trh-site-foot">${badge}${qchip}</div>
+      <div class="trh-site-foot">${badge}${qchip}${s.nav?navHTML(s.nav):''}</div>
     </div>
   </div>`;
 }
@@ -5574,6 +5645,8 @@ function openSiteDetail(id, opt){
       </div>
       <h3>${dc?`<span style="color:var(--trh-accent)">${dc.order}.</span> `:''}${esc(s.name)}</h3>
       <div class="trh-detail-meta">${CITIES[s.city].flag} ${CITIES[s.city].name} · ${esc(s.era)} · ${esc(s.by)}<br>📍 ${esc(s.place)}${dc&&dc.titleOriginal?` · <i>${esc(dc.titleOriginal)}</i>`:''}</div>
+      ${(s.walk || s.stay || s.nav) ? `<div class="trh-site-foot" style="margin:0 0 10px">${s.walk?`<span class="trh-chip trh-chip-time">🚶 ${esc(s.walk)}</span>`:''}${s.stay?`<span class="trh-chip trh-chip-time">⏱ ${esc(s.stay)}</span>`:''}${s.nav?navHTML(s.nav):''}</div>` : ''}
+      ${s.tip ? `<div class="trh-dc-note">💡 ${esc(s.tip)}</div>` : ''}
       ${dc ? trhDcPanel(s) : ''}
       <div class="trh-detail-block">
         <h4>${dc?'🧭 한눈에 보기':'🧭 11살 눈높이 이야기'}</h4>
@@ -6059,7 +6132,8 @@ function trhMinePreview(src){ const pv=document.getElementById('trhMinePv'), im=
 async function trhMineOpen(mk, id){
   const item = id ? (trhMine[mk]||[]).find(x=>x.id===id) : null;
   trhMineEdit = { mk, id:item?item.id:null, blob:null, removePhoto:false };
-  document.getElementById('trhMineHead').textContent = item ? '✏️ 내가 찾은 작품 고치기' : `➕ ${MUSEUMS[mk]?MUSEUMS[mk].name:''}에서 찾은 작품`;
+  const mineHeadName = (MUSEUMS[mk]&&MUSEUMS[mk].name) || (CITIES[mk]&&CITIES[mk].name) || '';
+  document.getElementById('trhMineHead').textContent = item ? '✏️ 내가 찾은 작품 고치기' : `➕ ${mineHeadName}에서 찾은 작품`;
   document.getElementById('trhMineTitle').value = item ? item.title : '';
   document.getElementById('trhMineMemo').value = item ? (item.memo||'') : '';
   document.getElementById('trhMineDelBtn').style.display = item ? 'flex' : 'none';
