@@ -211,5 +211,15 @@
     "audio/nhm/nhm-story-darwin-pigeons_2.mp3",
     "audio/nhm/nhm-story-vault-science_1.mp3",
     "audio/nhm/nhm-story-vault-science_2.mp3"
+  ],
+  "munich-walk": [
+    "audio/munich-walk/oktoberfest_1.mp3",
+    "audio/munich-walk/karlsplatz_1.mp3",
+    "audio/munich-walk/st-michael_1.mp3",
+    "audio/munich-walk/frauenkirche_1.mp3",
+    "audio/munich-walk/marienplatz_1.mp3",
+    "audio/munich-walk/odeonsplatz_1.mp3",
+    "audio/munich-walk/national-theatre_1.mp3",
+    "audio/munich-walk/hofbraeuhaus_1.mp3"
   ]
 }
