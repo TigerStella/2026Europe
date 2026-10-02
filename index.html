@@ -1944,8 +1944,8 @@ const DAYS = [
       {ic:'🛌', t:'숙소 복귀·저녁·취침 (늦잠 허용)', time:'17:00'}
     ] },
   { d:10, date:'10/4', wd:'일', city:'munich', badges:['뮌헨'],
-    title:'BMW 박물관 · 알리안츠 아레나 투어',
-    story:'<b>BMW</b>는 원래 자동차가 아니라 <b>비행기 엔진</b>을 만들던 회사였어. 그래서 로고의 파랑·흰 무늬가 빙글빙글 도는 <b>프로펠러</b>를 뜻한다는 이야기가 있지. 근처 <b>알리안츠 아레나</b>는 FC 바이에른의 홈 축구장인데, <b>바깥벽 전체가 밤이면 빨강·파랑·하양으로 빛나는</b> 세상에 하나뿐인 경기장이야!',
+    title:'BMW 박물관 · 알리안츠 아레나 · FC Bayern · 올림픽공원',
+    story:'<b>BMW</b>는 원래 자동차가 아니라 <b>비행기 엔진</b>을 만들던 회사였어. 그래서 로고의 파랑·흰 무늬가 빙글빙글 도는 <b>프로펠러</b>를 뜻한다는 이야기가 있지. 근처 <b>알리안츠 아레나</b>는 FC 바이에른의 홈 축구장인데, <b>바깥벽 전체가 밤이면 빨강·파랑·하양으로 빛나는</b> 세상에 하나뿐인 경기장이야!<br><br><b>FC 바이에른 뮌헨</b>은 독일에서 가장 강한 축구팀이야. 100년이 넘는 역사에 독일 리그 우승만 <b>30번 넘게</b> 했고, 알리안츠 아레나가 그 홈 경기장이지.<br><br>마지막으로 <b>올림픽공원</b>은 1972년 올림픽이 열린 곳인데, 지붕이 거미줄·텐트처럼 물결치는 신기한 모양이야. 지금은 넓은 잔디밭에서 공 차고 뛰어놀기 딱 좋아!',
     foot:'⭐ <b>알리안츠 아레나 투어</b> <a href="https://fcbayern.com/en/tours" target="_blank" rel="noopener">fcbayern.com/en/tours</a> — 일요일 시간대 조기 마감·<b>사전 예약 필수</b>·홈경기 충돌 재확인 · 🚗 <b>BMW 박물관</b> <a href="https://bmw-welt.com" target="_blank" rel="noopener">bmw-welt.com</a> (온라인 소폭 할인)<br>⭐ <b>10/5 새벽 공항 택시</b> — 숙소 프런트 or Bolt/FreeNow 앱으로 <b>05:15 픽업 전날 예약</b>',
     acts:[
       {ic:'😴', t:'늦잠·조식 (회복)', time:'09:00', endTime:'10:00'},
@@ -1956,10 +1956,14 @@ const DAYS = [
       {ic:'🚶', t:'BMW → 알리안츠 아레나 (도보 10분권)', time:'13:30', endTime:'14:00',
         nav:{from:'BMW Museum, München', to:'Allianz Arena, München', mode:'walking'} },
       {ic:'🏟️', t:'알리안츠 아레나 투어 (홈경기 없는 주말 확인)', time:'14:00', endTime:'15:30'},
-      {ic:'🚇', t:'숙소 복귀 (대중교통)', time:'15:30', endTime:'16:00',
-        nav:{from:'Allianz Arena, München', to:'Am Oberwiesenfeld 20, München', mode:'walking'} },
-      {ic:'🧳', t:'휴식·짐 완전 정리 (새벽 이동 대비)', time:'16:00', endTime:'18:00'},
-      {ic:'🍽️', t:'이른 저녁 (숙소 근처)', time:'18:00', endTime:'19:30'},
+      {ic:'🛍️', t:'FC 바이에른 스토어 (축구 최애 코스)', time:'15:30', endTime:'16:10'},
+      {ic:'🚇', t:'알리안츠 → 올림픽공원 (U6→U3·약 25~30분)', time:'16:10', endTime:'16:40',
+        nav:{from:'Allianz Arena, München', to:'Olympiapark, München', mode:'walking'} },
+      {ic:'🌳', t:'올림피아파크 놀이터·잔디언덕 (벤치 다수·엄마도 착석 휴식, 가볍게 1시간)', time:'16:40', endTime:'17:40'},
+      {ic:'🚶', t:'숙소 복귀 (올림픽공원 → 숙소 근처)', time:'17:40', endTime:'18:00',
+        nav:{from:'Olympiapark, München', to:'Am Oberwiesenfeld 20, München', mode:'walking'} },
+      {ic:'🧳', t:'휴식·짐 완전 정리 (새벽 이동 대비)', time:'18:00', endTime:'18:40'},
+      {ic:'🍽️', t:'이른 저녁 (숙소 근처)', time:'18:40', endTime:'19:30'},
       {ic:'🛌', t:'조기 취침', time:'19:30', endTime:'21:00'},
       {ic:'💰', t:'비용: 224,270원'}
     ] },
@@ -6579,6 +6583,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-02 · 뮌헨 10/2 개편</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-02b · 10/4 올림픽공원 이동</div>
 </body>
 </html>
