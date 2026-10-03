@@ -1925,23 +1925,27 @@ const DAYS = [
   { d:9, date:'10/3', wd:'토', city:'munich', badges:['뮌헨'],
     title:'추크슈피체 알프스 정상 · 아이브제 호수',
     story:'<b>추크슈피체</b>는 2,962m로 <b>독일에서 가장 높은 산</b>이야. 톱니바퀴 기차와 케이블카로 오르면 10월인데도 <b>안 녹고 쌓인 만년설</b>을 만질 수 있어! 정상에선 독일·오스트리아 알프스가 한눈에 보이고 발밑으로 구름이 지나간단다. 정상은 영하니까 방한복 꼭 챙기기!',
-    foot:'⭐ <b>가르미셔 콤비티켓</b> — 뮌헨중앙역 자판기 or <a href="https://zugspitze.de" target="_blank" rel="noopener">zugspitze.de</a> · 날씨 유동성 위해 1~2일 전 구매 권장 (성인 €72 / 청소년 €57.5 / 아동 €36)<br>⚠️ 당일 아침 <a href="https://zugspitze.de" target="_blank" rel="noopener">zugspitze.de</a>에서 <b>케이블카 실시간 운행상태</b> 확인 (기상 악화 시 운휴)',
+    foot:'⭐ <b>가르미셔 콤비티켓</b> — 뮌헨중앙역 자판기 or <a href="https://zugspitze.de" target="_blank" rel="noopener">zugspitze.de</a> (성인 €72 / 청소년 €57.5 / 아동 €36)<br>🚆 갈 때 <b>RB60 08:28 뮌헨 Hbf → 가르미슈</b> · 가르미슈 → 아이브제 <b>RB64 11:00</b> · 돌아올 때 <b>17:15 아이브제 출발 → 19:26 뮌헨 Hbf</b><br>⛵ 아이브제 보트는 <b>오늘이 마지막 운영일</b>(선택)<br>⚠️ 당일 아침 <a href="https://zugspitze.de" target="_blank" rel="noopener">zugspitze.de</a>에서 <b>케이블카 실시간 운행상태</b> 확인 (기상 악화 시 운휴) · 정상은 영하, 방한복 필수',
     acts:[
-      {ic:'⏰', t:'기상·중앙역 이동 (택시·도시락 지참)', time:'06:00', endTime:'06:32',
-        nav:{from:'Am Oberwiesenfeld 20, München', to:'München Hauptbahnhof', mode:'driving'} },
-      {ic:'🚆', t:'뮌헨→가르미슈 기차 (좌석=휴식·콤비티켓 개시)', time:'06:32', endTime:'08:00',
+      {ic:'🚶', t:'숙소 출발 (→ 뮌헨 Hbf, 열차 출발 전 여유 있게 도착)', time:'07:30', endTime:'08:15',
+        nav:{from:'Am Oberwiesenfeld 20, München', to:'München Hauptbahnhof'} },
+      {ic:'🚆', t:'뮌헨 Hbf → 가르미슈 출발 (RB60, 약 1시간 30분)', time:'08:28', endTime:'09:56',
         nav:{from:'München Hauptbahnhof', to:'Garmisch-Partenkirchen Bahnhof'} },
-      {ic:'🔁', t:'톱니열차 환승·대기 (도보 2분)', time:'08:00', endTime:'08:30'},
-      {ic:'🚞', t:'톱니열차 → 추크슈플라트 (앉아서 이동)', time:'08:30', endTime:'09:45',
-        nav:{from:'Garmisch-Partenkirchen Bahnhof', to:'Zugspitzplatt'} },
-      {ic:'🏔️', t:'정상 케이블카 → 알프스 만년설 체험 (방한복 필수·고도 적응 수시 체크)', time:'09:45', endTime:'12:30'},
-      {ic:'🍽️', t:'정상 레스토랑 점심·휴식 (하산 전 충분히)', time:'12:30', endTime:'13:30'},
-      {ic:'🚡', t:'하산 → 아이브제 (케이블카·콤비티켓 내)', time:'13:30', endTime:'14:30',
+      {ic:'🍳', t:'가르미슈역에서 아침 식사', time:'09:56', endTime:'10:50'},
+      {ic:'🚞', t:'가르미슈 → 아이브제 열차 탑승 (RB64, 약 30분)', time:'11:00', endTime:'11:30',
+        nav:{from:'Garmisch-Partenkirchen Bahnhof', to:'Eibsee, Grainau'} },
+      {ic:'🚡', t:'아이브제 도착, 곧바로 케이블카 탑승 (→ 추크슈피체 정상)', time:'11:30'},
+      {ic:'🏔️', t:'추크슈피체 정상 전망·점심·눈썰매장 (방한복 필수)', time:'11:30', endTime:'13:00'},
+      {ic:'🚡', t:'케이블카 하산 → 아이브제 (약 10분)', time:'13:00', endTime:'13:10',
         nav:{from:'Zugspitze', to:'Eibsee, Grainau'} },
-      {ic:'🏞️', t:'아이브제 호숫가 짧은 산책 (평지·뷰포인트)', time:'14:30', endTime:'15:15'},
-      {ic:'🚆', t:'가르미슈 → 뮌헨 복귀 (좌석=휴식)', time:'15:15', endTime:'17:00',
-        nav:{from:'Garmisch-Partenkirchen Bahnhof', to:'München Hauptbahnhof'} },
-      {ic:'🛌', t:'숙소 복귀·저녁·취침 (늦잠 허용)', time:'17:00'}
+      {ic:'🏞️', t:'아이브제 호수 산책 + 보트 (선택, 오늘이 마지막 운영일)', time:'13:10', endTime:'15:30'},
+      {ic:'🚉', t:'아이브제역 복귀 (17:15 열차까지 대기·휴식)', time:'15:45', endTime:'17:15',
+        nav:{from:'Eibsee, Grainau', to:'Eibsee Bahnhof, Grainau', mode:'walking'} },
+      {ic:'🚆', t:'아이브제 → 가르미슈 → 뮌헨 Hbf 출발 (약 2시간 10분)', time:'17:15', endTime:'19:26',
+        nav:{from:'Eibsee Bahnhof, Grainau', to:'München Hauptbahnhof'} },
+      {ic:'🚉', t:'뮌헨 Hbf 도착 → 숙소 이동 (약 25분)', time:'19:26', endTime:'19:50',
+        nav:{from:'München Hauptbahnhof', to:'Am Oberwiesenfeld 20, München'} },
+      {ic:'🏠', t:'숙소 도착', time:'19:50'}
     ] },
   { d:10, date:'10/4', wd:'일', city:'munich', badges:['뮌헨'],
     title:'BMW 박물관 · 알리안츠 아레나 · FC Bayern · 올림픽공원',
@@ -6678,6 +6682,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-02b · 10/4 올림픽공원 이동</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-03 · 10/3 추크슈피체 개편</div>
 </body>
 </html>
