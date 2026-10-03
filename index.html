@@ -1016,6 +1016,25 @@
   .trh-jw{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
   .trh-jw > div{ background:var(--trh-parch); border:1px solid var(--trh-line); border-radius:12px; padding:10px 12px; }
   .trh-jw h5{ font-size:13px; color:var(--trh-accent); margin-bottom:4px; }
+
+  /* ── 🎙 특별전(사진+해설+음성, 미션·퀴즈 없음) ── */
+  .trh-special-player{ position:sticky; top:0; z-index:5; background:#fff; border:1px solid var(--trh-line); border-radius:14px; padding:12px; margin-bottom:16px; box-shadow:0 2px 10px rgba(0,0,0,.06); }
+  .trh-special-ctrl{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:8px; }
+  .trh-special-ctrl button{ min-height:44px; min-width:44px; border-radius:10px; border:1.5px solid var(--trh-line); background:#fff; font-size:17px; cursor:pointer; font-family:inherit; }
+  .trh-special-now{ flex:1; min-width:110px; font-size:13px; font-weight:700; color:var(--trh-ink); }
+  .trh-special-card{ background:var(--trh-parch); border:1px solid var(--trh-line); border-radius:14px; padding:12px; margin-bottom:14px; transition:box-shadow .2s, border-color .2s; scroll-margin-top:92px; }
+  .trh-special-card.visited{ border-color:#C9803B; }
+  .trh-special-card.playing{ border-color:#5560A8; box-shadow:0 0 0 3px rgba(85,96,168,.22); }
+  .trh-special-photos{ position:relative; width:100%; background:#1E1E22; border-radius:12px; overflow:hidden; margin-bottom:10px; display:flex; }
+  .trh-special-photos img{ width:100%; max-height:360px; object-fit:contain; display:none; margin:0 auto; background:#1E1E22; }
+  .trh-special-photos img.on{ display:block; }
+  .trh-special-nophoto{ width:100%; height:120px; display:flex; align-items:center; justify-content:center; font-size:40px; color:#fff; background:linear-gradient(135deg,#243350,#3A4C78); }
+  .trh-special-dots{ position:absolute; bottom:8px; left:0; right:0; display:flex; justify-content:center; gap:6px; }
+  .trh-special-dots span{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.45); }
+  .trh-special-dots span.on{ background:#fff; }
+  .trh-special-nav{ position:absolute; top:50%; transform:translateY(-50%); min-height:40px; min-width:40px; border-radius:50%; border:none; background:rgba(0,0,0,.4); color:#fff; font-size:20px; cursor:pointer; }
+  .trh-special-nav.prev{ left:6px; } .trh-special-nav.next{ right:6px; }
+  .trh-special-order{ display:inline-flex; min-width:26px; height:26px; border-radius:13px; background:#fff; color:#3A2C1A; font-size:13px; font-weight:800; align-items:center; justify-content:center; margin-right:6px; box-shadow:0 1px 3px rgba(0,0,0,.15); }
   .trh-jw p{ font-size:15px; line-height:1.55; }
   .trh-links{ display:flex; flex-direction:column; gap:8px; }
   .trh-link-chip{ display:block; width:100%; text-align:left; min-height:44px; padding:10px 12px; border-radius:12px; border:1.5px solid var(--trh-line); background:#fff; font-size:15px; line-height:1.45; font-family:inherit; color:var(--text-dark); }
@@ -4857,14 +4876,16 @@ const MUSEUMS = {
   louvre:   { key:'louvre',   name:'루브르박물관',  en:'Musée du Louvre',    city:'paris',    country:'프랑스', flag:'🇫🇷', icon:'🔺' },
   orsay:    { key:'orsay',    name:'오르세미술관',  en:"Musée d'Orsay",      city:'paris',    country:'프랑스', flag:'🇫🇷', icon:'🕰' },
   orangerie:{ key:'orangerie',name:'오랑주리미술관', en:"Musée de l'Orangerie", city:'paris', country:'프랑스', flag:'🇫🇷', icon:'🪷' },
+  'orangerie-special':{ key:'orangerie-special', name:'모네 특별전', en:'Monet, peindre le temps', sub:'오랑주리 · 서거 100주년',
+    city:'paris', country:'프랑스', flag:'🇫🇷', icon:'⏳', special:true },
   uffizi:   { key:'uffizi',   name:'우피치미술관',  en:'Uffizi Gallery',     city:'florence', country:'이탈리아', flag:'🇮🇹', icon:'🎨' },
   vatican:  { key:'vatican',  name:'바티칸미술관',  en:'Vatican Museums',    city:'rome',     country:'바티칸(세계에서 가장 작은 나라)', flag:'🇻🇦', icon:'⛪' },
 };
-const MUSEUM_ORDER = ['british','greenwich','hpstudio','nhm','national','louvre','orsay','orangerie','uffizi','vatican'];
+const MUSEUM_ORDER = ['british','greenwich','hpstudio','nhm','national','louvre','orsay','orangerie','orangerie-special','uffizi','vatican'];
 // 나라별 그룹(여행 동선 순서)
 const MUSEUM_COUNTRY_GROUPS = [
   { country:'영국',   flag:'🇬🇧', museums:['british','greenwich','hpstudio','nhm','national'] },
-  { country:'프랑스', flag:'🇫🇷', museums:['louvre','orsay','orangerie'] },
+  { country:'프랑스', flag:'🇫🇷', museums:['louvre','orsay','orangerie','orangerie-special'] },
   { country:'이탈리아', flag:'🇮🇹', museums:['uffizi'] },
   { country:'바티칸',  flag:'🇻🇦', museums:['vatican'] },
 ];
@@ -5208,6 +5229,10 @@ const TRH_DC_FILES = [   // 새 박물관 JSON은 여기에 추가(여행 동선
   'data/docent_florence_uffizi.json',
   'data/docent_rome_vatican.json',
 ];
+// 특별전 등 스키마가 다른(clips 배열) JSON — trhDcMerge가 아니라 trhLoadSpecialClips()로 변환해 병합
+const TRH_SPECIAL_FILES = [
+  'data/special_orangerie_monet.json',
+];
 const TRH_DC_MANIFEST = 'audio/manifest.json';
 // 음성을 다시 만들면(목소리 변경 등) 버전을 올린다 → 폰에 남은 예전 오프라인 저장본을 자동으로 지움
 // (v2: 현수 목소리 + 문장 단위 합성으로 전체 재생성)
@@ -5383,9 +5408,33 @@ function trhDocentLoad(){
         trhDcMerge(await r.json());
       }catch(e){ console.warn('[도슨트] 불러오기 실패', f, e); }
     }
+    for(const f of TRH_SPECIAL_FILES){
+      try{
+        const r = await fetch(f, {cache:'no-cache'});
+        if(!r.ok) continue;
+        trhLoadSpecialClips(await r.json());
+      }catch(e){ console.warn('[특별전] 불러오기 실패', f, e); }
+    }
     trhDcLoaded = true;
   })();
   return trhDcPromise;
+}
+// 특별전(clips 배열) JSON → 기존 HISTORY_SITES 카드 구조로 변환. 미션·퀴즈·힌트는 없음(s.docent 미설정).
+function trhLoadSpecialClips(data){
+  if(!data || !data.museumId) return;
+  const mk = data.museumId;
+  if(!MUSEUMS[mk]){
+    MUSEUMS[mk] = { key:mk, name:data.title||mk, en:data.subtitle||'', sub:data.subtitle||'', city:data.city||'paris', country:'', flag:'', icon:'⏳', special:true };
+    MUSEUM_ORDER.push(mk);
+  }
+  (data.clips||[]).forEach(c=>{
+    if(!c || !c.id || trhSite(c.id)) return;   // 이미 있으면(재호출 등) 건너뜀 — 중복 push 방지
+    HISTORY_SITES.push({
+      id:c.id, city:MUSEUMS[mk].city, museum:mk, order:c.order||0,
+      name:c.title||c.id, place:MUSEUMS[mk].name, emoji:'🎨',
+      images:c.images||[], text:c.text||'', audio:c.audio||`audio/${mk}/${c.id}.mp3`, section:c.section||'',
+    });
+  });
 }
 function trhDcMerge(data){
   if(data && data.meta && data.meta.tracks) TRH_DC_TRACKS = Object.assign({}, TRH_DC_TRACKS, data.meta.tracks);
@@ -5580,7 +5629,7 @@ function renderMuseumList(){
         </div>
         <div class="trh-citycard-body">
           <div class="trh-citycard-name">${esc(m.name)}<small>${esc(m.en)}</small></div>
-          <div class="trh-citycard-era">${m.flag} ${esc(m.country)}${m.docent?' · <b style="color:#C9803B">🎧 도슨트</b>':''}</div>
+          <div class="trh-citycard-era">${m.flag} ${esc(m.country)}${m.docent?' · <b style="color:#C9803B">🎧 도슨트</b>':''}${m.special?' · <b style="color:#8B5FBF">🎙 특별전</b>':''}</div>
           <div class="trh-citycard-prog"><span>${t}점 중 ${d}점 방문</span><span>${pct}%</span></div>
           <div class="trh-mini-bar"><div class="trh-mini-fill" style="width:${pct}%;background:${CITIES[m.city].color}"></div></div>
         </div>
@@ -5602,6 +5651,7 @@ function renderMuseumList(){
 }
 function openMuseum(mk, opt){
   opt=opt||{}; trhCurMuseum=mk;
+  if(MUSEUMS[mk] && MUSEUMS[mk].special) return renderSpecialMuseum(mk, opt);
   const m=MUSEUMS[mk];
   const sites=trhMuseumSites(mk);
   const periodsPresent = PERIOD_CAT_ORDER.filter(pc=>sites.some(s=>s.periodCat===pc));
@@ -5645,6 +5695,176 @@ function openMuseum(mk, opt){
   if(!opt.keep) trhShow('trhMuseum');
   trhAudioUi(); trhFillCardThumbs(); trhFillPhotoCount(); trhFillMineThumbs();
   if(m.docent && m.docent.intro) trhPrepareAudio([m.docent.intro.audio || `audio/${m.docent.audioMuseumId}/intro.mp3`]);
+}
+
+/* ══════════════════ 🎙 특별전 렌더 + 연속 재생 플레이어 ══════════════════ */
+let trhSpecial = { mk:null, continuous:false, idx:-1, rate:1 };
+
+function trhSpecialList(mk){ return trhMuseumSites(mk); }
+
+function renderSpecialMuseum(mk, opt){
+  opt = opt || {};
+  const m = MUSEUMS[mk];
+  const list = trhSpecialList(mk);
+  const d = trhMuseumDone(mk), t = trhMuseumTotal(mk);
+  const allDone = trhMuseumComplete(mk);
+  const cards = list.map(trhSpecialCard).join('');
+  document.getElementById('trhMuseum').innerHTML = `
+    <button class="trh-btn trh-btn-back" onclick="backToMuseumList()">← 박물관 목록으로</button>
+    <div class="trh-city-banner" style="background:${trhMuseumGrad(mk)}">
+      <h2>${m.icon} ${esc(m.name)} <span style="font-size:14px;font-weight:500;opacity:.85">${esc(m.en||'')}</span></h2>
+      <div class="trh-cb-sub">${esc(m.sub||'')}</div>
+      <div style="margin-top:10px;font-size:12.5px;font-weight:700">📍 ${t}점 중 <b>${d}점</b> 감상 완료 ${allDone?'· 🏅 다 들었어요!':''}</div>
+    </div>
+    ${trhSpecialPlayerBar(mk)}
+    ${trhMineAddBtn(mk)}
+    ${cards}
+    ${trhMineSectionHtml(mk)}
+  `;
+  if(!opt.keep) trhShow('trhMuseum');
+  trhAudioUi(); trhFillCardThumbs(); trhFillMineThumbs();
+  trhSpecialSyncUi();
+}
+
+function trhSpecialCard(s){
+  const visited = !!trhVisited[s.id];
+  const imgs = s.images || [];
+  let photoHtml;
+  if(imgs.length){
+    photoHtml = `<div class="trh-special-photos" data-photos="${s.id}">
+      ${imgs.map((src,i)=>`<img src="${esc(src)}" loading="lazy" class="${i===0?'on':''}" data-idx="${i}">`).join('')}
+      ${imgs.length>1?`<div class="trh-special-dots">${imgs.map((_,i)=>`<span class="${i===0?'on':''}"></span>`).join('')}</div>
+      <button class="trh-special-nav prev" onclick="event.stopPropagation();trhSpecialPhotoNav('${s.id}',-1)">‹</button>
+      <button class="trh-special-nav next" onclick="event.stopPropagation();trhSpecialPhotoNav('${s.id}',1)">›</button>`:''}
+    </div>`;
+  } else {
+    photoHtml = `<div class="trh-special-photos trh-special-nophoto">🎨</div>`;
+  }
+  return `<div class="trh-special-card ${visited?'visited':''}" id="trh-special-${s.id}" data-special-site="${s.id}">
+    ${photoHtml}
+    <div class="trh-site-body">
+      <div class="trh-site-name"><span class="trh-special-order">${(s.order||0)+1}</span>${esc(s.name)}</div>
+      <details class="trh-script" ontoggle="if(this.open) trhSpecialMarkSeen('${s.id}')"><summary>해설 읽기</summary><p>${esc(s.text||'')}</p></details>
+      <div class="trh-site-foot">
+        ${trhSpecialAudioBtn(s)}
+        ${visited?`<span class="trh-chip trh-chip-stamp">✓ 봤어요</span>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function trhSpecialAudioBtn(s){
+  const path = s.audio;
+  if(!trhDcAudioSet.has(path)) return `<button class="trh-dc-btn trh-audio-btn" disabled><span>🔇 듣기</span><span class="st">음성 준비 중</span></button>`;
+  return `<button class="trh-dc-btn trh-audio-btn" data-audio="${esc(path)}" onclick="event.stopPropagation();trhSpecialPlayId('${s.id}')"><span>🎧 듣기</span><span class="st">▶ 듣기</span></button>`;
+}
+
+function trhSpecialGoto(mk, idx){
+  const list = trhSpecialList(mk);
+  if(idx<0){ idx=0; }
+  if(idx>=list.length){ trhSpecialStop(); toast('🎉 전시 해설을 끝까지 들었어요!'); return; }
+  const s = list[idx];
+  trhSpecial.mk = mk; trhSpecial.idx = idx;
+  if(!trhDcAudioSet.has(s.audio)){
+    toast('🔇 아직 음성이 준비되지 않았어요');
+    if(trhSpecial.continuous) trhSpecialGoto(mk, idx+1);
+    return;
+  }
+  trhAudio.pause(); trhAudioCur = s.audio;
+  trhAudio.src = trhAudioBlobs[s.audio] || s.audio;
+  trhAudio.defaultPlaybackRate = trhSpecial.rate; trhAudio.playbackRate = trhSpecial.rate;
+  const pr = trhAudio.play(); if(pr) pr.catch(trhAudioFail);
+  trhSpecialMarkSeen(s.id);
+  trhSpecialSyncUi();
+}
+
+function trhSpecialPlayId(id){
+  const s = trhSite(id); if(!s || !s.museum) return;
+  const list = trhSpecialList(s.museum);
+  const idx = list.findIndex(x=>x.id===id);
+  if(trhAudioCur===s.audio){
+    if(trhAudio.paused){ const pr=trhAudio.play(); if(pr) pr.catch(trhAudioFail); } else trhAudio.pause();
+    trhSpecial.mk=s.museum; trhSpecial.idx=idx;
+    trhSpecialSyncUi();
+    return;
+  }
+  trhSpecial.continuous = false;
+  trhSpecialGoto(s.museum, idx);
+}
+
+function trhSpecialStart(mk){
+  trhSpecial.continuous = true;
+  trhSpecialGoto(mk, 0);
+}
+function trhSpecialAdvance(){
+  if(!trhSpecial.mk) return;
+  trhSpecialGoto(trhSpecial.mk, trhSpecial.idx+1);
+}
+function trhSpecialPrev(){ if(trhSpecial.mk) trhSpecialGoto(trhSpecial.mk, Math.max(0, trhSpecial.idx-1)); }
+function trhSpecialNext(){ if(trhSpecial.mk) trhSpecialGoto(trhSpecial.mk, trhSpecial.idx+1); }
+function trhSpecialTogglePause(){
+  if(trhAudio.paused){ const pr=trhAudio.play(); if(pr) pr.catch(trhAudioFail); } else trhAudio.pause();
+  trhSpecialSyncUi();
+}
+function trhSpecialStop(){
+  trhSpecial.continuous = false;
+  trhAudioStop();
+  trhSpecialSyncUi();
+}
+function trhSpecialSetRate(r){
+  trhSpecial.rate = r; trhAudio.playbackRate = r;
+  trhSpecialSyncUi();
+}
+function trhSpecialMarkSeen(id){
+  if(trhVisited[id]) return;
+  trhAwardStamp(id);
+}
+function trhSpecialPhotoNav(id, dir){
+  const wrap = document.querySelector(`[data-photos="${id}"]`); if(!wrap) return;
+  const imgs = [...wrap.querySelectorAll('img')]; if(imgs.length<2) return;
+  let cur = imgs.findIndex(im=>im.classList.contains('on'));
+  let next = (cur+dir+imgs.length)%imgs.length;
+  imgs.forEach((im,i)=>im.classList.toggle('on', i===next));
+  const dots = wrap.querySelectorAll('.trh-special-dots span');
+  dots.forEach((d,i)=>d.classList.toggle('on', i===next));
+}
+function trhSpecialSyncUi(){
+  document.querySelectorAll('.trh-special-card').forEach(el=>el.classList.remove('playing'));
+  const bar = document.getElementById('trhSpecialPlayerBar');
+  if(!bar) return;
+  const ctrl = document.getElementById('trhSpecialCtrl');
+  const startBtn = document.getElementById('trhSpecialStartBtn');
+  const nowTitle = document.getElementById('trhSpecialNowTitle');
+  const pauseBtn = document.getElementById('trhSpecialPauseBtn');
+  if(trhSpecial.mk && trhSpecial.idx>=0){
+    const list = trhSpecialList(trhSpecial.mk);
+    const s = list[trhSpecial.idx];
+    if(s){
+      const card = document.getElementById('trh-special-'+s.id);
+      if(card){ card.classList.add('playing'); if(trhSpecial.continuous) card.scrollIntoView({behavior:'smooth', block:'center'}); }
+      if(nowTitle) nowTitle.textContent = `${trhSpecial.idx+1}. ${s.name}`;
+    }
+    if(ctrl) ctrl.style.display='flex';
+    if(startBtn) startBtn.style.display='none';
+    if(pauseBtn && s) pauseBtn.textContent = (trhAudioCur===s.audio && !trhAudio.paused) ? '⏸' : '▶';
+  } else {
+    if(ctrl) ctrl.style.display='none';
+    if(startBtn) startBtn.style.display='';
+  }
+  document.querySelectorAll('#trhSpecialCtrl [data-srate]').forEach(b=>b.classList.toggle('on', Number(b.dataset.srate)===trhSpecial.rate));
+}
+function trhSpecialPlayerBar(mk){
+  return `<div class="trh-special-player" id="trhSpecialPlayerBar">
+    <button class="trh-dc-btn trh-btn-gold" id="trhSpecialStartBtn" style="width:100%" onclick="trhSpecialStart('${mk}')">▶ 처음부터 이어 듣기</button>
+    <div class="trh-special-ctrl" id="trhSpecialCtrl" style="display:none">
+      <button onclick="trhSpecialPrev()">⏮</button>
+      <button id="trhSpecialPauseBtn" onclick="trhSpecialTogglePause()">⏸</button>
+      <button onclick="trhSpecialNext()">⏭</button>
+      <span class="trh-special-now" id="trhSpecialNowTitle"></span>
+      <button class="trh-linkbtn" onclick="trhSpecialStop()">정지</button>
+    </div>
+    <div class="trh-rate" style="margin-top:8px">속도 ${[0.9,1,1.1].map(r=>`<button data-srate="${r}" onclick="trhSpecialSetRate(${r})">${r===1?'1.0':r}×</button>`).join('')}</div>
+  </div>`;
 }
 
 function trhSiteCard(s){
@@ -5888,7 +6108,7 @@ let trhAudioRate = Number(trhLoad(TRH_LS.audiorate, 1)) || 1;
 const trhAudioBlobs = {};   // { 경로: blob URL } — 오프라인 저장본을 미리 꺼내 둔 것
 trhAudio.addEventListener('play', trhAudioUi);
 trhAudio.addEventListener('pause', trhAudioUi);
-trhAudio.addEventListener('ended', ()=>{ trhAudioCur=null; trhAudioUi(); });
+trhAudio.addEventListener('ended', ()=>{ trhAudioCur=null; trhAudioUi(); if(trhSpecial.continuous) trhSpecialAdvance(); });
 trhAudio.addEventListener('error', ()=>{ if(trhAudioCur){ toast('음성을 불러오지 못했어요 (인터넷 또는 오프라인 저장 확인)'); trhAudioCur=null; trhAudioUi(); } });
 function trhDcAudioPath(dc, track){ return `audio/${dc.audioMuseumId}/${dc.workId}_${track}.mp3`; }
 // 오프라인 저장본을 화면을 열 때 미리 blob으로 준비 → 탭하면 기다림 없이 바로 재생(비행기 모드 대응)
@@ -5930,6 +6150,7 @@ function trhAudioUi(){
     const st=b.querySelector('.st'); if(st) st.textContent = on ? '⏸ 재생 중' : (mine && trhAudio.src ? '▶ 이어 듣기' : '▶ 듣기');
   });
   document.querySelectorAll('[data-rate]').forEach(b=>b.classList.toggle('on', Number(b.dataset.rate)===trhAudioRate));
+  if(typeof trhSpecialSyncUi==='function' && document.getElementById('trhSpecialPlayerBar')) trhSpecialSyncUi();
 }
 function trhAudioBtn(path, label){
   if(!trhDcAudioSet.has(path)) return `<button class="trh-dc-btn trh-audio-btn" disabled><span>🔇 ${esc(label)}</span><span class="st">음성 준비 중</span></button>`;

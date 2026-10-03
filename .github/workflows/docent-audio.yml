@@ -22,6 +22,8 @@ on:
     paths:
       - 'data/docent_*.json'
       - 'scripts/generate_audio.py'
+      - 'data/special_*.json'
+      - 'scripts/generate_special_audio.py'
 
 permissions:
   contents: write
@@ -55,6 +57,10 @@ jobs:
       - name: 음성 생성
         if: ${{ !inputs.samples }}
         run: python scripts/generate_audio.py 'data/docent_*.json' ${{ inputs.force && '--force' || '' }}
+
+      - name: 특별전 음성 생성
+        if: ${{ !inputs.samples }}
+        run: python scripts/generate_special_audio.py 'data/special_*.json' ${{ inputs.force && '--force' || '' }}
 
       - name: 음성 파일 커밋
         id: commit
