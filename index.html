@@ -3179,6 +3179,23 @@ const SEED_EXPENSES = [
       { fr:'REO CAMEMBERT AOC', ko:'카망베르 AOC', qty:1, unit:4.99, amt:4.99 },
       { fr:'380G SUSHI SAUMON', ko:'연어 초밥 380g', qty:1, unit:14.95, amt:14.95 },
     ] },
+  { id:'seed-20261003-biergarten', amount:31.80, ccy:'EUR', cat:'식비', pay:'신한트래블', date:'2026-10-03',
+    memo:'아이브제 파빌리온 비어가르텐 (Eibsee Pavillon Biergarten)',
+    items:[
+      { fr:'Bratwurst Semmel/Breze', ko:'브라트부어스트 (빵/프레첼 곁들임)', qty:1, unit:7.50, amt:7.50 },
+      { fr:'Portion Pommes', ko:'감자튀김 1인분', qty:1, unit:5.50, amt:5.50 },
+      { fr:'Gemischter Salat', ko:'모둠 샐러드', qty:1, unit:10.50, amt:10.50 },
+      { fr:'Münchner Hell Biergarten 0,5l', ko:'뮌헨 헬 맥주 0.5L', qty:1, unit:4.30, amt:4.30 },
+      { fr:'Cola Biergarten 0,5l', ko:'콜라 0.5L', qty:1, unit:4.00, amt:4.00 },
+    ] },
+  { id:'seed-20261003-souvenir', amount:53.70, ccy:'EUR', cat:'선물', pay:'신한트래블', date:'2026-10-03',
+    memo:'아이브제 기념품 (Seeweg 2, Grainau)',
+    items:[
+      { fr:'Kleidung', ko:'의류 소품', qty:1, unit:4.90, amt:4.90 },
+      { fr:'Herren Mütze', ko:'남성용 모자', qty:1, unit:9.00, amt:9.00 },
+      { fr:'Shirt neu', ko:'티셔츠', qty:1, unit:21.90, amt:21.90 },
+      { fr:'Kindershirt Zugspitze', ko:'추크슈피체 어린이 티셔츠', qty:1, unit:17.90, amt:17.90 },
+    ] },
 ];
 (function seedExpenses(){
   const KEY='noleu_seeded_exp_v1'; const done=load(KEY,[]); let changed=false;
@@ -6682,6 +6699,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-03 · 10/3 추크슈피체 개편</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-03b · 아이브제 영수증</div>
 </body>
 </html>
