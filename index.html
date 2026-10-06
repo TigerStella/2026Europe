@@ -5467,6 +5467,10 @@ function trhLoadSpecialClips(data){
     });
   });
 }
+function trhDcConvertQuiz(w, sup){
+  return (w.quiz||[]).filter(q=>q && Array.isArray(q.options) && typeof q.answer==='number')
+    .map((q,i)=>({ q:q.q, opts:q.options, a:q.answer, why:(sup.why && sup.why[i]) || q.why || '' }));
+}
 function trhDcMerge(data){
   if(data && data.meta && data.meta.tracks) TRH_DC_TRACKS = Object.assign({}, TRH_DC_TRACKS, data.meta.tracks);
   ((data && data.museums) || []).forEach((m, mi)=>{
@@ -5494,10 +5498,14 @@ function trhDcMerge(data){
         officialAudioLen:w.officialAudioLen||'', toNext:w.toNext||'', badge:[].concat(w.badge||[]),
         floorLabel:w.floorLabel||'', guideApp:w.guideApp||'', tip:w.tip||'' };
       const existing = trhSite(TRH_DC_MERGE_ID[w.id] || w.id);
-      if(existing){ existing.docent = dc; return; }   // 기존 필드 유지 + 신규 필드만 추가
+      if(existing){
+        // JSON에 quiz가 있으면 항상 우선(기존 카드의 옛 퀴즈를 덮어씀). 스탬프·퀴즈 기록(localStorage)은 그대로 유지.
+        const newQuiz = trhDcConvertQuiz(w, TRH_DC_SUPPLEMENT[w.id] || {});
+        if(newQuiz.length) existing.quiz = newQuiz;
+        existing.docent = dc; return;   // 기존 필드 유지 + 신규 필드만 추가
+      }
       const sup = TRH_DC_SUPPLEMENT[w.id] || {};
-      const quiz = (w.quiz||[]).filter(q=>q && Array.isArray(q.options) && typeof q.answer==='number')
-        .map((q,i)=>({ q:q.q, opts:q.options, a:q.answer, why:(sup.why && sup.why[i]) || q.why || '' }));
+      const quiz = trhDcConvertQuiz(w, sup);
       // 보충(TRH_DC_SUPPLEMENT)이 우선, 없으면 JSON의 emoji·kid·era·periodCat·place 사용(새 JSON은 자체 완결)
       HISTORY_SITES.push({ id:w.id, city, order:200 + mSeq*20 + (w.order||0), era:sup.era || w.era || m.era || '근대 미술',
         name:w.title, by:[w.artist, w.year].filter(Boolean).join(' · '), place:sup.place || w.place || MUSEUMS[mk].name,
@@ -5999,6 +6007,7 @@ function startMuseumQuiz(mk){
 }
 function renderQuizQuestion(){
   const st=trhQuizState; if(!st) return;
+  st.attempt=0;
   const q=st.qs[st.i];
   const total=st.qs.length;
   const title = st.mode==='city' ? `🧠 ${CITIES[st.city].name} 종합 퀴즈` : (st.mode==='museum' ? `🧠 ${MUSEUMS[st.museum].name} 종합 미션` : `🎫 도장 퀴즈`);
@@ -6014,10 +6023,17 @@ function answerQuiz(idx){
   const st=trhQuizState; if(!st) return;
   const q=st.qs[st.i];
   const btns=document.querySelectorAll('#trhOpts .trh-opt');
-  btns.forEach((b,i)=>{ b.disabled=true; if(i===q.a) b.classList.add('correct'); });
   const ok = idx===q.a;
-  if(ok) st.correct++; else btns[idx].classList.add('wrong');
   const fb=document.getElementById('trhQuizFb');
+  if(!ok && st.attempt===0){
+    // 첫 오답: 정답을 바로 공개하지 않고 힌트만 주고 한 번 더 기회
+    st.attempt=1;
+    btns[idx].disabled=true; btns[idx].classList.add('wrong');
+    fb.innerHTML = `<div class="trh-quiz-feedback no">🎧 트랙 2를 다시 들어 봐! 한 번 더 도전해 볼까?</div>`;
+    return;
+  }
+  btns.forEach((b,i)=>{ b.disabled=true; if(i===q.a) b.classList.add('correct'); });
+  if(ok) st.correct++; else btns[idx].classList.add('wrong');
   const last = st.i >= st.qs.length-1;
   fb.innerHTML = `<div class="trh-quiz-feedback ${ok?'ok':'no'}">${ok?'⭐ 정답이에요!':'아쉬워요! 정답은 위에 초록색으로 표시했어요.'}<br>${esc(q.why)}</div>
     <div class="trh-detail-actions" style="margin-top:12px">
