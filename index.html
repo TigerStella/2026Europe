@@ -3238,6 +3238,31 @@ const SEED_EXPENSES = [
       { fr:'Shirt neu', ko:'티셔츠', qty:1, unit:21.90, amt:21.90 },
       { fr:'Kindershirt Zugspitze', ko:'추크슈피체 어린이 티셔츠', qty:1, unit:17.90, amt:17.90 },
     ] },
+  { id:'seed-20261005-opera', amount:33.00, ccy:'EUR', cat:'식비', pay:'신한트래블', date:'2026-10-05',
+    memo:'오페라 카페 (L\'Opera Caffè · Piazza del Duomo 62/R) · 11:31',
+    items:[
+      { fr:'IMPORTO (카드 단말기 영수증 — 품목 미기재)', ko:'식음료 (메뉴 내역 없음)', qty:1, unit:33.00, amt:33.00 },
+    ] },
+  { id:'seed-20261005-amorino', amount:12.00, ccy:'EUR', cat:'식비', pay:'신한트래블', date:'2026-10-05',
+    memo:'아모리노 젤라또 (Amorino Gelato al Naturale · Via Cerretani 2/R) · 12:32',
+    items:[
+      { fr:'Cono normale pralinato', ko:'젤라또 콘 (일반 사이즈·프랄리네 맛)', qty:2, unit:6.00, amt:12.00 },
+    ] },
+  { id:'seed-20261005-nelli', amount:49.00, ccy:'EUR', cat:'식비', pay:'현금', date:'2026-10-05',
+    memo:'칸토 데이 넬리 (Ristorante Canto dei Nelli · Via Canto de\' Nelli 22/R) · 17:48 · 현금 결제',
+    items:[
+      { fr:'SPAG POMODORO', ko:'토마토 스파게티', qty:1, unit:13.00, amt:13.00 },
+      { fr:'TORT POM BURR', ko:'토르텔리, 토마토·버터 소스 (약어 — 추정)', qty:1, unit:18.00, amt:18.00 },
+      { fr:'COCA COLA', ko:'코카콜라', qty:1, unit:5.00, amt:5.00 },
+      { fr:'CAL. C CLASSICO', ko:'와인 한 잔 (약어 — 키안티 클라시코 추정)', qty:1, unit:8.00, amt:8.00 },
+      { fr:'2 X COPERTO', ko:'자릿세(커버차지) 2인', qty:2, unit:2.50, amt:5.00 },
+    ] },
+  { id:'seed-20261005-lucia', amount:7.00, ccy:'EUR', cat:'식비', pay:'신한트래블', date:'2026-10-05',
+    memo:'루치아 (Lucia · Via Faenza 5/r) · 21:04~21:05 (영수증 2장)',
+    items:[
+      { fr:'Pizza Classica', ko:'클래식 피자', qty:1, unit:3.50, amt:3.50 },
+      { fr:'Coca Cola', ko:'코카콜라', qty:1, unit:3.50, amt:3.50 },
+    ] },
 ];
 (function seedExpenses(){
   const KEY='noleu_seeded_exp_v1'; const done=load(KEY,[]); let changed=false;
@@ -6999,6 +7024,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-06 · 아들 일기만 보내기</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-06b · 10/5 식비 영수증</div>
 </body>
 </html>
