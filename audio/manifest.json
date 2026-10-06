@@ -288,5 +288,18 @@
     "audio/accademia/accademia-david-2_2.mp3",
     "audio/accademia/accademia-gipsoteca_1.mp3",
     "audio/accademia/accademia-gipsoteca_2.mp3"
+  ],
+  "pisa": [
+    "audio/pisa/intro.mp3",
+    "audio/pisa/pisa-duomo_1.mp3",
+    "audio/pisa/pisa-duomo_2.mp3",
+    "audio/pisa/pisa-tower-1_1.mp3",
+    "audio/pisa/pisa-tower-1_2.mp3",
+    "audio/pisa/pisa-tower-2_1.mp3",
+    "audio/pisa/pisa-tower-2_2.mp3",
+    "audio/pisa/pisa-baptistery_1.mp3",
+    "audio/pisa/pisa-baptistery_2.mp3",
+    "audio/pisa/pisa-camposanto_1.mp3",
+    "audio/pisa/pisa-camposanto_2.mp3"
   ]
 }
