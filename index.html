@@ -1351,6 +1351,7 @@
       <button class="btn btn-ghost" onclick="exportData()" title="일기·사진·추가일정 백업">💾 백업</button>
       <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()" title="이 파일로 전체 교체(덮어쓰기)">📥 복원(덮어쓰기)</button>
       <button class="btn btn-ghost" onclick="document.getElementById('mergeFile').click()" title="다른 기기 백업을 합쳐서 누적">🔀 합치기(누적)</button>
+      <button class="btn btn-ghost" onclick="exportSonDiary()" title="아들 일기만 담아 보내기 — 도장·미션·지출 등 다른 기록은 포함하지 않아요">🐯 아들 일기만 보내기</button>
       <button class="btn btn-ghost" onclick="openCopyBackup()" title="파일 다운로드가 안 될 때 — 같은 폰의 다른 앱으로 복사·붙여넣기">📋 복사해서 옮기기</button>
       <button class="btn btn-ghost" onclick="openPasteMerge()" title="복사한 백업 글을 붙여넣어 합치기">📋 붙여넣기로 합치기</button>
       <button class="btn btn-ghost" onclick="openSync()" title="구글 드라이브 자동 동기화">☁️ 동기화</button>
@@ -4473,7 +4474,13 @@ function mergeData(j){
   let added=0;
   if(Array.isArray(j.diary)){
     const ids=new Set(diary.map(x=>x.id));
-    j.diary.forEach(x=>{ if(!ids.has(x.id)){ x.photos=normPhotos(x.photos); if(!x.iso){ const dd=DAYS.find(d=>d.d===x.day); x.iso=dd?dd.iso:(x.date?mdToIso(x.date):''); } diary.push(x); ids.add(x.id); added++; } });
+    const sonOnly = j.kind==='diary-son';
+    j.diary.forEach(x=>{
+      if(sonOnly && x.who!=='son') return;
+      x.photos=normPhotos(x.photos); if(!x.iso){ const dd=DAYS.find(d=>d.d===x.day); x.iso=dd?dd.iso:(x.date?mdToIso(x.date):''); }
+      if(!ids.has(x.id)){ diary.push(x); ids.add(x.id); added++; }
+      else if(sonOnly){ const i=diary.findIndex(y=>y.id===x.id); if(i>=0 && diary[i].who==='son' && JSON.stringify(diary[i])!==JSON.stringify(x)){ diary[i]=x; added++; } }  // 아들이 고친 일기는 최신본으로 교체
+    });
     save(LS.diary, diary);
   }
   if(Array.isArray(j.expenses)){
@@ -4524,6 +4531,22 @@ async function copyBackupToClipboard(){
     if(document.execCommand('copy')){ status.textContent='✅ 복사했어요! 이제 다른 앱에서 붙여넣기 해주세요.'; return; }
     throw new Error('copy 실패');
   }catch(e){ status.textContent='자동 복사가 안 돼요 — 위 글상자를 손가락으로 길게 눌러 "전체 선택" → "복사"를 직접 눌러 주세요.'; }
+}
+// 🐯 아들 일기만 보내기: 일기(아들)만 담은 파일/글 — 받는 폰에서 「합치기(누적)」나 「붙여넣기로 합치기」로 넣으면 일기만 추가·갱신됨
+async function exportSonDiary(){
+  const list=diary.filter(e=>e.who==='son');
+  if(!list.length){ toast('이 폰에는 아들 일기가 아직 없어요'); return; }
+  const payload={ app:'noleu-europe', version:1, kind:'diary-son', exportedAt:new Date().toISOString(), diary:list };
+  const text=JSON.stringify(payload);
+  const name=`tiger-diary-${stamp()}.json`;
+  const file=new File([text], name, {type:'application/json'});
+  if(navigator.canShare && navigator.share){
+    try{ if(navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:'타이거 일기'}); toast(`📤 아들 일기 ${list.length}편 — 카톡 등으로 엄마 폰에 보내 주세요`); return; } }
+    catch(e){ if(e && e.name==='AbortError') return; }
+  }
+  document.getElementById('copyBackupText').value=text;
+  document.getElementById('copyBackupStatus').textContent=`🐯 아들 일기 ${list.length}편만 담았어요(도장·미션 기록은 없음). 복사해서 카톡 등으로 엄마 폰에 보내고, 엄마 폰에서 「📋 붙여넣기로 합치기」에 붙여넣어 주세요.`;
+  openModal('copyBackupModal');
 }
 function openPasteMerge(){ document.getElementById('pasteMergeText').value=''; openModal('pasteMergeModal'); }
 function submitPasteMerge(){
@@ -6976,6 +6999,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-05 · 피렌체 10/5 개편</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-06 · 아들 일기만 보내기</div>
 </body>
 </html>
