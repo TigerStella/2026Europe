@@ -973,6 +973,7 @@
   .trh-time-group{ font-size:14px; font-weight:800; color:#1F4F86; background:#E8F1FB; border-radius:10px; padding:7px 12px; margin:14px 0 8px; }
   .trh-floor-group{ font-size:15px; font-weight:900; color:#7A3E1D; background:#FBE9D6; border-radius:10px; padding:9px 12px; margin:18px 0 8px; }
   .trh-dc-warn{ background:#FFF1E6; border:1.5px solid #F2B27A; color:#8A3B00; border-radius:12px; padding:10px 12px; font-size:15px; font-weight:800; margin-bottom:10px; }
+  .trh-dc-redbox{ background:#FDECEC; border:1.5px solid #E5807A; color:#A61B11; border-radius:12px; padding:10px 12px; font-size:15px; font-weight:800; margin-bottom:8px; line-height:1.5; }
   .trh-dc-next{ color:#1F4F86 !important; font-weight:700; }
   .trh-dc{ font-size:16px; line-height:1.7; }
   .trh-dc-sec{ margin:0 0 16px; }
@@ -2047,14 +2048,14 @@ const DAYS = [
   { d:12, date:'10/6', wd:'화', city:'florence', badges:['피렌체'],
     title:'피사 사탑 당일치기 · 저녁 다비드',
     story:'🌍 <b>왜 피사의 탑은 기울었을까?</b><br>1173년 착공 당시 지반이 무른 걸 몰랐어요. 3층까지 짓다 이미 기울기 시작했는데, 공사를 멈추지 않고 기운 채로 200년에 걸쳐 완성했어요. <b>갈릴레오</b>가 이 탑 꼭대기에서 무게가 다른 두 공을 떨어뜨려 "무게와 상관없이 같은 속도로 떨어진다"를 증명했다는 전설이 있는 곳이에요.<br><br>🌍 <b>세례당의 마법 — 노래하는 돔</b><br>사탑 옆 둥근 세례당은 <b>소리가 10초 넘게 울려 퍼지는</b> 신비한 곳이에요. 경비원이 몇 개의 음을 노래하면 천장에서 화음이 저절로 만들어져요. 30분마다 짧게 시연하니 꼭 들어보세요!<br><br>🌍 <b>저녁엔 다비드 — 미켈란젤로의 5m 거인</b><br>미켈란젤로가 26세에 시작해 3년 만에 완성한 조각이에요. 성경 속 소년 다윗이 거인 골리앗에게 돌을 던지기 직전, 눈을 부릅뜬 긴장의 순간을 표현했죠. 원래 두오모 지붕에 올리려 했지만 너무 아름다워 광장에 세웠고, 아카데미아에 있는 게 <b>진짜 원본</b>이에요!',
-    foot:'🎟️ <b>예약</b> · 아카데미아(다비드) <b>10/6 17:30</b> <a href="https://www.galleriaaccademiafirenze.it" target="_blank" rel="noopener">galleriaaccademiafirenze.it</a> · 피사 <b>COMPLETE+TOWER €27</b> 등탑 <b>09:45</b> <a href="https://www.opapisa.it" target="_blank" rel="noopener">opapisa.it</a> (캄포산토·박물관 포함이나 생략 OK) · 기차 <a href="https://www.trenitalia.com" target="_blank" rel="noopener">trenitalia.com</a><br>🧳 <b>준비할 것</b> ☐ 07:53 S.Rossore 직행 기차 ☐ 사탑 10:00 세션(도착 즉시 락커) ☐ 세례당 에코 시연 ☐ 귀로 Pisa Centrale 13:32(도보 20분) ☐ 아카데미아 17:30 ☐ 물·간식',
+    foot:'⚠️ 타이거 <b>여권 지참</b>(사탑은 나이 확인 — 2019년 이후 출생 입장 불가)<br>🎟️ <b>예약</b> · 아카데미아(다비드) <b>10/6 17:30</b> <a href="https://www.galleriaaccademiafirenze.it" target="_blank" rel="noopener">galleriaaccademiafirenze.it</a> · 피사 <b>COMPLETE+TOWER €27</b> 등탑 <b>09:45</b> <a href="https://www.opapisa.it" target="_blank" rel="noopener">opapisa.it</a> (캄포산토·박물관 포함이나 생략 OK) · 기차 <a href="https://www.trenitalia.com" target="_blank" rel="noopener">trenitalia.com</a><br>🧳 <b>준비할 것</b> ☐ 07:53 S.Rossore 직행 기차 ☐ 타이거 여권 ☐ 사탑 10:00 세션(도착 즉시 클로크룸) ☐ 세례당 에코 시연 ☐ 귀로 Pisa Centrale 13:32(도보 20분) ☐ 아카데미아 17:30 ☐ 물·간식',
     acts:[
       {ic:'🍳', t:'조식·준비 (호텔이 S.M.N. 도보 5분)', time:'07:00', endTime:'07:45'},
       {ic:'🚂', t:'피렌체 S.M.N. → 피사 S.Rossore · ⭐직행 07:53 (사탑 도보 5분!)', time:'07:53', endTime:'09:13',
         nav:{from:'Firenze Santa Maria Novella', to:'Pisa San Rossore'} },
-      {ic:'🚶', t:'S.Rossore역 → 도보 5분 미라콜리 광장 · 락커에 짐부터 보관(등탑 반입금지)', time:'09:13', endTime:'09:35',
+      {ic:'🚶', t:'S.Rossore역 → 도보 5분 미라콜리 광장 · 사탑 뒤편 매표소 쪽 등탑자 무료 클로크룸에 가방 맡기기(등탑 가방 반입 금지 · 휴대폰·카메라·물병만 · 슬롯 15분 전까지)', time:'09:13', endTime:'09:35',
         nav:{from:'Pisa San Rossore', to:'Piazza dei Miracoli, Pisa', mode:'walking'} },
-      {ic:'⛪', t:'대성당(두오모) 둘러보기 · 등탑 대기', time:'09:35', endTime:'10:00'},
+      {ic:'⛪', t:'대성당(두오모) 둘러보기 · 09:50엔 사탑 입구 앞 대기', time:'09:35', endTime:'10:00'},
       {ic:'🗼', t:'★피사의 사탑 등탑 (예약 10:00 세션·251계단·타이거 체험!)', time:'10:00', endTime:'10:40'},
       {ic:'🔔', t:'세례당 — ⭐경비원 아카펠라 에코 시연(정각·30분마다·11:00 시연)', time:'10:40', endTime:'11:15'},
       {ic:'📸', t:'광장 잔디밭 "사탑 미는" 인증샷·휴식 (캄포산토는 시간 남으면)', time:'11:15', endTime:'11:40'},
@@ -4909,16 +4910,17 @@ const MUSEUMS = {
   orangerie:{ key:'orangerie',name:'오랑주리미술관', en:"Musée de l'Orangerie", city:'paris', country:'프랑스', flag:'🇫🇷', icon:'🪷' },
   'orangerie-special':{ key:'orangerie-special', name:'모네 특별전', en:'Monet, peindre le temps', sub:'오랑주리 · 서거 100주년',
     city:'paris', country:'프랑스', flag:'🇫🇷', icon:'⏳', special:true },
+  pisa:{ key:'pisa', name:'피사 기적의 광장', en:'Piazza dei Miracoli', city:'florence', country:'이탈리아', flag:'🇮🇹', icon:'🗼' },
   accademia:{ key:'accademia', name:'아카데미아미술관', en:"Galleria dell'Accademia", city:'florence', country:'이탈리아', flag:'🇮🇹', icon:'🗿' },
   uffizi:   { key:'uffizi',   name:'우피치미술관',  en:'Uffizi Gallery',     city:'florence', country:'이탈리아', flag:'🇮🇹', icon:'🎨' },
   vatican:  { key:'vatican',  name:'바티칸미술관',  en:'Vatican Museums',    city:'rome',     country:'바티칸(세계에서 가장 작은 나라)', flag:'🇻🇦', icon:'⛪' },
 };
-const MUSEUM_ORDER = ['british','greenwich','hpstudio','nhm','national','louvre','orsay','orangerie','orangerie-special','accademia','uffizi','vatican'];
+const MUSEUM_ORDER = ['british','greenwich','hpstudio','nhm','national','louvre','orsay','orangerie','orangerie-special','pisa','accademia','uffizi','vatican'];
 // 나라별 그룹(여행 동선 순서)
 const MUSEUM_COUNTRY_GROUPS = [
   { country:'영국',   flag:'🇬🇧', museums:['british','greenwich','hpstudio','nhm','national'] },
   { country:'프랑스', flag:'🇫🇷', museums:['louvre','orsay','orangerie','orangerie-special'] },
-  { country:'이탈리아', flag:'🇮🇹', museums:['accademia','uffizi'] },
+  { country:'이탈리아', flag:'🇮🇹', museums:['pisa','accademia','uffizi'] },
   { country:'바티칸',  flag:'🇻🇦', museums:['vatican'] },
 ];
 const PERIOD_CAT_ORDER = ['ancient','medieval','modern','contemporary'];
@@ -5259,6 +5261,7 @@ const TRH_DC_FILES = [   // 새 박물관 JSON은 여기에 추가(여행 동선
   'data/docent_london_national_gallery.json',
   'data/docent_paris_louvre.json',
   'data/docent_paris_orsay_orangerie.json',
+  'data/docent_pisa_miracoli.json',
   'data/docent_florence_accademia.json',
   'data/docent_florence_uffizi.json',
   'data/docent_rome_vatican.json',
@@ -5279,6 +5282,7 @@ const TRH_DC_MERGE_ID = {
   'ng-arnolfini':'arnolfini', 'ng-hay-wain':'haywain', 'ng-temeraire':'temeraire', 'ng-sunflowers-absent':'sunflowers',
   'louvre-venus-milo':'venus-milo', 'louvre-nike':'nike', 'louvre-mona-lisa':'mona-lisa', 'louvre-liberty':'liberty', 'louvre-hammurabi':'hammurabi',
   'uffizi-annunciation':'annunciation', 'uffizi-duke-urbino':'duke-urbino', 'uffizi-primavera':'primavera', 'uffizi-birth-venus':'birth-venus',
+  'pisa-tower-1':'pisa-tower',
   'vatican-laocoon':'laocoon', 'vatican-school-athens':'school-athens', 'vatican-creation-adam':'creation-adam', 'vatican-last-judgment':'last-judgment',
 };
 const TRH_DC_MUSEUM_ALIAS = { 'national-gallery':'national' };
@@ -5505,6 +5509,7 @@ function trhDcMerge(data){
         // JSON에 quiz가 있으면 항상 우선(기존 카드의 옛 퀴즈를 덮어씀). 스탬프·퀴즈 기록(localStorage)은 그대로 유지.
         const newQuiz = trhDcConvertQuiz(w, TRH_DC_SUPPLEMENT[w.id] || {});
         if(newQuiz.length) existing.quiz = newQuiz;
+        if(!existing.museum) existing.museum = mk;   // 병합 전엔 museum 없이 도시 카드로만 있던 경우(예: pisa-tower) 박물관 화면에도 뜨게
         existing.docent = dc; return;   // 기존 필드 유지 + 신규 필드만 추가
       }
       const sup = TRH_DC_SUPPLEMENT[w.id] || {};
@@ -6687,7 +6692,8 @@ function trhDcMuseumHeader(mk){
     ${d.warning ? `<div class="trh-dc-warn">⚠️ ${esc(d.warning)}</div>` : ''}
     ${d.routeMap ? `<button class="trh-dc-btn trh-btn-ghost2" style="width:100%;margin-bottom:10px" onclick="trhShowImg('${d.routeMap}')">🗺 동선 지도 보기</button>` : ''}
     ${d.tourMode && d.tourMode.note ? `<div class="trh-dc-note trh-tourmode"><b>🎧 투어 모드</b> — ${esc(d.tourMode.note)}</div>` : ''}
-    ${(d.routeNote || d.rules.length) ? `<div class="trh-dc-note">${d.routeNote?`<div>🧭 <b>동선</b> ${esc(d.routeNote)}</div>`:''}${d.rules.map(r=>`<div>⚠️ ${esc(r)}</div>`).join('')}</div>` : ''}
+    ${d.rules.filter(r=>r.startsWith('⚠️')).map(r=>`<div class="trh-dc-redbox">${esc(r)}</div>`).join('')}
+    ${(d.routeNote || d.rules.some(r=>!r.startsWith('⚠️'))) ? `<div class="trh-dc-note">${d.routeNote?`<div>🧭 <b>동선</b> ${esc(d.routeNote)}</div>`:''}${d.rules.filter(r=>!r.startsWith('⚠️')).map(r=>`<div>⚠️ ${esc(r)}</div>`).join('')}</div>` : ''}
     ${trhMom && d.intro && d.intro.factCheck ? `<div class="trh-fact">🔍 인트로 사실 확인: ${esc(d.intro.factCheck)}</div>` : ''}
     <div class="trh-dc-tools">
       <button class="trh-dc-btn trh-btn-ghost2" id="trhOffBtn" onclick="trhOfflineSave('${mk}')">${trhOfflineLabel(d.audioMuseumId)}</button>
