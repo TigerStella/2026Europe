@@ -261,5 +261,28 @@
     "audio/orangerie-special/m27.mp3",
     "audio/orangerie-special/m28.mp3",
     "audio/orangerie-special/m29.mp3"
+  ],
+  "accademia": [
+    "audio/accademia/intro.mp3",
+    "audio/accademia/accademia-upright-piano_1.mp3",
+    "audio/accademia/accademia-upright-piano_2.mp3",
+    "audio/accademia/accademia-cristofori-stradivari_1.mp3",
+    "audio/accademia/accademia-cristofori-stradivari_2.mp3",
+    "audio/accademia/accademia-sabine_1.mp3",
+    "audio/accademia/accademia-sabine_2.mp3",
+    "audio/accademia/accademia-cassone-adimari_1.mp3",
+    "audio/accademia/accademia-cassone-adimari_2.mp3",
+    "audio/accademia/accademia-deposition_1.mp3",
+    "audio/accademia/accademia-deposition_2.mp3",
+    "audio/accademia/accademia-prisoners_1.mp3",
+    "audio/accademia/accademia-prisoners_2.mp3",
+    "audio/accademia/accademia-st-matthew_1.mp3",
+    "audio/accademia/accademia-st-matthew_2.mp3",
+    "audio/accademia/accademia-david-1_1.mp3",
+    "audio/accademia/accademia-david-1_2.mp3",
+    "audio/accademia/accademia-david-2_1.mp3",
+    "audio/accademia/accademia-david-2_2.mp3",
+    "audio/accademia/accademia-gipsoteca_1.mp3",
+    "audio/accademia/accademia-gipsoteca_2.mp3"
   ]
 }
