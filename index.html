@@ -1352,6 +1352,7 @@
       <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()" title="이 파일로 전체 교체(덮어쓰기)">📥 복원(덮어쓰기)</button>
       <button class="btn btn-ghost" onclick="document.getElementById('mergeFile').click()" title="다른 기기 백업을 합쳐서 누적">🔀 합치기(누적)</button>
       <button class="btn btn-ghost" onclick="exportSonDiary()" title="아들 일기만 담아 보내기 — 도장·미션·지출 등 다른 기록은 포함하지 않아요">🐯 아들 일기만 보내기</button>
+      <button class="btn btn-ghost" onclick="exportSonDiary(true)" title="사진은 빼고 글만 — 문자(MMS)로 보내기 좋아요. 엄마 폰에 이미 있는 사진은 그대로 유지돼요">🐯 아들 일기 (사진 빼고 글만)</button>
       <button class="btn btn-ghost" onclick="openCopyBackup()" title="파일 다운로드가 안 될 때 — 같은 폰의 다른 앱으로 복사·붙여넣기">📋 복사해서 옮기기</button>
       <button class="btn btn-ghost" onclick="openPasteMerge()" title="복사한 백업 글을 붙여넣어 합치기">📋 붙여넣기로 합치기</button>
       <button class="btn btn-ghost" onclick="openSync()" title="구글 드라이브 자동 동기화">☁️ 동기화</button>
@@ -1996,7 +1997,7 @@ const DAYS = [
     title:'뮌헨 → 피렌체 · 두오모 · 팔라초 베키오 · 야경투어',
     transport:{ icon:'✈️', time:'07:55', end:'09:10', text:'<strong>EN8192</strong> · 07:55 뮌헨 MUC(Terminal 2·게이트 G63) 출발 → 09:10 피렌체 FLR 도착' },
     story:'🌍 <b>두오모의 돔은 어떻게 지어졌을까?</b><br>1436년 완공 당시, 이렇게 큰 돔을 지지대 없이 세우는 건 불가능하다고 여겨졌어요. 건축가 브루넬레스키는 고대 로마 판테온을 연구해 <b>이중 돔 구조</b>라는 방법을 발명했고, 지금도 벽돌로 지은 돔 중 <b>세계 최대 규모</b>예요. 세례당의 청동문은 미켈란젤로가 <b>"천국의 문"</b>이라 부를 만큼 정교해서 그 별명이 붙었답니다.<br><br>🌍 <b>팔라초 베키오 — 오백인의 방</b><br>시뇨리아 광장의 탑 높은 궁전은 700년 넘게 피렌체 시청으로 쓰이는 건물이에요. 안에 있는 <b>오백인의 방(Salone dei Cinquecento)</b>은 옛날 시민 대표 500명이 모여 회의하던 거대한 홀이랍니다.<br><br>⚠️ 월요일은 우피치·아카데미아 휴관 — 대신 두오모(내부 무료)와 팔라초 베키오, 야경투어로 하루를 채워요.',
-    foot:'✈️ <b>EN8192</b> 07:55 MUC(T2·G63) → 09:10 FLR · 🚊 공항 <b>T2 트램</b> 1인 €2.00 (11세 이상 성인 요금 · 비접촉 카드 1장당 1명)<br>⛪ <b>두오모 성당 내부</b> 무료·예약 불가 · 월~토 10:15~15:45 · 어깨·무릎 가리기<br>🌃 <b>야경투어 18:30 집결</b> — 호텔 드 라 빌 앞 (Piazza degli Antinori 1, 산티 미켈레 에 가에타노 성당 앞 계단) · 전날 밤/당일 카카오톡 안내 확인<br>✅ <b>확인 필요</b> ☐ 팔라초 베키오 오늘 시간 지정 슬롯 (<a href="https://bigliettimusei.comune.fi.it" target="_blank" rel="noopener">bigliettimusei.comune.fi.it</a>) ☐ 투어 가이드에게 12번 버스 막차·정류장 확인 (안 되면 Bolt) ☐ 10/6 피사행 기차 08:53 — 오늘 밤 수면 중요<br>🧳 <b>준비할 것</b> ☐ 체크인용 신분증(여권) ☐ 편한 신발 ☐ 수신기 대여비 €5 현금 ☐ 개인 이어폰(3.5mm) ☐ 바람막이/겉옷<br>🔀 <b>A/B 갈림길</b> A) 컨디션 좋음: 위 일정 그대로 (두오모 + 팔라초 베키오) / B) 아이 피곤함: 팔라초 베키오 생략, 시뇨리아 광장 구경만 → 바로 체크인·휴식. 점심은 <b>Trattoria Mario</b> (Via Rosina 2r, 월~토 12:00~15:30, 예약 불가)',
+    foot:'✈️ <b>EN8192</b> 07:55 MUC(T2·G63) → 09:10 FLR · 🚊 공항 <b>T2 트램</b> 1인 €2.00 (11세 이상 성인 요금 · 비접촉 카드 1장당 1명)<br>⛪ <b>두오모 성당 내부</b> 무료·예약 불가 · 월~토 10:15~15:45 · 어깨·무릎 가리기<br>🌃 <b>야경투어 18:30 집결</b> — 호텔 드 라 빌 앞 (Piazza degli Antinori 1, 산티 미켈레 에 가에타노 성당 앞 계단) · 전날 밤/당일 카카오톡 안내 확인<br>✅ <b>확인 필요</b> ☐ 팔라초 베키오 오늘 시간 지정 슬롯 (<a href="https://bigliettimusei.comune.fi.it" target="_blank" rel="noopener">bigliettimusei.comune.fi.it</a>) ☐ 투어 가이드에게 12번 버스 막차·정류장 확인 (안 되면 Bolt) ☐ 10/6 피사행 기차 07:53 — 오늘 밤 수면 중요<br>🧳 <b>준비할 것</b> ☐ 체크인용 신분증(여권) ☐ 편한 신발 ☐ 수신기 대여비 €5 현금 ☐ 개인 이어폰(3.5mm) ☐ 바람막이/겉옷<br>🔀 <b>A/B 갈림길</b> A) 컨디션 좋음: 위 일정 그대로 (두오모 + 팔라초 베키오) / B) 아이 피곤함: 팔라초 베키오 생략, 시뇨리아 광장 구경만 → 바로 체크인·휴식. 점심은 <b>Trattoria Mario</b> (Via Rosina 2r, 월~토 12:00~15:30, 예약 불가)',
     acts:[
       {ic:'🚕', t:'호텔 → MUC 공항 우버 (04:50 픽업, 05:18 도착 예정 · €60.81 Wait & Save)', time:'04:50', endTime:'05:18', status:'booked',
         nav:{from:'Am Oberwiesenfeld 20, München', to:'Munich Airport Terminal 2', mode:'driving'} },
@@ -2277,7 +2278,7 @@ const PREP_TODO = {
     {t:'피렌체→피사 기차', a:'trenitalia.com or 현장 · 좌석지정 불필요'},
     {t:'팔라초 베키오 시간 지정 슬롯 (10/5)', a:'bigliettimusei.comune.fi.it · 18세 미만 무료라도 예약 필요할 수 있음'},
     {t:'야경투어 후 12번 버스 막차·정류장 (10/5)', a:'투어 가이드에게 확인 · 안 되면 Bolt'},
-    {t:'10/6 피사행 기차 08:53', a:'10/5 밤 수면 중요'},
+    {t:'10/6 피사행 기차 07:53', a:'10/5 밤 수면 중요'},
   ],
   rome:[
     {t:'콜로세움 & 포로로마노 투어 (10/10 토 14:00 Colosseo B선역 미팅)', a:'형제투어 · 결제완료·통합권35€/학생10€+수신기3€'},
@@ -4504,7 +4505,7 @@ function mergeData(j){
       if(sonOnly && x.who!=='son') return;
       x.photos=normPhotos(x.photos); if(!x.iso){ const dd=DAYS.find(d=>d.d===x.day); x.iso=dd?dd.iso:(x.date?mdToIso(x.date):''); }
       if(!ids.has(x.id)){ diary.push(x); ids.add(x.id); added++; }
-      else if(sonOnly){ const i=diary.findIndex(y=>y.id===x.id); if(i>=0 && diary[i].who==='son' && JSON.stringify(diary[i])!==JSON.stringify(x)){ diary[i]=x; added++; } }  // 아들이 고친 일기는 최신본으로 교체
+      else if(sonOnly){ const i=diary.findIndex(y=>y.id===x.id); if(i>=0 && diary[i].who==='son'){ if(j.textOnly) x.photos=diary[i].photos||[]; if(JSON.stringify(diary[i])!==JSON.stringify(x)){ diary[i]=x; added++; } } }  // 아들이 고친 일기는 최신본으로 교체
     });
     save(LS.diary, diary);
   }
@@ -4558,10 +4559,11 @@ async function copyBackupToClipboard(){
   }catch(e){ status.textContent='자동 복사가 안 돼요 — 위 글상자를 손가락으로 길게 눌러 "전체 선택" → "복사"를 직접 눌러 주세요.'; }
 }
 // 🐯 아들 일기만 보내기: 일기(아들)만 담은 파일/글 — 받는 폰에서 「합치기(누적)」나 「붙여넣기로 합치기」로 넣으면 일기만 추가·갱신됨
-async function exportSonDiary(){
-  const list=diary.filter(e=>e.who==='son');
+async function exportSonDiary(textOnly){
+  let list=diary.filter(e=>e.who==='son');
   if(!list.length){ toast('이 폰에는 아들 일기가 아직 없어요'); return; }
-  const payload={ app:'noleu-europe', version:1, kind:'diary-son', exportedAt:new Date().toISOString(), diary:list };
+  if(textOnly) list=list.map(e=>Object.assign({}, e, {photos:[]}));
+  const payload={ app:'noleu-europe', version:1, kind:'diary-son', textOnly:!!textOnly, exportedAt:new Date().toISOString(), diary:list };
   const text=JSON.stringify(payload);
   const name=`tiger-diary-${stamp()}.json`;
   const file=new File([text], name, {type:'application/json'});
@@ -4570,7 +4572,7 @@ async function exportSonDiary(){
     catch(e){ if(e && e.name==='AbortError') return; }
   }
   document.getElementById('copyBackupText').value=text;
-  document.getElementById('copyBackupStatus').textContent=`🐯 아들 일기 ${list.length}편만 담았어요(도장·미션 기록은 없음). 복사해서 카톡 등으로 엄마 폰에 보내고, 엄마 폰에서 「📋 붙여넣기로 합치기」에 붙여넣어 주세요.`;
+  document.getElementById('copyBackupStatus').textContent=`🐯 아들 일기 ${list.length}편만 담았어요(${textOnly?'사진 없이 글만 · ':''}도장·미션 기록은 없음). 복사해서 카톡 등으로 엄마 폰에 보내고, 엄마 폰에서 「📋 붙여넣기로 합치기」에 붙여넣어 주세요.`;
   openModal('copyBackupModal');
 }
 function openPasteMerge(){ document.getElementById('pasteMergeText').value=''; openModal('pasteMergeModal'); }
@@ -7024,6 +7026,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-06b · 10/5 식비 영수증</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-06c · 일기 글만 보내기</div>
 </body>
 </html>
