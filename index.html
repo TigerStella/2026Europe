@@ -4909,15 +4909,16 @@ const MUSEUMS = {
   orangerie:{ key:'orangerie',name:'오랑주리미술관', en:"Musée de l'Orangerie", city:'paris', country:'프랑스', flag:'🇫🇷', icon:'🪷' },
   'orangerie-special':{ key:'orangerie-special', name:'모네 특별전', en:'Monet, peindre le temps', sub:'오랑주리 · 서거 100주년',
     city:'paris', country:'프랑스', flag:'🇫🇷', icon:'⏳', special:true },
+  accademia:{ key:'accademia', name:'아카데미아미술관', en:"Galleria dell'Accademia", city:'florence', country:'이탈리아', flag:'🇮🇹', icon:'🗿' },
   uffizi:   { key:'uffizi',   name:'우피치미술관',  en:'Uffizi Gallery',     city:'florence', country:'이탈리아', flag:'🇮🇹', icon:'🎨' },
   vatican:  { key:'vatican',  name:'바티칸미술관',  en:'Vatican Museums',    city:'rome',     country:'바티칸(세계에서 가장 작은 나라)', flag:'🇻🇦', icon:'⛪' },
 };
-const MUSEUM_ORDER = ['british','greenwich','hpstudio','nhm','national','louvre','orsay','orangerie','orangerie-special','uffizi','vatican'];
+const MUSEUM_ORDER = ['british','greenwich','hpstudio','nhm','national','louvre','orsay','orangerie','orangerie-special','accademia','uffizi','vatican'];
 // 나라별 그룹(여행 동선 순서)
 const MUSEUM_COUNTRY_GROUPS = [
   { country:'영국',   flag:'🇬🇧', museums:['british','greenwich','hpstudio','nhm','national'] },
   { country:'프랑스', flag:'🇫🇷', museums:['louvre','orsay','orangerie','orangerie-special'] },
-  { country:'이탈리아', flag:'🇮🇹', museums:['uffizi'] },
+  { country:'이탈리아', flag:'🇮🇹', museums:['accademia','uffizi'] },
   { country:'바티칸',  flag:'🇻🇦', museums:['vatican'] },
 ];
 const PERIOD_CAT_ORDER = ['ancient','medieval','modern','contemporary'];
@@ -5257,6 +5258,7 @@ const TRH_DC_FILES = [   // 새 박물관 JSON은 여기에 추가(여행 동선
   'data/docent_london_national_gallery.json',
   'data/docent_paris_louvre.json',
   'data/docent_paris_orsay_orangerie.json',
+  'data/docent_florence_accademia.json',
   'data/docent_florence_uffizi.json',
   'data/docent_rome_vatican.json',
 ];
