@@ -592,6 +592,8 @@
   .modal-back.open { display: flex; }
   .modal { background: white; border-radius: 16px; padding: 22px; width: 100%; max-width: 480px; max-height: 88vh; overflow-y: auto; }
   .modal h3 { font-size: 16px; margin-bottom: 14px; color: var(--deep-navy); }
+  .cost-photos { display:flex; gap:6px; flex-wrap:wrap; padding:4px 4px 8px; }
+  .cost-photos img { width:56px; height:56px; object-fit:cover; border-radius:8px; border:1px solid var(--border); cursor:pointer; }
   .photo-preview { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
   .photo-preview .pp { position: relative; }
   .photo-preview img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
@@ -1533,6 +1535,7 @@
       </div>
     </div>
     <div class="field" style="margin:10px 0"><label>메모 (지출 내역)</label><input id="exMemo" placeholder="예: 에펠탑 입장권, 점심 파스타"></div>
+    <div class="field" style="margin:10px 0"><label>📷 사진 (영수증·메뉴·현장 — 기억용)</label><input type="file" id="exPhotoInput" accept="image/*" multiple onchange="handleExPhotoPick(event)"><div class="photo-preview" id="exPhotoPreview"></div></div>
     <div id="exPreview" class="hint" style="margin-bottom:12px"></div>
     <div class="form-actions">
       <button class="btn btn-primary" onclick="saveExpense()">저장</button>
@@ -3280,6 +3283,25 @@ let exCatSel = '기타비용';
 function toKrw(amount, ccy){ return Math.round((+amount||0) * (FX[ccy]||1)); }
 function costSum(){ let s=0; COSTS.forEach(c=>c.items.forEach(i=>s+=i[1])); return s; }
 let editingExpId=null;
+let exPhotos=[];
+function handleExPhotoPick(ev){
+  const files=[...ev.target.files]; if(!files.length) return;
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{ resizeImage(e.target.result, 1100, dataUrl=>{ exPhotos.push(dataUrl); renderExPhotoPreview(); }); };
+    reader.readAsDataURL(file);
+  });
+  ev.target.value='';
+}
+function renderExPhotoPreview(){
+  const el=document.getElementById('exPhotoPreview'); if(!el) return;
+  el.innerHTML=exPhotos.map((src,i)=>`<div class="pp"><img src="${src}" onclick="viewImage(this.src)"><button type="button" class="rm" onclick="removeExPhoto(${i})">✕</button></div>`).join('');
+}
+function removeExPhoto(i){ exPhotos.splice(i,1); renderExPhotoPreview(); }
+function expPhotosHTML(e){
+  if(!e.photos||!e.photos.length) return '';
+  return `<div class="cost-photos" onclick="event.stopPropagation()">${e.photos.map(src=>`<img src="${src}" onclick="viewImage(this.src)" alt="영수증/사진">`).join('')}</div>`;
+}
 function openExpenseModal(){
   editingExpId=null;
   document.getElementById('expenseModalTitle').textContent='💰 비용 추가';
@@ -3290,6 +3312,7 @@ function openExpenseModal(){
   document.getElementById('exMemo').value='';
   document.getElementById('exDate').value = fxDateBack(0);
   document.getElementById('exPay').selectedIndex=0;
+  exPhotos=[]; renderExPhotoPreview();
   document.getElementById('exCats').innerHTML = EXP_CATS.map(c=>`<button type="button" class="exp-cat ${c[1]===exCatSel?'on':''}" onclick="pickExCat('${c[1]}')">${c[0]} ${c[1]}</button>`).join('');
   updateExPreview();
   document.getElementById('expenseModal').classList.add('open');
@@ -3313,6 +3336,7 @@ function editExpense(id){
   const payS=document.getElementById('exPay'); [...payS.options].forEach((o,i)=>{ if(o.value===e.pay) payS.selectedIndex=i; });
   document.getElementById('exCats').innerHTML = EXP_CATS.map(c=>`<button type="button" class="exp-cat ${c[1]===exCatSel?'on':''}" onclick="pickExCat('${c[1]}')">${c[0]} ${c[1]}</button>`).join('');
   document.getElementById('exDelBtn').style.display='';
+  exPhotos=(e.photos||[]).slice(); renderExPhotoPreview();
   updateExPreview();
   document.getElementById('expenseModal').classList.add('open');
 }
@@ -3320,7 +3344,7 @@ function deleteEditingExpense(){ if(editingExpId){ delExpense(editingExpId); edi
 function saveExpense(){
   const amount=+document.getElementById('exAmount').value;
   if(!amount||amount<=0){ toast('금액을 입력해주세요'); return; }
-  const fields={ amount, ccy:document.getElementById('exCcy').value, cat:exCatSel, pay:document.getElementById('exPay').value, date:document.getElementById('exDate').value, memo:document.getElementById('exMemo').value.trim() };
+  const fields={ amount, ccy:document.getElementById('exCcy').value, cat:exCatSel, pay:document.getElementById('exPay').value, date:document.getElementById('exDate').value, memo:document.getElementById('exMemo').value.trim(), photos:exPhotos.slice() };
   if(editingExpId){
     const e=expenses.find(x=>x.id===editingExpId); if(e) Object.assign(e, fields);
     editingExpId=null;
@@ -3370,7 +3394,7 @@ function renderExpenses(){
       html+=list.map(e=>{
         const krw=toKrw(e.amount,e.ccy);
         const orig = e.ccy!=='KRW' ? `<span class="cost-line-orig"> (${CCY_SYM[e.ccy]}${(+e.amount).toLocaleString()})</span>` : '';
-        return `<div class="cost-line" onclick="editExpense('${e.id}')" title="탭하면 수정"><span class="cost-line-name">${catIcon(e.cat)} ${esc(e.memo||e.cat)}<span class="cost-line-orig"> · ${esc(e.pay||'')}</span></span><span class="cost-line-amt">${won(krw)}원${orig}<span class="cost-del" onclick="event.stopPropagation();delExpense('${e.id}')" title="삭제">✕</span></span></div>${expItemsHTML(e)}`;
+        return `<div class="cost-line" onclick="editExpense('${e.id}')" title="탭하면 수정"><span class="cost-line-name">${catIcon(e.cat)} ${esc(e.memo||e.cat)}<span class="cost-line-orig"> · ${esc(e.pay||'')}</span></span><span class="cost-line-amt">${won(krw)}원${orig}<span class="cost-del" onclick="event.stopPropagation();delExpense('${e.id}')" title="삭제">✕</span></span></div>${expItemsHTML(e)}${expPhotosHTML(e)}`;
       }).join('')+`</div>`;
       // 일별 사용·잔액 (EUR·GBP 환전 지갑 기준)
       if(cls==='local'){
@@ -7026,6 +7050,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-06c · 일기 글만 보내기</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-07 · 비용 사진 첨부</div>
 </body>
 </html>
