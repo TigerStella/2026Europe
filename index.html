@@ -3267,6 +3267,23 @@ const SEED_EXPENSES = [
       { fr:'Pizza Classica', ko:'클래식 피자', qty:1, unit:3.50, amt:3.50 },
       { fr:'Coca Cola', ko:'코카콜라', qty:1, unit:3.50, amt:3.50 },
     ] },
+  { id:'seed-20261007-carrefour', amount:35.15, ccy:'EUR', cat:'식비', pay:'신한트래블', date:'2026-10-07',
+    memo:'까르푸 익스프레스 장보기 (Carrefour Express · Via Sebastiano Veniero 10/A, 로마) · 18:02 · 14개',
+    items:[
+      { fr:'AQUAVITAMIN LIMONE', ko:'아쿠아비타민 레몬 (비타민 워터)', qty:1, unit:2.00, amt:2.00 },
+      { fr:'YOGURT MAGRO BIANCO', ko:'무지방 플레인 요거트', qty:1, unit:3.99, amt:3.99 },
+      { fr:'ACQUA SAN PELLEGRIN(O)', ko:'산펠레그리노 탄산수', qty:2, unit:2.00, amt:4.00 },
+      { fr:'FORMAGGIO MAASDAM A…', ko:'마스담 치즈', qty:1, unit:2.39, amt:2.39 },
+      { fr:'N.3B WURSTEL SERVEL…', ko:'소시지 (세르벨라 3개입)', qty:1, unit:4.39, amt:4.39 },
+      { fr:'DOMOPAK SACCHI', ko:'도모팍 비닐봉투', qty:1, unit:2.39, amt:2.39 },
+      { fr:'WURSTEL POLLO FORMA…', ko:'닭고기 소시지', qty:1, unit:1.39, amt:1.39 },
+      { fr:'SUCCO ACE E ZENZERO', ko:'과일·생강 주스 (ACE)', qty:1, unit:1.99, amt:1.99 },
+      { fr:'RAVIOLONI PORCINI/S…', ko:'포르치니 라비올로니 (생파스타)', qty:1, unit:3.59, amt:3.59 },
+      { fr:'SUGO BASILICO CRF B…', ko:'바질 토마토소스 (까르푸)', qty:1, unit:1.79, amt:1.79 },
+      { fr:'BB MIX PROTEICO GR1…', ko:'프로틴 믹스 (견과·곡물 추정)', qty:1, unit:3.39, amt:3.39 },
+      { fr:'FRUITTELLA VERTIGO', ko:'프루티텔라 버티고 (과일 젤리 캔디)', qty:1, unit:1.95, amt:1.95 },
+      { fr:'PANINO LUNGO MORBI…', ko:'부드러운 롤빵', qty:1, unit:1.89, amt:1.89 },
+    ] },
 ];
 (function seedExpenses(){
   const KEY='noleu_seeded_exp_v1'; const done=load(KEY,[]); let changed=false;
@@ -7050,6 +7067,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-07 · 비용 사진 첨부</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-08 · 10/7 까르푸 영수증</div>
 </body>
 </html>
