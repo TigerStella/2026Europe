@@ -3284,6 +3284,13 @@ const SEED_EXPENSES = [
       { fr:'FRUITTELLA VERTIGO', ko:'프루티텔라 버티고 (과일 젤리 캔디)', qty:1, unit:1.95, amt:1.95 },
       { fr:'PANINO LUNGO MORBI…', ko:'부드러운 롤빵', qty:1, unit:1.89, amt:1.89 },
     ] },
+  { id:'seed-20261010-mapica', amount:18.64, ccy:'EUR', cat:'식비', pay:'신한트래블', date:'2026-10-10',
+    memo:'마피카 (Mapica S.r.l. · Via del Tritone 97, 로마) · 19:24 · 중량 판매 델리',
+    items:[
+      { fr:'Bilancia (articolo a peso)', ko:'델리 음식 (정가 판매)', qty:1, unit:10.00, amt:10.00 },
+      { fr:'0,088 × Bilancia', ko:'델리 음식 (중량 88g)', qty:1, unit:2.82, amt:2.82 },
+      { fr:'0,182 × Bilancia', ko:'델리 음식 (중량 182g)', qty:1, unit:5.82, amt:5.82 },
+    ] },
 ];
 (function seedExpenses(){
   const KEY='noleu_seeded_exp_v1'; const done=load(KEY,[]); let changed=false;
@@ -7067,6 +7074,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-08 · 10/7 까르푸 영수증</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-10 · 10/10 마피카 영수증</div>
 </body>
 </html>
