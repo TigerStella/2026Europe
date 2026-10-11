@@ -2464,7 +2464,7 @@ async function hydrateDiaryPhotos(){
   if(need.length){ try{ rerenderAll(); }catch(e){} }
   try{
     await diarySaveChain;
-    if(!need.some(p=>!p.src)){ const used=new Set(); diary.forEach(e=>(e.photos||[]).forEach(p=>{ if(p.pid) used.add(p.pid); })); const keys=await phAllKeys(); for(const k of keys){ if(!used.has(k)) await phDel(k); } }
+    if(!need.some(p=>!p.src)){ const used=new Set(); diary.forEach(e=>(e.photos||[]).forEach(p=>{ if(p.pid) used.add(p.pid); })); try{ const dr=JSON.parse(localStorage.getItem('noleu_diary_draft_v1')||'null'); if(dr) (dr.photos||[]).forEach(p=>used.add(p.pid)); }catch(e){} const keys=await phAllKeys(); for(const k of keys){ if(!used.has(k)) await phDel(k); } }
   }catch(e){}
 }
 diary.forEach(e => { e.photos = normPhotos(e.photos); if(!e.iso){ const dd=DAYS.find(x=>x.d===e.day); e.iso = dd?dd.iso:(e.date?mdToIso(e.date):''); } });
@@ -4053,7 +4053,53 @@ function editDiary(id){
   document.getElementById('ddayBadge').textContent='✈ '+tripDday(document.getElementById('dDate').value);
   document.getElementById('diaryModal').classList.add('open');
 }
-function closeDiaryModal(){ document.getElementById('diaryModal').classList.remove('open'); }
+function closeDiaryModal(){ saveDraftNow(); document.getElementById('diaryModal').classList.remove('open'); renderDraftBanner(); }
+
+/* ── 📝 일기 임시저장: 쓰는 도중 창이 닫히거나 앱이 꺼져도 글·사진 보존 (저장/지우기 전까지 유지) ── */
+const DRAFT_KEY='noleu_diary_draft_v1';
+let draftTimer=null;
+function diaryModalOpen(){ const m=document.getElementById('diaryModal'); return !!(m && m.classList.contains('open')); }
+function loadDraft(){ try{ return JSON.parse(localStorage.getItem(DRAFT_KEY)||'null'); }catch(e){ return null; } }
+function clearDraft(){ clearTimeout(draftTimer); try{ localStorage.removeItem(DRAFT_KEY); }catch(e){} renderDraftBanner(); }
+function saveDraftNow(){
+  clearTimeout(draftTimer);
+  if(!diaryModalOpen()) return;
+  const title=document.getElementById('dTitle').value, body=document.getElementById('dBody').value;
+  const photos=pendingPhotos.filter(p=>p.pid).map(p=>({pid:p.pid, cap:p.cap||''}));
+  const orig = editingId ? diary.find(x=>x.id===editingId) : null;
+  const unchanged = orig && title===(orig.title||'') && body===(orig.body||'') && photos.length===(orig.photos||[]).length;
+  try{
+    if((!title.trim() && !body.trim() && !photos.length) || unchanged){ localStorage.removeItem(DRAFT_KEY); }
+    else localStorage.setItem(DRAFT_KEY, JSON.stringify({ editingId, who:document.getElementById('dWho').value, iso:document.getElementById('dDate').value, font:document.getElementById('dFont').value, title, body, photos, t:Date.now() }));
+  }catch(e){}
+}
+function saveDraftSoon(){ clearTimeout(draftTimer); draftTimer=setTimeout(saveDraftNow, 400); }
+async function resumeDraft(){
+  const d=loadDraft(); if(!d) return;
+  if(d.editingId && diary.some(x=>x.id===d.editingId)) editDiary(d.editingId); else openDiaryModal(d.who);
+  document.getElementById('dWho').value=d.who||document.getElementById('dWho').value;
+  if(d.iso) document.getElementById('dDate').value=d.iso;
+  document.getElementById('dTitle').value=d.title||''; document.getElementById('dBody').value=d.body||'';
+  fillFontSelect(document.getElementById('dFont')); document.getElementById('dFont').value=d.font||''; applyDiaryFont(); updateDDayHint();
+  pendingPhotos=[]; renderPhotoPreview();
+  for(const ph of (d.photos||[])){ try{ const src=await phGet(ph.pid); if(src){ pendingPhotos.push({src, cap:ph.cap||'', pid:ph.pid}); phStored.add(ph.pid); } }catch(e){} }
+  renderPhotoPreview();
+  renderDraftBanner();
+}
+function discardDraft(){ if(confirm('쓰던 임시저장 글을 지울까요? (되돌릴 수 없어요)')) clearDraft(); }
+function renderDraftBanner(){
+  let el=document.getElementById('draftBanner');
+  const d=loadDraft();
+  if(!d || diaryModalOpen()){ if(el) el.remove(); return; }
+  const cal=document.getElementById('diaryCal'); if(!cal) return;
+  if(!el){ el=document.createElement('div'); el.id='draftBanner'; el.style.cssText='margin:8px 0;padding:10px 12px;border-radius:12px;background:#FFF6D9;border:1px solid #E8C96A;font-size:13px;display:flex;gap:8px;align-items:center;flex-wrap:wrap'; cal.parentNode.insertBefore(el, cal); }
+  const who=d.who==='son'?'🧑 아들':'👩 엄마';
+  el.innerHTML=`<span style="flex:1;min-width:140px">📝 <b>쓰던 일기가 있어요</b> · ${who}${d.title?` · ${esc(d.title)}`:''} <small>(${esc((d.body||'').slice(0,20))}${(d.body||'').length>20?'…':''})</small></span><button class="btn btn-primary" onclick="resumeDraft()">이어쓰기</button><button class="btn btn-ghost" onclick="discardDraft()">지우기</button>`;
+}
+['dTitle','dBody','dDate','dWho','dFont'].forEach(id=>{ const el=document.getElementById(id); if(el){ el.addEventListener('input', saveDraftSoon); el.addEventListener('change', saveDraftSoon); } });
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') saveDraftNow(); });
+window.addEventListener('pagehide', saveDraftNow);
+
 
 function diaryPhotoCount(who, iso, excludeId){ return diary.filter(e=>e.who===who && e.iso===iso && e.id!==excludeId).reduce((a,e)=>a+(e.photos||[]).length,0); }
 function handlePhotoPick(ev){
@@ -4065,7 +4111,7 @@ function handlePhotoPick(ev){
   if(files.length>room){ toast(room>0?`사진은 하루 ${MAX_DIARY_PHOTOS}장까지예요 — ${room}장만 넣었어요`:`이 날 사진은 이미 ${MAX_DIARY_PHOTOS}장이에요`); files=files.slice(0,room); }
   files.forEach(file=>{
     const reader=new FileReader();
-    reader.onload=e=>{ resizeImage(e.target.result, 1000, dataUrl=>{ pendingPhotos.push({src:dataUrl, cap:''}); renderPhotoPreview(); }); };
+    reader.onload=e=>{ resizeImage(e.target.result, 1000, dataUrl=>{ const pid='p'+Date.now().toString(36)+Math.random().toString(36).slice(2,8); pendingPhotos.push({src:dataUrl, cap:'', pid}); renderPhotoPreview(); phPut(pid, dataUrl).then(saveDraftSoon).catch(()=>{}); }); };
     reader.readAsDataURL(file);
   });
 }
@@ -4088,8 +4134,8 @@ function renderPhotoPreview(){
        <input value="${esc(p.cap)}" oninput="setPhotoCap(${i}, this.value)" placeholder="캡션" style="width:80px;font-size:10px;border:1px solid var(--border);border-radius:6px;padding:3px 5px;font-family:inherit">
      </div>`).join('');
 }
-function setPhotoCap(i, v){ if(pendingPhotos[i]) pendingPhotos[i].cap=v; }
-function removePendingPhoto(i){ pendingPhotos.splice(i,1); renderPhotoPreview(); }
+function setPhotoCap(i, v){ if(pendingPhotos[i]) pendingPhotos[i].cap=v; saveDraftSoon(); }
+function removePendingPhoto(i){ pendingPhotos.splice(i,1); renderPhotoPreview(); saveDraftSoon(); }
 
 function saveDiary(){
   const who=document.getElementById('dWho').value;
@@ -4108,7 +4154,7 @@ function saveDiary(){
     diary.push({ id:'e'+Date.now()+Math.floor(performance.now()), ...fields });
   }
   save(LS.diary, diary);
-  closeDiaryModal(); renderDiary();
+  closeDiaryModal(); clearDraft(); renderDiary();
   toast('일기가 저장됐어요 📔');
 }
 function delDiary(id){
@@ -7143,6 +7189,7 @@ init();
 try{ gdriveInit(); }catch(e){}
 try{ trhLastViewInit(); }catch(e){}
 hydrateDiaryPhotos();
+try{ if(loadDraft()){ renderDraftBanner(); toast('📝 쓰던 일기가 있어요 — 일기 탭에서 이어쓰기'); } }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
 <!-- 📚 더 자세한 이야기(미션과 별개) MODAL -->
@@ -7249,6 +7296,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-11b · 아들일기 구글 전달</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-12 · 일기 자동 임시저장</div>
 </body>
 </html>
