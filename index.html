@@ -2413,7 +2413,7 @@ const LS = {
   actedit: 'noleu_actedit_v1',
 };
 function load(key, def){ try { const v=JSON.parse(localStorage.getItem(key)); return (v===null||v===undefined)?def:v; } catch(e){ return def; } }
-function save(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){ toast('저장 공간이 부족해요 (사진 용량 확인)'); } scheduleGdPush(); }
+function save(key, val){ if(key===LS.diary){ saveDiaryStore(val); scheduleGdPush(); return; } try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){ toast('저장 공간이 부족해요 (사진 용량 확인)'); } scheduleGdPush(); }
 let addedActs = load(LS.acts, {});   // { dayNum: [ {ic,t,type,time} ] }
 let reserveState = load(LS.reserve, {}); // { 'london:0': true }
 let diary = load(LS.diary, []);       // [ {id, who, day, date, title, body, photos:[{src,cap}] } ]
@@ -2422,7 +2422,49 @@ const DEFAULT_SETTINGS = { title:'노을과 타이거, 유럽', subtitle:'둘이
 settings = Object.assign({}, DEFAULT_SETTINGS, settings);
 
 // normalize legacy photo format (string -> {src,cap})
-function normPhotos(arr){ return (arr||[]).map(p => typeof p==='string' ? {src:p, cap:''} : {src:p.src, cap:p.cap||''}); }
+function normPhotos(arr){ return (arr||[]).map(p => typeof p==='string' ? {src:p, cap:''} : {src:p.src||'', cap:p.cap||'', pid:p.pid}); }
+/* 📷 일기 사진: 용량 큰 IndexedDB에 따로 저장(글 목록에는 pid만) — 일별 10장 이상도 안전 */
+const MAX_DIARY_PHOTOS = 10;
+const phStored = new Set();
+let phDbP = null, diarySavePending = 0, diarySaveChain = Promise.resolve();
+function phDb(){
+  if(phDbP) return phDbP;
+  phDbP = new Promise((res,rej)=>{ if(!('indexedDB' in window)) return rej(new Error('no idb')); const rq=indexedDB.open('noleu_diary_photos',1); rq.onupgradeneeded=()=>{ const db=rq.result; if(!db.objectStoreNames.contains('p')) db.createObjectStore('p',{keyPath:'id'}); }; rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error); });
+  phDbP.catch(()=>{ phDbP=null; });
+  return phDbP;
+}
+function phPut(id, src){ return phDb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('p','readwrite'); tx.objectStore('p').put({id,src}); tx.oncomplete=()=>{ phStored.add(id); res(); }; tx.onerror=()=>rej(tx.error); })); }
+function phGet(id){ return phDb().then(db=>new Promise((res,rej)=>{ const rq=db.transaction('p','readonly').objectStore('p').get(id); rq.onsuccess=()=>res(rq.result?rq.result.src:''); rq.onerror=()=>rej(rq.error); })); }
+function phAllKeys(){ return phDb().then(db=>new Promise((res,rej)=>{ const rq=db.transaction('p','readonly').objectStore('p').getAllKeys(); rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error); })); }
+function phDel(id){ return phDb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('p','readwrite'); tx.objectStore('p').delete(id); tx.oncomplete=res; tx.onerror=()=>rej(tx.error); })); }
+function diaryStripped(list, useIdb){ return list.map(e=>Object.assign({}, e, { photos:(e.photos||[]).map(p=> (useIdb && p.pid) ? {pid:p.pid, cap:p.cap||''} : {src:p.src, cap:p.cap||'', pid:p.pid}) })); }
+function saveDiaryStore(list){
+  list.forEach(e=>(e.photos||[]).forEach(p=>{ if(p.src && !p.pid) p.pid='p'+Date.now().toString(36)+Math.random().toString(36).slice(2,8); }));
+  const snap=list.map(e=>Object.assign({}, e, { photos:(e.photos||[]).map(p=>({src:p.src, cap:p.cap||'', pid:p.pid})) }));
+  const need=[]; snap.forEach(e=>e.photos.forEach(p=>{ if(p.src && !phStored.has(p.pid)) need.push(p); }));
+  const write=(useIdb)=>{ try{ localStorage.setItem(LS.diary, JSON.stringify(diaryStripped(snap, useIdb))); }catch(err){ toast('저장 공간이 부족해요'); } };
+  if(!need.length && !diarySavePending){ write(true); return; }
+  diarySavePending++;
+  diarySaveChain = diarySaveChain.then(async()=>{
+    let ok=true;
+    try{ for(const p of need){ if(!phStored.has(p.pid)) await phPut(p.pid, p.src); } }catch(e){ ok=false; }
+    write(ok);
+  }).catch(()=>{}).then(()=>{ diarySavePending--; });
+}
+async function hydrateDiaryPhotos(){
+  let migrate=false;
+  diary.forEach(e=>(e.photos||[]).forEach(p=>{ if(p.src && !p.pid) migrate=true; }));
+  const need=[]; diary.forEach(e=>(e.photos||[]).forEach(p=>{ if(p.pid && !p.src) need.push(p); }));
+  try{
+    for(const p of need){ const src=await phGet(p.pid); if(src){ p.src=src; phStored.add(p.pid); } }
+  }catch(e){}
+  if(migrate) saveDiaryStore(diary);   // 예전 일기의 사진을 새 저장소로 옮김(옮겨진 걸 확인한 뒤에만 글 목록에서 뺌)
+  if(need.length){ try{ rerenderAll(); }catch(e){} }
+  try{
+    await diarySaveChain;
+    if(!need.some(p=>!p.src)){ const used=new Set(); diary.forEach(e=>(e.photos||[]).forEach(p=>{ if(p.pid) used.add(p.pid); })); const keys=await phAllKeys(); for(const k of keys){ if(!used.has(k)) await phDel(k); } }
+  }catch(e){}
+}
 diary.forEach(e => { e.photos = normPhotos(e.photos); if(!e.iso){ const dd=DAYS.find(x=>x.d===e.day); e.iso = dd?dd.iso:(e.date?mdToIso(e.date):''); } });
 
 // 비공개 연락처 (공개 저장소에 저장 안 함, 브라우저 localStorage에만 보관)
@@ -3998,7 +4040,7 @@ function openDiaryModal(who){
 }
 function editDiary(id){
   const e=diary.find(x=>x.id===id); if(!e) return;
-  editingId=id; pendingPhotos=(e.photos||[]).map(p=>({src:p.src, cap:p.cap||''}));
+  editingId=id; pendingPhotos=(e.photos||[]).map(p=>({src:p.src, cap:p.cap||'', pid:p.pid}));
   document.getElementById('diaryModalTitle').textContent='✏️ 일기 수정';
   document.getElementById('dWho').value=e.who;
   document.getElementById('dDate').value=e.iso || (entryDay(e)?entryDay(e).iso:DAYS[0].iso);
@@ -4011,9 +4053,14 @@ function editDiary(id){
 }
 function closeDiaryModal(){ document.getElementById('diaryModal').classList.remove('open'); }
 
+function diaryPhotoCount(who, iso, excludeId){ return diary.filter(e=>e.who===who && e.iso===iso && e.id!==excludeId).reduce((a,e)=>a+(e.photos||[]).length,0); }
 function handlePhotoPick(ev){
-  const files=[...ev.target.files];
+  let files=[...ev.target.files];
+  ev.target.value='';
   if(!files.length) return;
+  const who=document.getElementById('dWho').value, iso=document.getElementById('dDate').value;
+  const room=Math.max(0, MAX_DIARY_PHOTOS - diaryPhotoCount(who,iso,editingId) - pendingPhotos.length);
+  if(files.length>room){ toast(room>0?`사진은 하루 ${MAX_DIARY_PHOTOS}장까지예요 — ${room}장만 넣었어요`:`이 날 사진은 이미 ${MAX_DIARY_PHOTOS}장이에요`); files=files.slice(0,room); }
   files.forEach(file=>{
     const reader=new FileReader();
     reader.onload=e=>{ resizeImage(e.target.result, 1000, dataUrl=>{ pendingPhotos.push({src:dataUrl, cap:''}); renderPhotoPreview(); }); };
@@ -4049,6 +4096,7 @@ function saveDiary(){
   const body=document.getElementById('dBody').value.trim();
   if(!iso){ toast('날짜를 선택해주세요'); return; }
   if(!title && !body){ toast('제목이나 내용을 입력해주세요'); return; }
+  if(diaryPhotoCount(who,iso,editingId)+pendingPhotos.length>MAX_DIARY_PHOTOS){ toast(`사진은 하루 ${MAX_DIARY_PHOTOS}장까지예요 (이 날 이미 다른 일기에 ${diaryPhotoCount(who,iso,editingId)}장)`); return; }
   const dd=ISO2DAY[iso];
   const font=document.getElementById('dFont').value; lastDiaryFont=font;
   const fields={ who, iso, day: dd?dd.d:null, date: dd?dd.date:isoLabel(iso), title, body, font, photos:pendingPhotos.slice() };
@@ -6612,7 +6660,7 @@ async function trhFillMineThumbs(){
     el.style.backgroundImage=`url(${trhPhotoUrl(p)})`; el.classList.add('has-photo');
   }
 }
-function trhMineCount(){ const m=document.getElementById('trhMineMemo'), c=document.getElementById('trhMineCnt'); if(m&&c) c.textContent=`${m.value.length} / 200`; }
+function trhMineCount(){ const m=document.getElementById('trhMineMemo'), c=document.getElementById('trhMineCnt'); if(m&&c) c.textContent=`${m.value.length} / 2000`; }
 function trhMinePreview(src){ const pv=document.getElementById('trhMinePv'), im=document.getElementById('trhMinePvImg'); if(src){ im.src=src; pv.style.display='block'; } else { im.removeAttribute('src'); pv.style.display='none'; } }
 async function trhMineOpen(mk, id){
   const item = id ? (trhMine[mk]||[]).find(x=>x.id===id) : null;
@@ -6640,7 +6688,7 @@ async function trhMineDropPhotos(id){ try{ for(const p of await trhPhotoList('mi
 async function trhMineSubmit(){
   const ed=trhMineEdit; if(!ed) return;
   const title=(document.getElementById('trhMineTitle').value||'').trim().slice(0,40);
-  const memo=(document.getElementById('trhMineMemo').value||'').trim().slice(0,200);
+  const memo=(document.getElementById('trhMineMemo').value||'').trim().slice(0,2000);
   if(!title){ toast('제목을 한 단어라도 적어 줘!'); document.getElementById('trhMineTitle').focus(); return; }
   const now=Date.now();
   const list=trhMine[ed.mk]=trhMine[ed.mk]||[];
@@ -6680,8 +6728,8 @@ function trhMineMerge(src){
     arr.forEach(x=>{
       if(!x || !x.id || !x.title || trhMineDel[x.id]) return;
       const cur=list.find(y=>y.id===x.id);
-      if(!cur){ list.push({ id:x.id, title:String(x.title).slice(0,40), memo:String(x.memo||'').slice(0,200), createdAt:x.createdAt||Date.now(), hasPhoto:!!x.hasPhoto, updatedAt:x.updatedAt||x.createdAt||0 }); added++; }
-      else if((x.updatedAt||0) > (cur.updatedAt||0)){ cur.title=String(x.title).slice(0,40); cur.memo=String(x.memo||'').slice(0,200); cur.updatedAt=x.updatedAt; }
+      if(!cur){ list.push({ id:x.id, title:String(x.title).slice(0,40), memo:String(x.memo||'').slice(0,2000), createdAt:x.createdAt||Date.now(), hasPhoto:!!x.hasPhoto, updatedAt:x.updatedAt||x.createdAt||0 }); added++; }
+      else if((x.updatedAt||0) > (cur.updatedAt||0)){ cur.title=String(x.title).slice(0,40); cur.memo=String(x.memo||'').slice(0,2000); cur.updatedAt=x.updatedAt; }
     });
   });
   Object.keys(trhMine).forEach(mk=>{ trhMine[mk]=(trhMine[mk]||[]).filter(x=>!trhMineDel[x.id]); if(!trhMine[mk].length) delete trhMine[mk]; });
@@ -6900,7 +6948,7 @@ function trhDcBestHtml(mk){
   return `<div class="trh-best">
     <h4>🏆 관람 완료! 오늘의 베스트 1</h4>
     <select id="trhBestSel" class="trh-best-sel"><option value="">— 제일 좋았던 작품 고르기 —</option>${sites.map(s=>`<option value="${s.id}" ${b.siteId===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select>
-    <textarea id="trhBestNote" class="trh-best-note" rows="2" maxlength="200" placeholder="한 줄 감상: 왜 제일 좋았어?">${esc(b.note||'')}</textarea>
+    <textarea id="trhBestNote" class="trh-best-note" rows="3" maxlength="1000" placeholder="한 줄 감상: 왜 제일 좋았어?">${esc(b.note||'')}</textarea>
     <button class="trh-dc-btn trh-btn-gold" style="width:100%" onclick="trhSaveBest('${mk}')">💾 저장하기</button>
     ${b.siteId ? `<p class="trh-small">✅ 저장됨 — ${esc((trhSite(b.siteId)||{}).name||'')}${b.note?` · “${esc(b.note)}”`:''}</p>` : ''}
   </div>`;
@@ -6953,7 +7001,7 @@ function trhDcPanel(s){
   // 미션: 기억 미션(촬영 금지) > 사진 미션
   if(dc.memoryMission){
     h += `<div class="trh-dc-sec"><h4>🧠 기억 미션 (촬영 금지 구역)</h4><p>${esc(dc.memoryMission)}</p>
-      <textarea id="trhMem" class="trh-best-note" rows="3" maxlength="400" placeholder="눈으로 본 것을 기억해서 적어 봐">${esc(trhMemory[s.id]||'')}</textarea>
+      <textarea id="trhMem" class="trh-best-note" rows="6" maxlength="3000" placeholder="눈으로 본 것을 기억해서 적어 봐">${esc(trhMemory[s.id]||'')}</textarea>
       <button class="trh-dc-btn trh-btn-gold" style="width:100%" onclick="trhSaveMemory('${s.id}')">✍️ 기록하고 도장 받기</button></div>`;
   } else if(dc.photoMission && !/^없음/.test(dc.photoMission.trim()) && eff!=='absent'){
     h += `<div class="trh-dc-sec"><h4>📸 사진 미션</h4><p>${esc(dc.photoMission)}</p>
@@ -7018,6 +7066,7 @@ function renderPassport(){
 init();
 try{ gdriveInit(); }catch(e){}
 try{ trhLastViewInit(); }catch(e){}
+hydrateDiaryPhotos();
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
 <!-- 📚 더 자세한 이야기(미션과 별개) MODAL -->
@@ -7079,7 +7128,7 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
     </div>
     <div class="pv" id="trhMinePv"><img id="trhMinePvImg" alt="미리보기"><button type="button" aria-label="사진 빼기" onclick="trhMineRemovePhoto()">✕</button></div>
     <label class="lb" for="trhMineMemo">③ 짧은 메모 <small style="font-weight:500;color:var(--text-light)">(선택)</small></label>
-    <textarea id="trhMineMemo" maxlength="200" placeholder="왜 눈에 띄었어?" oninput="trhMineCount()"></textarea>
+    <textarea id="trhMineMemo" rows="5" maxlength="2000" placeholder="왜 눈에 띄었어?" oninput="trhMineCount()"></textarea>
     <div class="cnt" id="trhMineCnt">0 / 200</div>
     <div class="row" style="margin-top:14px">
       <button class="trh-dc-btn trh-btn-primary2" id="trhMineSaveBtn" onclick="trhMineSubmit()">💾 저장</button>
@@ -7124,6 +7173,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-10 · 10/10 마피카 영수증</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-11 · 일기 사진 하루10장·글자수 확대</div>
 </body>
 </html>
