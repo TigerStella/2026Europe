@@ -1354,6 +1354,8 @@
       <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()" title="이 파일로 전체 교체(덮어쓰기)">📥 복원(덮어쓰기)</button>
       <button class="btn btn-ghost" onclick="document.getElementById('mergeFile').click()" title="다른 기기 백업을 합쳐서 누적">🔀 합치기(누적)</button>
       <button class="btn btn-ghost" onclick="exportSonDiary()" title="아들 일기만 담아 보내기 — 도장·미션·지출 등 다른 기록은 포함하지 않아요">🐯 아들 일기만 보내기</button>
+      <button class="btn btn-ghost" onclick="sonDrivePush()" title="아들 폰에서: 아들 일기+사진만 구글 드라이브에 올려요 (도장·미션·비용은 올리지 않아요)">🐯 아들 일기 올리기 (구글)</button>
+      <button class="btn btn-ghost" onclick="sonDrivePull()" title="태블릿/엄마 폰에서: 아들 일기+사진만 가져와 합쳐요 (다른 기록은 건드리지 않아요)">🐯 아들 일기 가져오기 (구글)</button>
       <button class="btn btn-ghost" onclick="exportSonDiary(true)" title="사진은 빼고 글만 — 문자(MMS)로 보내기 좋아요. 엄마 폰에 이미 있는 사진은 그대로 유지돼요">🐯 아들 일기 (사진 빼고 글만)</button>
       <button class="btn btn-ghost" onclick="openCopyBackup()" title="파일 다운로드가 안 될 때 — 같은 폰의 다른 앱으로 복사·붙여넣기">📋 복사해서 옮기기</button>
       <button class="btn btn-ghost" onclick="openPasteMerge()" title="복사한 백업 글을 붙여넣어 합치기">📋 붙여넣기로 합치기</button>
@@ -4601,7 +4603,7 @@ function mergeData(j){
       if(sonOnly && x.who!=='son') return;
       x.photos=normPhotos(x.photos); if(!x.iso){ const dd=DAYS.find(d=>d.d===x.day); x.iso=dd?dd.iso:(x.date?mdToIso(x.date):''); }
       if(!ids.has(x.id)){ diary.push(x); ids.add(x.id); added++; }
-      else if(sonOnly){ const i=diary.findIndex(y=>y.id===x.id); if(i>=0 && diary[i].who==='son'){ if(j.textOnly) x.photos=diary[i].photos||[]; if(JSON.stringify(diary[i])!==JSON.stringify(x)){ diary[i]=x; added++; } } }  // 아들이 고친 일기는 최신본으로 교체
+      else if(sonOnly){ const i=diary.findIndex(y=>y.id===x.id); if(i>=0 && diary[i].who==='son'){ if(j.textOnly) x.photos=diary[i].photos||[]; else x.photos.forEach(pp=>{ if(!pp.src && pp.pid){ const lp=(diary[i].photos||[]).find(q=>q.pid===pp.pid); if(lp) pp.src=lp.src; } }); const sig=e=>JSON.stringify([e.who,e.iso,e.day,e.title,e.body,e.font,(e.photos||[]).map(q=>[q.pid||'',q.cap||''])]); if(sig(diary[i])!==sig(x)){ diary[i]=x; added++; } } }  // 아들이 고친 일기는 최신본으로 교체
     });
     save(LS.diary, diary);
   }
@@ -4670,6 +4672,80 @@ async function exportSonDiary(textOnly){
   document.getElementById('copyBackupText').value=text;
   document.getElementById('copyBackupStatus').textContent=`🐯 아들 일기 ${list.length}편만 담았어요(${textOnly?'사진 없이 글만 · ':''}도장·미션 기록은 없음). 복사해서 카톡 등으로 엄마 폰에 보내고, 엄마 폰에서 「📋 붙여넣기로 합치기」에 붙여넣어 주세요.`;
   openModal('copyBackupModal');
+}
+
+/* ── 🐯 아들 일기 전용 구글 드라이브 전달 (일기+사진만 · 다른 기록은 올리지도, 가져오지도 않음) ──
+   아들 폰: 올리기 / 태블릿·엄마 폰: 가져오기. 같은 구글 계정(앱 전용)으로 로그인. 파일은 이 앱이 만든 것만 접근(drive.file). */
+const GD_SON_FILE='noleu-son-diary.json', GD_SON_PHOTO='noleu-sp-';
+function gdAuth(){
+  return new Promise((res,rej)=>{
+    if(gdToken) return res();
+    if(!gdReady()) return rej(new Error('구글 스크립트를 못 불러왔어요 (인터넷 확인)'));
+    gdTokenClient=google.accounts.oauth2.initTokenClient({ client_id:gdClientId(), scope:'https://www.googleapis.com/auth/drive.file',
+      callback:(r)=>{ if(r&&r.access_token){ gdToken=r.access_token; settings.gdConsented=true; try{ localStorage.setItem(LS.settings, JSON.stringify(settings)); }catch(e){} res(); } else rej(new Error('로그인에 실패했어요')); },
+      error_callback:()=>rej(new Error('로그인이 취소됐어요')) });
+    gdTokenClient.requestAccessToken({prompt: settings.gdConsented?'':'consent'});
+  });
+}
+async function gdListAll(){
+  const map={}; let tok='';
+  do{
+    const r=await gdFetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent('trashed=false')}&spaces=drive&pageSize=1000&fields=${encodeURIComponent('nextPageToken,files(id,name)')}${tok?'&pageToken='+tok:''}`);
+    const j=await r.json(); (j.files||[]).forEach(f=>{ map[f.name]=f.id; }); tok=j.nextPageToken||'';
+  }while(tok);
+  return map;
+}
+async function gdUpsertNamed(name, body, id){
+  if(id) return gdFetch(`https://www.googleapis.com/upload/drive/v3/files/${id}?uploadType=media`, {method:'PATCH', headers:{'Content-Type':'application/json'}, body});
+  const bd='noleuB'+Math.floor(performance.now())+Math.floor(Math.random()*1e6); const meta=JSON.stringify({name, mimeType:'application/json'});
+  const mp=`--${bd}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${bd}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${bd}--`;
+  return gdFetch(`https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id`, {method:'POST', headers:{'Content-Type':`multipart/related; boundary=${bd}`}, body:mp});
+}
+let sonSyncBusy=false;
+async function sonDrivePush(){
+  if(sonSyncBusy) return;
+  const list=diary.filter(e=>e.who==='son');
+  if(!list.length){ toast('이 폰에는 아들 일기가 아직 없어요'); return; }
+  sonSyncBusy=true;
+  try{
+    toast('🔑 구글 로그인…'); await gdAuth();
+    toast('☁️ 올릴 목록 확인 중…'); const files=await gdListAll();
+    const photos=[]; list.forEach(e=>(e.photos||[]).forEach(p=>{ if(p.src && p.pid && !files[GD_SON_PHOTO+p.pid+'.json']) photos.push(p); }));
+    for(let i=0;i<photos.length;i++){
+      toast(`📷 사진 올리는 중 ${i+1}/${photos.length}`);
+      await gdUpsertNamed(GD_SON_PHOTO+photos[i].pid+'.json', JSON.stringify({id:photos[i].pid, src:photos[i].src}), null);
+    }
+    const payload={ app:'noleu-europe', version:1, kind:'diary-son', exportedAt:new Date().toISOString(), diary:list.map(e=>Object.assign({}, e, {photos:(e.photos||[]).filter(p=>p.pid).map(p=>({pid:p.pid, cap:p.cap||''}))})) };
+    await gdUpsertNamed(GD_SON_FILE, JSON.stringify(payload), files[GD_SON_FILE]||null);
+    toast(`✅ 아들 일기 ${list.length}편 · 사진 ${photos.length}장 새로 올렸어요`);
+  }catch(e){ toast('올리기 실패: '+(e.message||e)); }
+  finally{ sonSyncBusy=false; }
+}
+async function sonDrivePull(){
+  if(sonSyncBusy) return;
+  sonSyncBusy=true;
+  try{
+    toast('🔑 구글 로그인…'); await gdAuth();
+    const files=await gdListAll();
+    if(!files[GD_SON_FILE]){ toast('드라이브에 올라온 아들 일기가 없어요 (아들 폰에서 먼저 「올리기」)'); return; }
+    toast('☁️ 아들 일기 내려받는 중…');
+    const j=await (await gdFetch(`https://www.googleapis.com/drive/v3/files/${files[GD_SON_FILE]}?alt=media`)).json();
+    const added=mergeData(j);
+    // 사진: 이 기기에 없는 것만 한 장씩 받아옴
+    const miss=[]; diary.forEach(e=>{ if(e.who==='son') (e.photos||[]).forEach(p=>{ if(p.pid && !p.src) miss.push(p); }); });
+    let got=0;
+    for(let i=0;i<miss.length;i++){
+      const p=miss[i];
+      try{ const local=await phGet(p.pid); if(local){ p.src=local; phStored.add(p.pid); continue; } }catch(e){}
+      const fid=files[GD_SON_PHOTO+p.pid+'.json']; if(!fid) continue;
+      toast(`📷 사진 받는 중 ${i+1}/${miss.length}`);
+      const pj=await (await gdFetch(`https://www.googleapis.com/drive/v3/files/${fid}?alt=media`)).json();
+      if(pj && pj.src){ p.src=pj.src; got++; try{ await phPut(p.pid, pj.src); }catch(e){} }
+    }
+    save(LS.diary, diary); rerenderAll();
+    toast(`✅ 아들 일기 합침 · 새로/바뀐 일기 ${added}편 · 사진 ${got}장 받음`);
+  }catch(e){ toast('가져오기 실패: '+(e.message||e)); }
+  finally{ sonSyncBusy=false; }
 }
 function openPasteMerge(){ document.getElementById('pasteMergeText').value=''; openModal('pasteMergeModal'); }
 function submitPasteMerge(){
@@ -7173,6 +7249,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-11 · 일기 사진 하루10장·글자수 확대</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-11b · 아들일기 구글 전달</div>
 </body>
 </html>
