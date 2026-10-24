@@ -1470,6 +1470,8 @@
     </div>
     <div class="field" style="margin-bottom:10px"><label>사진 업로드</label>
       <input type="file" id="dPhotos" accept="image/*" multiple onchange="handlePhotoPick(event)">
+      <button type="button" class="btn btn-ghost" style="margin-top:6px" onclick="document.getElementById('dPhotosFiles').click()" title="갤러리가 아닌 파일 선택 화면이 열려요 — 네이버 MYBOX·구글 드라이브·다운로드 폴더 등에서 고를 수 있어요">📁 파일에서 선택 (MYBOX·드라이브 등)</button>
+      <input type="file" id="dPhotosFiles" accept="*/*" multiple style="display:none" onchange="handlePhotoPick(event)">
       <div class="photo-preview" id="photoPreview"></div>
     </div>
     <div class="form-actions">
@@ -4105,6 +4107,9 @@ function diaryPhotoCount(who, iso, excludeId){ return diary.filter(e=>e.who===wh
 function handlePhotoPick(ev){
   let files=[...ev.target.files];
   ev.target.value='';
+  const isImg=f=>/^image\//.test(f.type) || /\.(jpe?g|png|webp|gif|heic|heif|bmp)$/i.test(f.name||'');
+  const skipped=files.filter(f=>!isImg(f)).length; files=files.filter(isImg);
+  if(skipped) toast(`사진이 아닌 파일 ${skipped}개는 건너뛰었어요`);
   if(!files.length) return;
   const who=document.getElementById('dWho').value, iso=document.getElementById('dDate').value;
   const room=Math.max(0, MAX_DIARY_PHOTOS - diaryPhotoCount(who,iso,editingId) - pendingPhotos.length);
@@ -7296,6 +7301,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-12 · 일기 자동 임시저장</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 10-24 · 일기 파일선택(MYBOX)</div>
 </body>
 </html>
