@@ -4272,7 +4272,17 @@ function openBrunch(){
   // populate day scope options (ISO 날짜 기준)
   const keys=[...new Set(diary.map(e=>entryKey(e)))].sort();
   const sel=document.getElementById('brunchScope');
-  sel.innerHTML = `<option value="all">전체 일기 모아서</option>` + keys.map(k=>{ const e=diary.find(x=>entryKey(x)===k); return `<option value="${k}">${esc(entryLabel(e))}</option>`; }).join('');
+  const prev=sel.value;
+  sel.innerHTML = `<option value="all">전체 일기 모아서</option>` + keys.map(k=>{
+    const list=diary.filter(x=>entryKey(x)===k).sort((a,b)=>((a.createdAt||0)-(b.createdAt||0)) || (a.id<b.id?-1:1));
+    const lbl=esc(entryLabel(list[0]));
+    if(list.length===1) return `<option value="${k}">${lbl}</option>`;
+    // 같은 날 여러 편: 한 편씩 따로 고르면 독립된 글로 출력
+    return `<optgroup label="${lbl} · ${list.length}편">`
+      + list.map((e,i)=>`<option value="id:${e.id}">${i+1}. ${e.who==='son'?'🧑':'👩'} ${esc(e.title||'무제')}</option>`).join('')
+      + `<option value="${k}">↳ 이 날 ${list.length}편 합쳐서</option></optgroup>`;
+  }).join('');
+  if([...sel.options].some(o=>o.value===prev)) sel.value=prev;
   closeBlogPub(); closeEbook();
   document.getElementById('brunchOut').classList.add('open');
   renderBrunch();
@@ -4284,10 +4294,13 @@ function buildBrunch(){
   const scope=document.getElementById('brunchScope').value;
   const voice=document.getElementById('brunchVoice').value;
   const cmp=(a,b)=> (entryKey(a)<entryKey(b)?-1:entryKey(a)>entryKey(b)?1:0) || (a.who>b.who?1:-1);
+  const one = scope.startsWith('id:') ? scope.slice(3) : null;   // 일기 한 편만 → 독립된 글
   let entries=diary.slice().sort(cmp);
-  if(scope!=='all') entries=entries.filter(e=>entryKey(e)===scope);
-  if(voice!=='both') entries=entries.filter(e=>e.who===voice);
+  if(one) entries=entries.filter(e=>e.id===one);
+  else if(scope!=='all') entries=entries.filter(e=>entryKey(e)===scope);
+  if(!one && voice!=='both') entries=entries.filter(e=>e.who===voice);
   if(!entries.length) return null;
+  const dayScope = one ? entryKey(entries[0]) : scope;
 
   const cityName1=e=>{ const d=entryDay(e); return d?CITIES[d.city].name:''; };
   const cities=[...new Set(entries.map(cityName1).filter(Boolean))];
@@ -4302,7 +4315,7 @@ function buildBrunch(){
     sub = settings.subtitle || `${cities.join(' · ')} — 엄마와 아들의 여행 일기`;
   } else {
     const cn = cityName1(entries[0]);
-    h1 = firstTitle || pickSeed([`${cn||isoLabel(scope)}에서의 하루`,`${cn||isoLabel(scope)}의 하루`,`그날의 ${cn||isoLabel(scope)}`,`${cn||isoLabel(scope)}, 그 하루의 기록`], scope);
+    h1 = firstTitle || pickSeed([`${cn||isoLabel(dayScope)}에서의 하루`,`${cn||isoLabel(dayScope)}의 하루`,`그날의 ${cn||isoLabel(dayScope)}`,`${cn||isoLabel(dayScope)}, 그 하루의 기록`], dayScope);
     sub = entryLabel(entries[0]);
   }
   const metaLine = `${dates[0]||''}${dates.length>1?` – ${dates[dates.length-1]}`:''}${cities.length?` · ${cities.join(', ')}`:''}`;
@@ -4323,7 +4336,7 @@ function buildBrunch(){
     byKey[kk].sort((a,b)=> a.who>b.who?1:-1).forEach(e=>{
       if(e.title && scope!=='all') blocks.push({type:'h2', html:esc(e.title)});
       // 노을(엄마)의 글은 본문 서술로 흐르게 두고, 타이거(아들)의 기록만 짚어준다
-      if(voice==='both' && e.who==='son') blocks.push({type:'label', html:`— ${esc(sonName)}의 기록`});
+      if(!one && voice==='both' && e.who==='son') blocks.push({type:'label', html:`— ${esc(sonName)}의 기록`});
       if(e.who==='son'){
         splitParas(e.body).forEach(para=> blocks.push({type:'quote', html:esc(para), hand:true}));
       } else if(tone==='noeul'){
@@ -4520,7 +4533,7 @@ const TITLE_EMO=['좋았던','좋은','행복한','행복했던','감동','설�
 function normPlace(t){ let x=String(t||''); PLACE_NAMES.forEach(([ok,alts])=>alts.forEach(a=>{ x=x.split(a).join(ok); })); return x; }
 function brunchMeta(){
   const scope=document.getElementById('brunchScope').value;
-  let es=diary.slice(); if(scope!=='all') es=es.filter(e=>entryKey(e)===scope);
+  let es=diary.slice(); if(scope.startsWith('id:')) es=es.filter(e=>e.id===scope.slice(3)); else if(scope!=='all') es=es.filter(e=>entryKey(e)===scope);
   const ds=[...new Set(es.map(e=>entryDay(e)).filter(Boolean))];
   const city=ds.length?CITIES[ds[0].city].name:'';
   const acts=ds.flatMap(d=>(d.acts||[]).map(a=>String(a.t||'').replace(/<[^>]+>/g,''))).filter(Boolean).slice(0,14);
@@ -7443,6 +7456,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 11-04 · 같은 날 여러 편 일기</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 11-10 · 브런치 한 편씩 발행</div>
 </body>
 </html>
