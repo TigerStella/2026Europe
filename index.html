@@ -2544,6 +2544,10 @@ function dayLabel(d){ const day=DAYS.find(x=>x.d===d); return day ? `D${day.d} �
 function entryDay(e){ return e.iso ? ISO2DAY[e.iso] : DAYS.find(x=>x.d===e.day); }
 function entryLabel(e){ const day=entryDay(e); return day ? `D${day.d} · ${day.date}(${day.wd}) ${CITIES[day.city].name}` : (e.iso ? isoLabel(e.iso) : (e.date||'날짜 미정')); }
 function entryKey(e){ return e.iso || (entryDay(e)?entryDay(e).iso:'') || '9999'; }
+// 같은 날 여러 편: 여행 day 번호는 같게, 뒤에 순번 — D2-01, D2-02 (한 편뿐이면 D2)
+function sameDayEntries(k){ return diary.filter(x=>entryKey(x)===k).sort((a,b)=>((a.createdAt||0)-(b.createdAt||0)) || (a.id<b.id?-1:1)); }
+function entryCode(e){ const d=entryDay(e), k=entryKey(e); const base=d?`D${d.d}`:(k!=='9999'?isoLabel(k):''); const list=sameDayEntries(k); return list.length>1 ? `${base}-${String(list.findIndex(x=>x.id===e.id)+1).padStart(2,'0')}` : base; }
+function entryLabelSeq(e){ const d=entryDay(e); return d ? `${entryCode(e)} · ${d.date}(${d.wd}) ${CITIES[d.city].name}` : `${entryLabel(e)}${sameDayEntries(entryKey(e)).length>1?' · '+entryCode(e).split('-').pop():''}`; }
 
 /* ══════════════════ RENDER: ROUTE BAR ══════════════════ */
 function renderRoute(){
@@ -4218,7 +4222,7 @@ function diaryCalClick(iso){
   if(!pn){ pn=document.createElement('div'); pn.id='calDayPanel'; pn.className='cal-day-panel'; cal.appendChild(pn); }
   const [y,m,d]=iso.split('-').map(Number);
   pn.innerHTML=`<div class="cdp-head">📅 ${m}/${d} · 기록 ${hits.length}편<button class="cdp-x" onclick="this.closest('.cal-day-panel').remove()">✕</button></div>`
-    + hits.map(e=>`<button class="cdp-item ${e.who}" onclick="jumpPostit('${e.id}')">${e.who==='son'?'🧑':'👩'} ${e.title?esc(e.title):'<i>무제</i>'}</button>`).join('')
+    + sameDayEntries(iso).map(e=>`<button class="cdp-item ${e.who}" onclick="jumpPostit('${e.id}')">${esc(entryCode(e))} ${e.who==='son'?'🧑':'👩'} ${e.title?esc(e.title):'<i>무제</i>'}</button>`).join('')
     + `<button class="btn btn-primary cdp-new" onclick="document.getElementById('calDayPanel').remove();openDiaryModalOn('${iso}')">＋ 이 날 새 글 쓰기</button>`;
 }
 function jumpPostit(id){ const el=document.getElementById('pit-'+id); if(el){ el.classList.add('open','flash'); el.scrollIntoView({behavior:'smooth', block:'center'}); setTimeout(()=>el.classList.remove('flash'),1600); } }
@@ -4251,7 +4255,7 @@ function renderDiary(){
     wrap.innerHTML = entries.map(e=>`
       <div class="postit ${who}" id="pit-${e.id}">
         <div class="postit-head" onclick="togglePostit('${e.id}')">
-          <span class="postit-date">${esc(entryLabel(e))}${tot[entryKey(e)]>1?` <span class="postit-nth">${(nth[entryKey(e)]=(nth[entryKey(e)]||0)+1)}/${tot[entryKey(e)]}</span>`:''}${entryKey(e)!=='9999'?` <span class="postit-dday">${esc(tripDday(entryKey(e)))}</span>`:''}</span>
+          <span class="postit-date">${esc(entryLabelSeq(e))}${entryKey(e)!=='9999'?` <span class="postit-dday">${esc(tripDday(entryKey(e)))}</span>`:''}</span>
           <span class="postit-titleline" style="font-family:${fontCss(e.font)}">${e.title?esc(e.title):'<i>무제</i>'}</span>
           <span class="postit-caret">▾</span>
         </div>
@@ -4279,7 +4283,7 @@ function openBrunch(){
     if(list.length===1) return `<option value="${k}">${lbl}</option>`;
     // 같은 날 여러 편: 한 편씩 따로 고르면 독립된 글로 출력
     return `<optgroup label="${lbl} · ${list.length}편">`
-      + list.map((e,i)=>`<option value="id:${e.id}">${i+1}. ${e.who==='son'?'🧑':'👩'} ${esc(e.title||'무제')}</option>`).join('')
+      + list.map(e=>`<option value="id:${e.id}">${esc(entryCode(e))} ${e.who==='son'?'🧑':'👩'} ${esc(e.title||'무제')}</option>`).join('')
       + `<option value="${k}">↳ 이 날 ${list.length}편 합쳐서</option></optgroup>`;
   }).join('');
   if([...sel.options].some(o=>o.value===prev)) sel.value=prev;
@@ -4316,7 +4320,7 @@ function buildBrunch(){
   } else {
     const cn = cityName1(entries[0]);
     h1 = firstTitle || pickSeed([`${cn||isoLabel(dayScope)}에서의 하루`,`${cn||isoLabel(dayScope)}의 하루`,`그날의 ${cn||isoLabel(dayScope)}`,`${cn||isoLabel(dayScope)}, 그 하루의 기록`], dayScope);
-    sub = entryLabel(entries[0]);
+    sub = entries.length===1 ? entryLabelSeq(entries[0]) : entryLabel(entries[0]);
   }
   const metaLine = `${dates[0]||''}${dates.length>1?` – ${dates[dates.length-1]}`:''}${cities.length?` · ${cities.join(', ')}`:''}`;
 
@@ -7456,6 +7460,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 11-10 · 브런치 한 편씩 발행</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 11-10b · 같은 날 D2-01 번호</div>
 </body>
 </html>
