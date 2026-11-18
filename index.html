@@ -664,6 +664,29 @@
   .prep-todo strong{font-weight:800;}
   .mg-line{margin:0 0 6px !important;}
   .bc-part{margin:0 0 14px;}
+  #diaryModal{padding:0;}
+  .modal.de{max-width:none;width:100%;height:100vh;height:100dvh;max-height:none;border-radius:0;padding:0;display:flex;flex-direction:column;overflow:hidden;background:#fff;}
+  .de-top{display:flex;align-items:center;justify-content:space-between;padding:10px 12px calc(10px);padding-top:calc(10px + env(safe-area-inset-top));}
+  .de-ttl{font-size:16px;color:#333;font-weight:400;}
+  .de-ic{border:none;background:none;font-size:22px;line-height:1;color:#333;cursor:pointer;padding:8px 10px;font-family:inherit;}
+  .de-ok{font-size:24px;}
+  .de-sm{font-size:18px;color:#999;}
+  .de-row{display:flex;align-items:center;border-bottom:1px solid #eee;padding:0 6px 0 16px;}
+  .de-title{flex:1;border:none;outline:none;font-size:24px;padding:16px 0;font-family:'MaruBuri','Nanum Myeongjo',serif;color:#222;background:transparent;min-width:0;}
+  .de-sub{flex:1;border:none;outline:none;font-size:17px;padding:14px 0;color:#555;font-family:'MaruBuri','Nanum Myeongjo',serif;background:transparent;}
+  .de-title::placeholder,.de-sub::placeholder,.de-body::placeholder{color:#bbb;}
+  .de-panel{display:none;padding:10px 16px;border-bottom:1px solid #eee;background:#fafafa;font-size:13px;}
+  .de-panel.open{display:block;}
+  .de-panel-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0;}
+  .de-panel select,.de-panel input{font-size:14px;padding:6px 8px;border:1px solid #ddd;border-radius:8px;font-family:inherit;}
+  .de-body{flex:1;border:none;outline:none;resize:none;padding:18px 16px;font-size:17px;line-height:1.9;color:#222;font-family:'MaruBuri','Nanum Myeongjo',serif;width:100%;margin:0;background:transparent;}
+  body:has(#diaryModal.open) #buildStamp{display:none;}
+  .de-photos{padding:0 16px 6px;margin:0;}
+  .de-photos:empty{display:none;}
+  .de-tools{display:flex;align-items:center;gap:6px;border-top:1px solid #eee;padding:6px 10px;padding-bottom:calc(6px + env(safe-area-inset-bottom));}
+  .de-a{font-family:'Times New Roman',serif;font-size:24px;}
+  .de-count{margin-left:auto;font-size:12px;color:#999;}
+  .postit-sub{font-size:12px;color:var(--text-light);font-style:italic;margin-bottom:6px;}
   .postit-nth{display:inline-block;font-size:10px;padding:0 6px;border-radius:8px;background:rgba(0,0,0,.08);margin-left:2px;}
   .cal-day-panel{margin:8px 0 4px;padding:10px 12px;border-radius:12px;background:var(--cream,#FBF7F0);border:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
   .cdp-head{width:100%;font-size:13px;font-weight:700;display:flex;justify-content:space-between;align-items:center;}
@@ -1463,37 +1486,40 @@
 
 <!-- DIARY MODAL -->
 <div class="modal-back" id="diaryModal">
-  <div class="modal">
-    <h3 id="diaryModalTitle">✏️ 오늘의 일기</h3>
-    <div id="ddayBadge" class="dday-badge"></div>
-    <div class="row">
-      <div class="field"><label>누가</label>
+  <div class="modal de">
+    <!-- 브런치 앱 글쓰기 화면과 같은 구성: ✕ · 글쓰기 · ✓ / 제목 / 소제목 / 본문 / 하단 도구 -->
+    <div class="de-top">
+      <button class="de-ic" onclick="closeDiaryModal()" title="닫기 (쓰던 글은 임시저장돼요)">✕</button>
+      <div class="de-ttl" id="diaryModalTitle">글쓰기</div>
+      <button class="de-ic de-ok" id="dSaveBtn" onclick="saveDiary()" title="저장">✓</button>
+    </div>
+    <div class="de-row de-title-row">
+      <input id="dTitle" class="de-title" placeholder="제목" autocomplete="off">
+      <button class="de-ic de-sm" onclick="toggleDePanel()" title="글 정보 (누가·날짜)">☰</button>
+    </div>
+    <div class="de-row"><input id="dSub" class="de-sub" placeholder="소제목" autocomplete="off"></div>
+    <div class="de-panel" id="dePanel">
+      <div class="de-panel-row">
         <select id="dWho"><option value="mom">👩 엄마</option><option value="son">🧑 아들</option></select>
-      </div>
-      <div class="field"><label>날짜 (달력)</label>
         <input type="date" id="dDate" oninput="updateDDayHint()">
+        <span id="ddayBadge" class="dday-badge"></span>
       </div>
-    </div>
-    <div id="dDayHint" class="hint" style="margin:-4px 0 10px"></div>
-    <div class="field" style="margin-bottom:10px"><label>손글씨 폰트</label>
-      <select id="dFont" onchange="applyDiaryFont()"></select>
-    </div>
-    <div class="field" style="margin-bottom:10px"><label>제목</label>
-      <input id="dTitle" placeholder="예: 에펠탑 아래에서">
-    </div>
-    <div class="field" style="margin-bottom:10px"><label>오늘의 느낌</label>
-      <textarea id="dBody" rows="6" spellcheck="true" lang="ko" placeholder="지금 이 순간의 느낌을 적어보세요…"></textarea>
-    </div>
-    <div class="field" style="margin-bottom:10px"><label>사진 업로드</label>
-      <input type="file" id="dPhotos" accept="image/*" multiple onchange="handlePhotoPick(event)">
-      <button type="button" class="btn btn-ghost" style="margin-top:6px" onclick="document.getElementById('dPhotosFiles').click()" title="갤러리가 아닌 파일 선택 화면이 열려요 — 네이버 MYBOX·구글 드라이브·다운로드 폴더 등에서 고를 수 있어요">📁 파일에서 선택 (MYBOX·드라이브 등)</button>
-      <input type="file" id="dPhotosFiles" accept="*/*" multiple style="display:none" onchange="handlePhotoPick(event)">
-      <div class="photo-preview" id="photoPreview"></div>
-    </div>
-    <div class="form-actions">
-      <button class="btn btn-primary" id="dSaveBtn" onclick="saveDiary()">저장</button>
+      <div id="dDayHint" class="hint"></div>
+      <div class="de-panel-row" id="deFontRow">
+        <label class="hint" for="dFont">손글씨 폰트</label><select id="dFont" onchange="applyDiaryFont()"></select>
+      </div>
       <button class="btn btn-ghost" id="dSaveNewBtn" onclick="saveDiary(true)" style="display:none" title="원래 글은 그대로 두고, 지금 내용을 같은 날 새 글로 하나 더 저장해요">➕ 새 글로 따로 저장</button>
-      <button class="btn btn-ghost" onclick="closeDiaryModal()">취소</button>
+    </div>
+    <textarea id="dBody" class="de-body" spellcheck="true" lang="ko" placeholder="내용을 입력하세요"></textarea>
+    <div class="photo-preview de-photos" id="photoPreview"></div>
+    <div class="de-tools">
+      <button class="de-ic" onclick="document.getElementById('dPhotos').click()" title="사진 (갤러리)">🖼</button>
+      <button class="de-ic" onclick="document.getElementById('dPhotosFiles').click()" title="파일에서 사진 (MYBOX·드라이브 등)">＋</button>
+      <button class="de-ic de-a" onclick="toggleDePanel(true)" title="손글씨 폰트">A</button>
+      <button class="de-ic" onclick="toggleDePanel()" title="글 정보 (누가·날짜·새 글로 저장)">≡</button>
+      <span class="de-count" id="deCount"></span>
+      <input type="file" id="dPhotos" accept="image/*" multiple style="display:none" onchange="handlePhotoPick(event)">
+      <input type="file" id="dPhotosFiles" accept="*/*" multiple style="display:none" onchange="handlePhotoPick(event)">
     </div>
   </div>
 </div>
@@ -4050,32 +4076,34 @@ function updateDDayHint(){
   el.innerHTML = day ? `📍 <strong>D${day.d} · ${CITIES[day.city].name}</strong> (${day.date} ${day.wd}요일)` : (iso?`여행 일정 밖의 날짜예요 (${isoLabel(iso)})`:'');
   const bd=document.getElementById('ddayBadge'); if(bd) bd.textContent='✈ '+tripDday(iso||null);
 }
-function setDiarySaveButtons(editing){ const a=document.getElementById('dSaveBtn'), b=document.getElementById('dSaveNewBtn'); if(a) a.textContent=editing?'수정 저장':'저장'; if(b) b.style.display=editing?'':'none'; }
+function toggleDePanel(force){ const p=document.getElementById('dePanel'); if(!p) return; if(force===true) p.classList.add('open'); else p.classList.toggle('open'); }
+function updateDeCount(){ const el=document.getElementById('deCount'); if(!el) return; const n=(document.getElementById('dBody').value||'').replace(/\s/g,'').length; el.textContent=n?`${n.toLocaleString()}자 · 자동 임시저장`:'자동 임시저장'; }
+function setDiarySaveButtons(editing){ const a=document.getElementById('dSaveBtn'), b=document.getElementById('dSaveNewBtn'); const t=document.getElementById('diaryModalTitle'); if(t) t.textContent=editing?'글 수정':'글쓰기'; if(a) a.title=editing?'수정 저장':'저장'; if(b) b.style.display=editing?'':'none'; }
 function openDiaryModal(who){
   editingId=null; pendingPhotos=[]; setDiarySaveButtons(false);
-  document.getElementById('diaryModalTitle').textContent='✏️ 오늘의 일기';
+  document.getElementById('diaryModalTitle').textContent='글쓰기';
   document.getElementById('dDate').value = fxDateBack(0); // 오늘 날짜 자동
   document.getElementById('dWho').value = who || (settings.tigerMode?'son':'mom');
-  document.getElementById('dTitle').value=''; document.getElementById('dBody').value='';
+  document.getElementById('dTitle').value=''; document.getElementById('dSub').value=''; document.getElementById('dBody').value=''; document.getElementById('dePanel').classList.remove('open');
   document.getElementById('dBody').placeholder=pickSeed(WRITE_HINTS, fxDateBack(0));
   document.getElementById('photoPreview').innerHTML=''; document.getElementById('dPhotos').value='';
   fillFontSelect(document.getElementById('dFont')); document.getElementById('dFont').value=lastDiaryFont; applyDiaryFont();
   updateDDayHint();
   document.getElementById('ddayBadge').textContent='✈ '+tripDday(document.getElementById('dDate').value);
-  document.getElementById('diaryModal').classList.add('open');
+  document.getElementById('diaryModal').classList.add('open'); updateDeCount();
 }
 function editDiary(id){
   const e=diary.find(x=>x.id===id); if(!e) return;
   editingId=id; pendingPhotos=(e.photos||[]).map(p=>({src:p.src, cap:p.cap||'', pid:p.pid})); setDiarySaveButtons(true);
-  document.getElementById('diaryModalTitle').textContent='✏️ 일기 수정';
+  document.getElementById('diaryModalTitle').textContent='글 수정';
   document.getElementById('dWho').value=e.who;
   document.getElementById('dDate').value=e.iso || (entryDay(e)?entryDay(e).iso:DAYS[0].iso);
-  document.getElementById('dTitle').value=e.title;
+  document.getElementById('dTitle').value=e.title; document.getElementById('dSub').value=e.sub||''; document.getElementById('dePanel').classList.remove('open');
   document.getElementById('dBody').value=e.body;
   fillFontSelect(document.getElementById('dFont')); document.getElementById('dFont').value=e.font||''; applyDiaryFont();
   renderPhotoPreview(); updateDDayHint();
   document.getElementById('ddayBadge').textContent='✈ '+tripDday(document.getElementById('dDate').value);
-  document.getElementById('diaryModal').classList.add('open');
+  document.getElementById('diaryModal').classList.add('open'); updateDeCount();
 }
 function closeDiaryModal(){ saveDraftNow(); document.getElementById('diaryModal').classList.remove('open'); renderDraftBanner(); }
 
@@ -4088,13 +4116,13 @@ function clearDraft(){ clearTimeout(draftTimer); try{ localStorage.removeItem(DR
 function saveDraftNow(){
   clearTimeout(draftTimer);
   if(!diaryModalOpen()) return;
-  const title=document.getElementById('dTitle').value, body=document.getElementById('dBody').value;
+  const title=document.getElementById('dTitle').value, body=document.getElementById('dBody').value, sub=document.getElementById('dSub').value;
   const photos=pendingPhotos.filter(p=>p.pid).map(p=>({pid:p.pid, cap:p.cap||''}));
   const orig = editingId ? diary.find(x=>x.id===editingId) : null;
-  const unchanged = orig && title===(orig.title||'') && body===(orig.body||'') && photos.length===(orig.photos||[]).length;
+  const unchanged = orig && title===(orig.title||'') && sub===(orig.sub||'') && body===(orig.body||'') && photos.length===(orig.photos||[]).length;
   try{
     if((!title.trim() && !body.trim() && !photos.length) || unchanged){ localStorage.removeItem(DRAFT_KEY); }
-    else localStorage.setItem(DRAFT_KEY, JSON.stringify({ editingId, who:document.getElementById('dWho').value, iso:document.getElementById('dDate').value, font:document.getElementById('dFont').value, title, body, photos, t:Date.now() }));
+    else localStorage.setItem(DRAFT_KEY, JSON.stringify({ editingId, sub, who:document.getElementById('dWho').value, iso:document.getElementById('dDate').value, font:document.getElementById('dFont').value, title, body, photos, t:Date.now() }));
   }catch(e){}
 }
 function saveDraftSoon(){ clearTimeout(draftTimer); draftTimer=setTimeout(saveDraftNow, 400); }
@@ -4103,7 +4131,7 @@ async function resumeDraft(){
   if(d.editingId && diary.some(x=>x.id===d.editingId)) editDiary(d.editingId); else openDiaryModal(d.who);
   document.getElementById('dWho').value=d.who||document.getElementById('dWho').value;
   if(d.iso) document.getElementById('dDate').value=d.iso;
-  document.getElementById('dTitle').value=d.title||''; document.getElementById('dBody').value=d.body||'';
+  document.getElementById('dTitle').value=d.title||''; document.getElementById('dSub').value=d.sub||''; document.getElementById('dBody').value=d.body||''; updateDeCount();
   fillFontSelect(document.getElementById('dFont')); document.getElementById('dFont').value=d.font||''; applyDiaryFont(); updateDDayHint();
   pendingPhotos=[]; renderPhotoPreview();
   for(const ph of (d.photos||[])){ try{ const src=await phGet(ph.pid); if(src){ pendingPhotos.push({src, cap:ph.cap||'', pid:ph.pid}); phStored.add(ph.pid); } }catch(e){} }
@@ -4120,8 +4148,9 @@ function renderDraftBanner(){
   const who=d.who==='son'?'🧑 아들':'👩 엄마';
   el.innerHTML=`<span style="flex:1;min-width:140px">📝 <b>쓰던 일기가 있어요</b> · ${who}${d.title?` · ${esc(d.title)}`:''} <small>(${esc((d.body||'').slice(0,20))}${(d.body||'').length>20?'…':''})</small></span><button class="btn btn-primary" onclick="resumeDraft()">이어쓰기</button><button class="btn btn-ghost" onclick="discardDraft()">지우기</button>`;
 }
-['dTitle','dBody','dDate','dWho','dFont'].forEach(id=>{ const el=document.getElementById(id); if(el){ el.addEventListener('input', saveDraftSoon); el.addEventListener('change', saveDraftSoon); } });
+['dTitle','dSub','dBody','dDate','dWho','dFont'].forEach(id=>{ const el=document.getElementById(id); if(el){ el.addEventListener('input', saveDraftSoon); el.addEventListener('change', saveDraftSoon); } });
 document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') saveDraftNow(); });
+(()=>{ const b=document.getElementById('dBody'); if(b) b.addEventListener('input', updateDeCount); })();
 window.addEventListener('pagehide', saveDraftNow);
 
 
@@ -4175,7 +4204,8 @@ function saveDiary(asNew){
   if(diaryPhotoCount(who,iso,editId)+pendingPhotos.length>MAX_DIARY_PHOTOS){ toast(`사진은 하루 ${MAX_DIARY_PHOTOS}장까지예요 (이 날 이미 다른 일기에 ${diaryPhotoCount(who,iso,editId)}장)`); return; }
   const dd=ISO2DAY[iso];
   const font=document.getElementById('dFont').value; lastDiaryFont=font;
-  const fields={ who, iso, day: dd?dd.d:null, date: dd?dd.date:isoLabel(iso), title, body, font, photos:pendingPhotos.slice() };
+  const sub=(document.getElementById('dSub').value||'').trim();
+  const fields={ who, iso, day: dd?dd.d:null, date: dd?dd.date:isoLabel(iso), title, sub, body, font, photos:pendingPhotos.slice() };
   const target = editId ? diary.find(x=>x.id===editId) : null;
   if(target){ Object.assign(target, fields); }
   else { diary.push({ id:'e'+Date.now()+Math.floor(performance.now())+Math.random().toString(36).slice(2,5), createdAt:Date.now(), ...fields }); }
@@ -4261,7 +4291,7 @@ function renderDiary(){
         </div>
         <div class="postit-detail">
           <div class="postit-actions"><button onclick="event.stopPropagation();editDiary('${e.id}')" title="수정">✎</button><button onclick="event.stopPropagation();delDiary('${e.id}')" title="삭제">🗑</button></div>
-          <div class="postit-body" style="font-family:${fontCss(e.font)}">${esc(e.body)}</div>
+          ${e.sub?`<div class="postit-sub">${esc(e.sub)}</div>`:''}<div class="postit-body" style="font-family:${fontCss(e.font)}">${esc(e.body)}</div>
           ${e.photos&&e.photos.length?`<div class="postit-photos">${e.photos.map(p=>`<img src="${p.src}" title="${esc(p.cap)}" onclick="event.stopPropagation();viewImage(this.src)">`).join('')}</div>`:''}
         </div>
       </div>`).join('');
@@ -4298,7 +4328,8 @@ function buildBrunch(){
   const scope=document.getElementById('brunchScope').value;
   const voice=document.getElementById('brunchVoice').value;
   const cmp=(a,b)=> (entryKey(a)<entryKey(b)?-1:entryKey(a)>entryKey(b)?1:0) || (a.who>b.who?1:-1);
-  const one = scope.startsWith('id:') ? scope.slice(3) : null;   // 일기 한 편만 → 독립된 글
+  let one = scope.startsWith('id:') ? scope.slice(3) : null;   // 일기 한 편만 → 독립된 글
+  if(!one && scope!=='all'){ const sd=diary.filter(e=>entryKey(e)===scope); if(sd.length===1) one=sd[0].id; }   // 그날 한 편뿐이면 그 글 그대로
   let entries=diary.slice().sort(cmp);
   if(one) entries=entries.filter(e=>e.id===one);
   else if(scope!=='all') entries=entries.filter(e=>entryKey(e)===scope);
@@ -4320,7 +4351,7 @@ function buildBrunch(){
   } else {
     const cn = cityName1(entries[0]);
     h1 = firstTitle || pickSeed([`${cn||isoLabel(dayScope)}에서의 하루`,`${cn||isoLabel(dayScope)}의 하루`,`그날의 ${cn||isoLabel(dayScope)}`,`${cn||isoLabel(dayScope)}, 그 하루의 기록`], dayScope);
-    sub = entries.length===1 ? entryLabelSeq(entries[0]) : entryLabel(entries[0]);
+    sub = entries.length===1 ? (entries[0].sub || entryLabelSeq(entries[0])) : entryLabel(entries[0]);
   }
   const metaLine = `${dates[0]||''}${dates.length>1?` – ${dates[dates.length-1]}`:''}${cities.length?` · ${cities.join(', ')}`:''}`;
 
@@ -4330,6 +4361,12 @@ function buildBrunch(){
   const keys=Object.keys(byKey).sort();
 
   const isBook = scope==='all';
+  if(one){   // 한 편만 고르면 쓴 글 그대로: 제목=대제목, 소제목=소제목, 본문은 쓴 그대로(문단·줄바꿈 유지)
+    const e=entries[0]; const bl=[];
+    String(e.body||'').replace(/\r/g,'').split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean).forEach(par=>bl.push({type:'p', html:esc(par), raw:true}));
+    (e.photos||[]).forEach(p=> bl.push({type:'img', html:p.src, cap:p.cap}));
+    return { h1:e.title||h1, sub, metaLine, blocks:bl, author:'', asIs:true };
+  }
   const sonName = settings.sonName || '타이거';
   let blocks=[];
   // intro
@@ -4483,7 +4520,7 @@ function brunchLocalParts(){
     out.push(strip(b.html));
   });
   if(data.author) out.push(data.author);
-  return { h1:data.h1, sub:data.sub, meta:data.metaLine, body:mobileBreak(out.join('\n\n')), emph:pickEmph(data.blocks), alts:[], ai:false, photos:data.blocks.filter(b=>b.type==='img') };
+  return { h1:data.h1, sub:data.sub, meta:data.metaLine, body:data.asIs?out.join('\n\n'):mobileBreak(out.join('\n\n')), emph:pickEmph(data.blocks), alts:[], ai:false, photos:data.blocks.filter(b=>b.type==='img') };
 }
 function parseAiBrunch(out){
   const sec={}; let cur='본문';
@@ -7460,6 +7497,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 11-10b · 같은 날 D2-01 번호</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 11-18 · 브런치식 글쓰기 화면</div>
 </body>
 </html>
