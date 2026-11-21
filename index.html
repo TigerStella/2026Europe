@@ -4054,6 +4054,10 @@ const DIARY_FONTS = [
   { id:'gw-modu-bold', name:'강원교육 모두 볼드', css:"'gw-modu-bold','Noto Sans KR',cursive" },
 ];
 let lastDiaryFont = '';
+// 작성자별 기본 손글씨: 엄마=강원교육 모두 볼드, 아이=강원교육 튼튼
+const WHO_FONT = { mom:'gw-modu-bold', son:'gw-teunteun' };
+function entryFont(e){ return (e && e.font) || WHO_FONT[e && e.who] || ''; }
+function syncFontToWho(){ const w=document.getElementById('dWho').value, f=document.getElementById('dFont'); if(Object.values(WHO_FONT).includes(f.value) || !f.value){ f.value=WHO_FONT[w]||''; applyDiaryFont(); } }
 function fontCss(id){ const f=DIARY_FONTS.find(x=>x.id===id); return f?f.css:DIARY_FONTS[0].css; }
 function fillFontSelect(sel){ sel.innerHTML=DIARY_FONTS.map(f=>`<option value="${f.id}" style="font-family:${f.css}">${f.name}</option>`).join(''); }
 function applyDiaryFont(){ const css=fontCss(document.getElementById('dFont').value); document.getElementById('dBody').style.fontFamily=css; document.getElementById('dTitle').style.fontFamily=css; }
@@ -4087,7 +4091,7 @@ function openDiaryModal(who){
   document.getElementById('dTitle').value=''; document.getElementById('dSub').value=''; document.getElementById('dBody').value=''; document.getElementById('dePanel').classList.remove('open');
   document.getElementById('dBody').placeholder=pickSeed(WRITE_HINTS, fxDateBack(0));
   document.getElementById('photoPreview').innerHTML=''; document.getElementById('dPhotos').value='';
-  fillFontSelect(document.getElementById('dFont')); document.getElementById('dFont').value=lastDiaryFont; applyDiaryFont();
+  fillFontSelect(document.getElementById('dFont')); document.getElementById('dFont').value=WHO_FONT[document.getElementById('dWho').value]||''; applyDiaryFont();
   updateDDayHint();
   document.getElementById('ddayBadge').textContent='✈ '+tripDday(document.getElementById('dDate').value);
   document.getElementById('diaryModal').classList.add('open'); updateDeCount();
@@ -4100,7 +4104,7 @@ function editDiary(id){
   document.getElementById('dDate').value=e.iso || (entryDay(e)?entryDay(e).iso:DAYS[0].iso);
   document.getElementById('dTitle').value=e.title; document.getElementById('dSub').value=e.sub||''; document.getElementById('dePanel').classList.remove('open');
   document.getElementById('dBody').value=e.body;
-  fillFontSelect(document.getElementById('dFont')); document.getElementById('dFont').value=e.font||''; applyDiaryFont();
+  fillFontSelect(document.getElementById('dFont')); document.getElementById('dFont').value=entryFont(e); applyDiaryFont();
   renderPhotoPreview(); updateDDayHint();
   document.getElementById('ddayBadge').textContent='✈ '+tripDday(document.getElementById('dDate').value);
   document.getElementById('diaryModal').classList.add('open'); updateDeCount();
@@ -4286,12 +4290,12 @@ function renderDiary(){
       <div class="postit ${who}" id="pit-${e.id}">
         <div class="postit-head" onclick="togglePostit('${e.id}')">
           <span class="postit-date">${esc(entryLabelSeq(e))}${entryKey(e)!=='9999'?` <span class="postit-dday">${esc(tripDday(entryKey(e)))}</span>`:''}</span>
-          <span class="postit-titleline" style="font-family:${fontCss(e.font)}">${e.title?esc(e.title):'<i>무제</i>'}</span>
+          <span class="postit-titleline" style="font-family:${fontCss(entryFont(e))}">${e.title?esc(e.title):'<i>무제</i>'}</span>
           <span class="postit-caret">▾</span>
         </div>
         <div class="postit-detail">
           <div class="postit-actions"><button onclick="event.stopPropagation();editDiary('${e.id}')" title="수정">✎</button><button onclick="event.stopPropagation();delDiary('${e.id}')" title="삭제">🗑</button></div>
-          ${e.sub?`<div class="postit-sub">${esc(e.sub)}</div>`:''}<div class="postit-body" style="font-family:${fontCss(e.font)}">${esc(e.body)}</div>
+          ${e.sub?`<div class="postit-sub">${esc(e.sub)}</div>`:''}<div class="postit-body" style="font-family:${fontCss(entryFont(e))}">${esc(e.body)}</div>
           ${e.photos&&e.photos.length?`<div class="postit-photos">${e.photos.map(p=>`<img src="${p.src}" title="${esc(p.cap)}" onclick="event.stopPropagation();viewImage(this.src)">`).join('')}</div>`:''}
         </div>
       </div>`).join('');
@@ -7389,6 +7393,9 @@ function renderPassport(){
 init();
 try{ gdriveInit(); }catch(e){}
 try{ trhLastViewInit(); }catch(e){}
+// 일기 폰트 일괄 변경(1회): 엄마=강원교육 모두 볼드, 아이=강원교육 튼튼
+(function fontFix1121(){ const K='noleu_fontfix_1121'; try{ if(localStorage.getItem(K)) return; let n=0; diary.forEach(e=>{ const f=WHO_FONT[e.who]; if(f && e.font!==f){ e.font=f; n++; } }); if(n) save(LS.diary, diary); localStorage.setItem(K,'1'); }catch(e){} })();
+document.getElementById('dWho').addEventListener('change', syncFontToWho);
 hydrateDiaryPhotos();
 try{ if(loadDraft()){ renderDraftBanner(); toast('📝 쓰던 일기가 있어요 — 일기 탭에서 이어쓰기'); } }catch(e){}
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
@@ -7497,6 +7504,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigato
   </div>
 </div>
 
-<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 11-18 · 브런치식 글쓰기 화면</div>
+<div id="buildStamp" style="position:fixed;left:8px;bottom:8px;z-index:9999;font-size:10px;line-height:1;color:rgba(120,120,140,.78);background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:4px 7px;pointer-events:none;font-family:-apple-system,system-ui,sans-serif;">빌드 11-21 · 일기 폰트 일괄(엄마 모두볼드·아이 튼튼)</div>
 </body>
 </html>
